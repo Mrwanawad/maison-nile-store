@@ -127,7 +127,7 @@
             <th class="px-3 py-2.5 text-start font-semibold">Stock</th>
             <th class="px-3 py-2.5 text-start font-semibold">Price override (EGP)</th>
             <th class="px-3 py-2.5 text-start font-semibold">SKU</th>
-            <th class="px-3 py-2.5 text-start font-semibold">On sale</th>
+            <th class="px-3 py-2.5 text-start font-semibold">Offered</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-line">
@@ -143,7 +143,7 @@
             </td>
             <td class="px-3 py-2"><input name="stock_{{ v.id }}" type="number" min="0" value="{{ v.stock }}" class="field w-24 py-1.5 {% if v.stock == 0 and v.is_active %}border-danger/50{% endif %}" aria-label="Stock"></td>
             <td class="px-3 py-2"><input name="price_{{ v.id }}" inputmode="decimal" value="{{ egp(v.price_override_piasters) if v.price_override_piasters else '' }}" placeholder="{{ egp(product.price_piasters) }}" class="field w-28 py-1.5" aria-label="Price override"></td>
-            <td class="px-3 py-2"><input name="sku_{{ v.id }}" value="{{ v.sku }}" class="field w-48 py-1.5 font-mono text-xs" aria-label="SKU" dir="ltr"></td>
+            <td class="px-3 py-2"><input name="sku_{{ v.id }}" value="{{ v.sku }}" class="field w-60 py-1.5 font-mono text-xs" aria-label="SKU" dir="ltr"></td>
             <td class="px-3 py-2"><input type="checkbox" name="active_{{ v.id }}" class="size-4 accent-[var(--color-ink)]" {% if v.is_active %}checked{% endif %} aria-label="Offered"></td>
           </tr>
           {% endfor %}

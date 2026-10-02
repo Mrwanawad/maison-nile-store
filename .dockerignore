@@ -1,0 +1,14 @@
+.git
+.venv
+node_modules
+media
+.env
+.env.*
+!.env.example
+**/__pycache__
+.mypy_cache
+.ruff_cache
+.pytest_cache
+app/static/css/app.css
+app/static/vendor
+app/static/fonts

@@ -1,6 +1,6 @@
 # DESIGN.md: Local Brand E-commerce Store (MVP)
 
-> Single source of truth for the build. Follow it in order. If something here conflicts with official third-party docs (Paymob, Supabase, Render, Preline), **the official docs win**: verify, never guess an API.
+> Single source of truth for the build. **Section 15 records the v1 decisions (2026-10-02) and overrides earlier sections where they differ.** Follow it in order. If something here conflicts with official third-party docs (Paymob, Supabase, Render, Preline), **the official docs win**: verify, never guess an API.
 
 ---
 
@@ -411,3 +411,30 @@ Use Supabase's **connection pooler** URL (transaction mode) and disable asyncpg 
 - Shipping: flat fee or per-city? Which cities are served?
 - Product variants needed (sizes/colors)? *(Not in v1 schema; adding them later means a `product_variants` table.)*
 - Return/exchange policy text and contact channels (WhatsApp, Instagram).
+
+---
+
+## 15. v1 decisions (2026-10-02, override the sections above)
+
+### Scope added to v1
+- **Bilingual EN/AR.** English at `/`, Arabic at `/ar/...` (RTL). UI text in `app/locales/{en,ar}.json`; product/category/color/size names stored in both languages. Arabic fonts: Alexandria (headings) + IBM Plex Sans Arabic (body). Admin is English only.
+- **Variants.** Global `sizes` table (grouped: apparel, waist, ...), per-product `product_colors`, and `product_variants` = product × color × size with its own SKU, stock and optional price override (`UNIQUE NULLS NOT DISTINCT`). `product_images.color_id` ties photos to a color. Products have no stock column.
+- **Categories, search, filters** (category, size, in stock, sort) and compare-at sale prices.
+- **Admin product management** (create/edit, colors, sizes, variant stock grid, photo upload → WebP), categories, sizes, COD phone blocklist, order notes, audit trail (`order_events`). Admins live in `admin_users` (bcrypt), created with `scripts/create_admin.py`.
+- **Orders keep a copy of the shipping details** (`ship_*` columns); `customers` holds the latest details per phone.
+- **Shipping** per governorate from `.env`: `SHIPPING_DEFAULT_FEE_EGP=100`, `SHIPPING_FEE_OVERRIDES=alexandria:50`. 27 governorates in `app/utils/governorates.py`.
+- **COD protection** (`.env`): max COD order total, max open COD orders per phone, phone blocklist, honeypot, rate limits. SMS OTP is an interface only (`OTP_PROVIDER=none`).
+- **Notifications** (background tasks, never block checkout): Telegram to the owners; customer confirmation email via Brevo (or Resend once a domain exists).
+- **Bosta**: "Create shipment" in admin; tracking number stored and shown to the customer.
+- **Refunds** from admin via Paymob's refund API.
+- **JSON API** `/api/v1` (products, categories, shipping rates, create/get order) sharing the same services.
+
+### Implementation choices that differ from earlier sections
+- `place_order` is implemented in Python (`order_service.place_order`) as one transaction that locks variant rows with `SELECT ... FOR UPDATE` in id order, reads prices from the locked rows and decrements stock. No SQL function. Concurrency is covered by tests.
+- Paymob: one order may have several payment attempts (`special_reference = <order_id>~<attempt>`), every transaction is stored in `payment_transactions` (unique Paymob id = idempotency). A failed attempt keeps the order pending so the customer can retry; the cleanup job cancels it after `UNPAID_ORDER_TIMEOUT_MIN`. The return redirect is not trusted: if the webhook has not arrived, the app asks Paymob's inquiry API (needs `PAYMOB_API_KEY`). A payment arriving after cancellation re-reserves stock or is flagged for refund.
+- CSRF uses a synchronizer token stored in the signed session (form field or `X-CSRF-Token` header).
+- Only Preline's overlay plugin is shipped (cart drawer, mobile menu); the gallery is CSS scroll-snap.
+- Architecture folders: `controllers/` (C), `views/` (V), `models/` (M) plus `services/`, `repositories/`, `integrations/`, `schemas/`, `utils/`, `core/`.
+
+### Deferred (future versions)
+Meta Pixel / Conversions API, GA4, sitemap / Open Graph / structured data / product feeds, SMS OTP provider, Bosta status webhooks, customer accounts, discounts.

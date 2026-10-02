@@ -22,6 +22,7 @@
         <figure class="relative aspect-[4/5] w-[85%] shrink-0 snap-center overflow-hidden rounded-xs bg-sand md:w-auto {% if loop.first %}md:col-span-2{% endif %}"
                 data-image-color="{{ img.color_id or '' }}">
           <img src="{{ img.url }}" alt="{{ localized(img, 'alt') or name }}" width="{{ img.width }}" height="{{ img.height }}"
+               {% if srcset(img.url) %}srcset="{{ srcset(img.url) }}" sizes="(min-width: 768px) {{ '55vw' if loop.first else '28vw' }}, 85vw"{% endif %}
                {% if loop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async" class="size-full object-cover">
         </figure>
         {% else %}
@@ -41,7 +42,7 @@
           <p class="price font-display text-2xl {% if product.compare_at_piasters %}text-accent{% endif %}" data-price>{{ price(product.price_piasters) }}</p>
           {% if product.compare_at_piasters %}
             <s class="price text-ink-soft">{{ price(product.compare_at_piasters) }}</s>
-            <span class="label-caps rounded-xs bg-accent px-2 py-1 text-white">−{{ card.percent_off }}%</span>
+            <span class="label-caps rounded-xs bg-accent px-2 py-1 text-white" dir="ltr">−{{ card.percent_off }}%</span>
           {% endif %}
         </div>
         <p class="mt-2 text-sm text-ink-soft">{{ t("product.shipping_from", fee=price(shipping_from)) }}</p>

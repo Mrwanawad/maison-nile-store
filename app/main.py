@@ -8,8 +8,11 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
+from starlette.responses import Response
+from starlette.types import Scope
 
 from app.controllers import system
 from app.controllers.admin import auth as admin_auth
@@ -29,6 +32,20 @@ from app.services import nav_cache, shipping_service
 
 log = logging.getLogger("app")
 STATIC_DIR = Path(__file__).resolve().parent / "static"
+
+
+class CachedStatic(StaticFiles):
+    """Static files with browser caching. URLs carry ?v=<version>, so they can be immutable."""
+
+    def __init__(self, *args: object, max_age: int, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)  # type: ignore[arg-type]
+        self.max_age = max_age
+
+    async def get_response(self, path: str, scope: Scope) -> Response:
+        response = await super().get_response(path, scope)
+        if response.status_code == 200:
+            response.headers["Cache-Control"] = f"public, max-age={self.max_age}, immutable"
+        return response
 
 
 def _check_config() -> None:
@@ -92,6 +109,7 @@ def create_app() -> FastAPI:
     register_error_handlers(app)
 
     # Middleware: last added runs first.
+    app.add_middleware(GZipMiddleware, minimum_size=800)
     app.add_middleware(
         SessionMiddleware,
         secret_key=s.secret_key,
@@ -103,10 +121,10 @@ def create_app() -> FastAPI:
     app.add_middleware(LocaleMiddleware)
     app.add_middleware(RequestContextMiddleware)
 
-    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+    app.mount("/static", CachedStatic(directory=STATIC_DIR, max_age=31536000), name="static")
     if s.storage_backend == "local":
         MEDIA_ROOT.mkdir(exist_ok=True)
-        app.mount("/media", StaticFiles(directory=MEDIA_ROOT), name="media")
+        app.mount("/media", CachedStatic(directory=MEDIA_ROOT, max_age=604800), name="media")
 
     for module in (
         system,

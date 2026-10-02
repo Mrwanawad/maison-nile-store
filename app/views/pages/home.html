@@ -13,7 +13,8 @@
   </div>
   <div class="md:col-span-7">
     <div class="relative aspect-[4/5] overflow-hidden rounded-md bg-sand sm:aspect-[5/4] md:aspect-[4/3.6]">
-      <img src="{{ settings.hero_image_url or static('img/placeholder.svg') }}" alt="{{ t('home.hero_alt') }}"
+      {% set hero = settings.hero_image_url or static('img/placeholder.svg') %}
+      <img src="{{ hero }}" alt="{{ t('home.hero_alt') }}" {% if srcset(hero) %}srcset="{{ srcset(hero) }}" sizes="(min-width: 768px) 55vw, 92vw"{% endif %}
            width="1200" height="1080" fetchpriority="high" class="size-full object-cover">
     </div>
   </div>

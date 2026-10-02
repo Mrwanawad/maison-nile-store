@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote
@@ -28,6 +29,25 @@ settings = get_settings()
 
 def _static(path: str) -> str:
     return f"/static/{path}?v={settings.app_version}"
+
+
+_UNSPLASH = re.compile(r"^https://images\.unsplash\.com/")
+SMALL_SUFFIX = "-480.webp"
+
+
+def _srcset(url: str) -> str:
+    """Responsive candidates: Unsplash width params, or our own 480px upload variant."""
+    if _UNSPLASH.match(url):
+        base = re.sub(r"([?&])w=\d+", lambda m: m.group(1) + "w={w}", url)
+        base = re.sub(r"([?&])h=\d+", lambda m: m.group(1) + "h={h}", base)
+        if "{w}" not in base:
+            return ""
+        return ", ".join(
+            f"{base.format(w=w, h=round(w * 1.25))} {w}w" for w in (360, 540, 720, 1000)
+        )
+    if url.endswith(".webp") and "/products/" in url and not url.endswith(SMALL_SUFFIX):
+        return f"{url[: -len('.webp')]}{SMALL_SUFFIX} 480w, {url} 1280w"
+    return ""
 
 
 def _price(piasters: int) -> str:
@@ -87,6 +107,7 @@ env.globals.update(
     url=url,
     static=_static,
     price=_price,
+    srcset=_srcset,
     percent_off=percent_off,
     localized=localized,
     locale=get_locale,

@@ -129,8 +129,8 @@ async def apply_transaction(db: AsyncSession, txn: paymob.Transaction) -> Paymen
         return PaymentResult(None, Outcome.ignored)
     if txn.pending or txn.is_refund or txn.is_voided:
         # Refunds are recorded by the refund flow; pending txns will be re-sent.
-        await db.rollback()
-        return PaymentResult(order.id, Outcome.ignored)
+        await db.rollback()  # expires `order`; use the plain id below
+        return PaymentResult(order_id, Outcome.ignored)
 
     is_new = await order_repo.record_transaction(
         db,
@@ -143,8 +143,8 @@ async def apply_transaction(db: AsyncSession, txn: paymob.Transaction) -> Paymen
         raw=txn.raw,
     )
     if not is_new:
-        await db.rollback()
-        return PaymentResult(order.id, Outcome.ignored)
+        await db.rollback()  # expires `order`; use the plain id below
+        return PaymentResult(order_id, Outcome.ignored)
 
     if txn.success and (txn.amount_cents != order.total_piasters or txn.currency != "EGP"):
         order.events.append(

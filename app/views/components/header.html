@@ -1,7 +1,7 @@
 {% from "components/icons.html" import icon %}
 <header class="sticky top-0 z-30 border-b border-line bg-bone/95 backdrop-blur-[2px]">
   <div class="container-page flex h-16 items-center gap-4 md:h-[72px]">
-    <button type="button" class="-ms-2 p-2 md:hidden" aria-haspopup="dialog" aria-expanded="false" aria-controls="mobile-nav" data-hs-overlay="#mobile-nav" aria-label="{{ t('nav.menu') }}">
+    <button type="button" class="-ms-2 p-2 lg:hidden" aria-haspopup="dialog" aria-expanded="false" aria-controls="mobile-nav" data-hs-overlay="#mobile-nav" aria-label="{{ t('nav.menu') }}">
       {{ icon("menu", "size-6") }}
     </button>
 
@@ -9,11 +9,11 @@
       {% if settings.brand_logo_url %}
         <img src="{{ settings.brand_logo_url }}" alt="{{ brand_name() }}" class="h-8 w-auto md:h-9" width="120" height="36">
       {% else %}
-        <span class="font-display text-[22px] font-medium tracking-tight md:text-[26px]">{{ brand_name() }}</span>
+        <span class="whitespace-nowrap font-display text-[22px] font-medium tracking-tight md:text-[26px]">{{ brand_name() }}</span>
       {% endif %}
     </a>
 
-    <nav class="ms-8 hidden items-center gap-7 md:flex" aria-label="{{ t('nav.main') }}">
+    <nav class="ms-8 hidden items-center gap-6 whitespace-nowrap lg:flex xl:gap-7" aria-label="{{ t('nav.main') }}">
       <a href="{{ url('/shop') }}" class="text-[15px] font-medium text-ink-soft transition-colors hover:text-ink">{{ t("nav.shop_all") }}</a>
       {% for c in nav_categories()[:4] %}
       <a href="{{ url('/c/' ~ c.slug) }}" class="text-[15px] font-medium text-ink-soft transition-colors hover:text-ink">{{ c.name(locale()) }}</a>

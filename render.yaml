@@ -1,0 +1,31 @@
+# Render Blueprint: one free Docker web service. Secrets are set in the Render
+# dashboard (sync: false) and never committed.
+services:
+  - type: web
+    name: brand-store
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: STORAGE_BACKEND
+        value: supabase
+      - key: DATABASE_USE_POOLER
+        value: "true"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: INTERNAL_CRON_TOKEN
+        generateValue: true
+      - key: BASE_URL
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false

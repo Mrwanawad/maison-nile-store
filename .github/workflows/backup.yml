@@ -1,0 +1,33 @@
+# Nightly database backup (Supabase free tier has no backups).
+# Secrets: BACKUP_DATABASE_URL (direct postgres:// URL, port 5432), BACKUP_PASSPHRASE.
+name: Nightly backup
+
+on:
+  schedule:
+    - cron: "15 1 * * *"   # 03:15 Cairo time (UTC+2)
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client
+      - name: Dump and encrypt
+        env:
+          DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+          PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          file="backup-$(date -u +%Y%m%d-%H%M).sql.gz"
+          pg_dump --no-owner --no-privileges "$DATABASE_URL" | gzip -9 > "$file"
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$PASSPHRASE" -c "$file"
+          rm "$file"
+          ls -lh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: db-backup
+          path: "*.gpg"
+          retention-days: 14

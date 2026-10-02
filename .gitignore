@@ -12,6 +12,7 @@ htmlcov/
 node_modules/
 app/static/css/app.css
 app/static/vendor/
+app/static/fonts/
 
 # Local data
 .env

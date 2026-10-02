@@ -260,8 +260,11 @@ async def upload_images(
             webp, width, height = to_webp(data, s.image_max_size_px, s.image_quality)
         except InvalidImage:
             raise AppError("admin.error.image_invalid") from None
-        key = f"products/{product.slug}/{uuid.uuid4().hex[:12]}.webp"
+        small, _, _ = to_webp(data, 480, s.image_quality)
+        name = uuid.uuid4().hex[:12]
+        key = f"products/{product.slug}/{name}.webp"
         try:
+            await storage.put(f"products/{product.slug}/{name}-480.webp", small, "image/webp")
             url = await storage.put(key, webp, "image/webp")
         except IntegrationError:
             raise AppError("admin.error.image_upload", status_code=502) from None
@@ -339,7 +342,10 @@ async def delete_image(db: AsyncSession, product_id: uuid.UUID, image_id: uuid.U
     url = image.url
     await db.delete(image)
     await db.commit()
-    await get_storage().delete(url)
+    storage = get_storage()
+    await storage.delete(url)
+    if url.endswith(".webp"):
+        await storage.delete(url[: -len(".webp")] + "-480.webp")
 
 
 # --- Categories ----------------------------------------------------------------

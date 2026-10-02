@@ -31,7 +31,7 @@
         <div class="flex justify-between"><dt class="text-ink-soft">Delivery</dt><dd class="price">{{ egp(order.shipping_piasters) }}</dd></div>
         <div class="flex justify-between text-base font-semibold"><dt>Total</dt><dd class="price">{{ egp(order.total_piasters) }}</dd></div>
         {% if order.refunded_piasters %}<div class="flex justify-between text-accent-ink"><dt>Refunded</dt><dd class="price">−{{ egp(order.refunded_piasters) }}</dd></div>{% endif %}
-        {% if order.payment_method.value == "cod" and order.payment_status.value != "paid" %}
+        {% if order.payment_method.value == "cod" and order.payment_status.value != "paid" and order.status.value != "cancelled" %}
         <div class="flex justify-between pt-2 text-ink-soft"><dt>Courier collects</dt><dd class="price font-medium text-ink">{{ egp(order.total_piasters) }}</dd></div>
         {% endif %}
       </dl>
