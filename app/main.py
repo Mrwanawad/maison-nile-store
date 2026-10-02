@@ -7,6 +7,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
+import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -68,15 +69,16 @@ def _check_config() -> None:
 
 
 def _init_sentry() -> None:
-    dsn = get_settings().sentry_dsn
-    if not dsn:
-        return
-    try:
-        import sentry_sdk  # type: ignore[import-not-found]
-    except ImportError:
-        log.warning("SENTRY_DSN set but sentry-sdk is not installed")
-        return
-    sentry_sdk.init(dsn=dsn, release=get_settings().app_version, traces_sample_rate=0.0)
+    s = get_settings()
+    if s.sentry_dsn:
+        # Error reports only (no performance tracing) to stay inside the free tier.
+        sentry_sdk.init(
+            dsn=s.sentry_dsn,
+            release=s.app_version,
+            environment=s.app_env,
+            traces_sample_rate=0.0,
+            send_default_pii=False,
+        )
 
 
 @asynccontextmanager

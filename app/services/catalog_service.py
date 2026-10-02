@@ -64,10 +64,6 @@ def variant_label(variant: ProductVariant, locale: str | None = None) -> str:
     return " / ".join(parts)
 
 
-def sellable(variant: ProductVariant) -> bool:
-    return variant.is_active and variant.stock > 0 and variant.product.is_active
-
-
 def _images_for_color(product: Product, color_id: uuid.UUID | None) -> list[ProductImage]:
     if color_id is None:
         return list(product.images)

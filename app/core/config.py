@@ -63,6 +63,7 @@ class Settings(BaseSettings):
     shipping_fee_overrides: str = "alexandria:50"
     delivery_days_min: int = 2
     delivery_days_max: int = 5
+    exchange_days: int = Field(14, ge=0)
 
     # Checkout / COD
     cod_enabled: bool = True

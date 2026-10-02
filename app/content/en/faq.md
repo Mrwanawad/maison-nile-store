@@ -16,4 +16,4 @@ Use the [order tracking page](/track) with your order number and mobile number.
 Message us as soon as possible on WhatsApp. If it hasn't shipped yet, we can change or cancel it.
 
 ### What if the size doesn't fit?
-You can exchange it within 14 days. See [delivery & exchanges](/pages/shipping-returns).
+You can exchange it within {exchange_days} days. See [delivery & exchanges](/pages/shipping-returns).

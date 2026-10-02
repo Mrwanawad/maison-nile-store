@@ -8,6 +8,7 @@
     <a href="{{ url('/shop') }}" class="btn btn-secondary" data-back>{{ t("common.go_back") }}</a>
     <a href="{{ url('/') }}" class="btn btn-ghost">{{ t("nav.home") }}</a>
   </div>
+  {% if status_code >= 500 and reference != "-" %}<p class="mt-6 text-sm text-ink-soft">{{ t("error.reference") }} <code dir="ltr">{{ reference }}</code></p>{% endif %}
   {% if settings.whatsapp_number %}
   <p class="mt-10 text-sm text-ink-soft">{{ t("error.contact") }} <a href="{{ whatsapp_link() }}" class="link" target="_blank" rel="noopener">WhatsApp</a></p>
   {% endif %}

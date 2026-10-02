@@ -1,6 +1,6 @@
 # Local development: Postgres + the app with auto-reload + Tailwind watcher.
 #   docker compose up -d db        # database only (run the app with uv on the host)
-#   docker compose up              # everything
+#   docker compose up              # everything (db, app on :8000, CSS watcher)
 services:
   db:
     image: postgres:16-alpine
@@ -46,7 +46,6 @@ services:
     volumes:
       - ./:/srv
       - /srv/node_modules
-    profiles: ["full"]
 
 volumes:
   pgdata:

@@ -108,7 +108,9 @@ async def start_checkout(db: AsyncSession, order_id: uuid.UUID) -> str:
             extras={"order_number": order.order_number},
         )
     except IntegrationError:
-        await db.rollback()
+        # Commit (not roll back) so the attempt is recorded and callers' objects stay usable.
+        order.events.append(OrderEvent(kind="payment", actor="system", note="payment page failed"))
+        await db.commit()
         raise AppError("payment.error.unavailable", status_code=502) from None
     order.paymob_intention_id = intention.id
     order.paymob_order_id = intention.paymob_order_id

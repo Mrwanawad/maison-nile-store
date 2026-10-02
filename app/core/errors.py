@@ -13,7 +13,8 @@ from fastapi.responses import JSONResponse, RedirectResponse, Response
 from slowapi.errors import RateLimitExceeded
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.core.i18n import t
+from app.core.i18n import current_locale, strip_locale, t
+from app.core.logging import request_id_var
 
 log = logging.getLogger("app.errors")
 
@@ -73,7 +74,10 @@ def _render_error_page(request: Request, status_code: int, message: str) -> Resp
 
     template = "pages/404.html" if status_code == 404 else "pages/error.html"
     return templates.TemplateResponse(
-        request, template, {"status_code": status_code, "message": message}, status_code=status_code
+        request,
+        template,
+        {"status_code": status_code, "message": message, "reference": request_id_var.get()},
+        status_code=status_code,
     )
 
 
@@ -82,7 +86,7 @@ def _respond(request: Request, status_code: int, code: str, message: str) -> Res
         request.url.path.startswith("/admin/")
         and request.method == "POST"
         and not is_htmx(request)
-        and status_code < 500
+        and status_code != 500  # 502 = third-party failure: show it on the page too
         and "session" in request.scope
     ):
         # Admin forms: show the problem on the page the admin came from.
@@ -102,7 +106,7 @@ def _respond(request: Request, status_code: int, code: str, message: str) -> Res
 def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(AppError)
     async def _app_error(request: Request, exc: AppError) -> Response:
-        return _respond(request, exc.status_code, exc.key, exc.message)
+        return _respond(request, exc.status_code, exc.key.rsplit(".", 1)[-1], exc.message)
 
     @app.exception_handler(StarletteHTTPException)
     async def _http_error(request: Request, exc: StarletteHTTPException) -> Response:
@@ -143,5 +147,15 @@ def register_error_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(Exception)
     async def _unhandled(request: Request, exc: Exception) -> Response:
-        log.exception("unhandled error", extra={"ctx": {"path": request.url.path}})
-        return _respond(request, 500, "server_error", t("error.server"))
+        # Runs outside the locale/request-id middleware, so restore both from the scope.
+        rid = request.scope.get("state", {}).get("request_id", "-")
+        locale, _ = strip_locale(request.url.path)
+        rid_token, locale_token = request_id_var.set(rid), current_locale.set(locale)
+        try:
+            log.exception("unhandled error", extra={"ctx": {"path": request.url.path}})
+            response = _respond(request, 500, "server_error", t("error.server"))
+            response.headers["X-Request-ID"] = rid
+            return response
+        finally:
+            request_id_var.reset(rid_token)
+            current_locale.reset(locale_token)

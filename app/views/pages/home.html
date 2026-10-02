@@ -46,7 +46,7 @@
     <div class="bg-bone p-6 md:p-8">
       {{ icon(ic, "size-6 text-accent") }}
       <p class="mt-4 font-medium">{{ t("home.promise." ~ key ~ ".title") }}</p>
-      <p class="mt-1 text-sm text-ink-soft">{{ t("home.promise." ~ key ~ ".body", min=settings.delivery_days_min, max=settings.delivery_days_max) }}</p>
+      <p class="mt-1 text-sm text-ink-soft">{{ t("home.promise." ~ key ~ ".body", min=settings.delivery_days_min, max=settings.delivery_days_max, days=settings.exchange_days) }}</p>
     </div>
     {% endfor %}
   </div>

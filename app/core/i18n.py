@@ -15,7 +15,6 @@ from typing import Any, Literal
 from starlette.types import ASGIApp, Receive, Scope, Send
 
 Locale = Literal["en", "ar"]
-LOCALES: tuple[Locale, ...] = ("en", "ar")
 RTL_LOCALES = {"ar"}
 _LOCALES_DIR = Path(__file__).resolve().parent.parent / "locales"
 

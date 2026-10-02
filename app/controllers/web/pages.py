@@ -38,6 +38,7 @@ def _load(locale: str, slug: str) -> tuple[str, Markup] | None:
         "{whatsapp}": s.whatsapp_number,
         "{delivery_min}": str(s.delivery_days_min),
         "{delivery_max}": str(s.delivery_days_max),
+        "{exchange_days}": str(s.exchange_days),
     }
     for key, value in replacements.items():
         text = text.replace(key, value)

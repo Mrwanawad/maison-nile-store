@@ -21,7 +21,14 @@ UNSAFE_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
 # --- CSRF (synchronizer token stored in the signed session cookie) ----------
 
 
+def has_session(request: Request) -> bool:
+    """False while rendering the last-resort 500 page (runs outside the session layer)."""
+    return "session" in request.scope
+
+
 def csrf_token(request: Request) -> str:
+    if not has_session(request):
+        return ""
     token = request.session.get(CSRF_SESSION_KEY)
     if not isinstance(token, str):
         token = secrets.token_urlsafe(32)

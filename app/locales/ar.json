@@ -52,7 +52,7 @@
   "home.promise.payment.title": "ادفع بالطريقة التي تناسبك",
   "home.promise.payment.body": "الدفع عند الاستلام أو أونلاين بأمان.",
   "home.promise.returns.title": "استبدال سهل",
-  "home.promise.returns.body": "المقاس غير مناسب؟ استبدله خلال 14 يوماً.",
+  "home.promise.returns.body": "المقاس غير مناسب؟ استبدله خلال {days} يوماً.",
   "home.story_title": "كميات صغيرة، صُنعت في مصر.",
   "home.story_body": "تعمل {brand} مع ورش محلية لصناعة ملابس نحب أن نرتديها كل يوم: خامات صادقة، قصّات مدروسة، ولا شيء يُصنع بكميات ضخمة ليبقى على الرف.",
   "home.story_cta": "اقرأ قصتنا",
@@ -74,7 +74,7 @@
   "product.shipping_from": "التوصيل يبدأ من {fee}",
   "product.delivery_note": "يصلك خلال {min}-{max} أيام عمل في أي مكان في مصر.",
   "product.payment_note": "ادفع عند الاستلام أو أونلاين.",
-  "product.returns_note": "استبدال المقاس مجاناً خلال 14 يوماً.",
+  "product.returns_note": "استبدال المقاس مجاناً خلال {days} يوماً.",
   "product.details": "التفاصيل",
   "product.ask_whatsapp": "عندك سؤال؟ اسألنا على واتساب",
   "product.whatsapp_message": "مرحباً! أنا مهتم بـ {name}: {url}",
@@ -218,5 +218,6 @@
   "error.validation": "من فضلك راجع البيانات وحاول مرة أخرى.",
   "error.rate_limited": "محاولات كثيرة. من فضلك انتظر دقيقة وحاول مرة أخرى.",
   "error.csrf": "انتهت الجلسة. من فضلك حدّث الصفحة وحاول مرة أخرى.",
-  "error.contact": "إذا تكررت المشكلة، راسلنا على"
+  "error.contact": "إذا تكررت المشكلة، راسلنا على",
+  "error.reference": "رقم مرجع الخطأ:"
 }

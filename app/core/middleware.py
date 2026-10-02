@@ -47,6 +47,8 @@ class RequestContextMiddleware:
 
         rid = uuid.uuid4().hex[:12]
         token = request_id_var.set(rid)
+        # Also kept on the scope: the last-resort error handler runs after the context var resets.
+        scope.setdefault("state", {})["request_id"] = rid
         started = time.perf_counter()
         status_holder = {"code": 500}
 

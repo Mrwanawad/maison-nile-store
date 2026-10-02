@@ -10,7 +10,7 @@ from sqlalchemy import Select, exists, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.models import Category, Product, ProductColor, ProductImage, ProductVariant, Size
+from app.models import Category, Product, ProductVariant, Size
 
 SortKey = Literal["featured", "newest", "price_asc", "price_desc"]
 
@@ -222,11 +222,3 @@ async def low_stock_variants(session: AsyncSession, threshold: int) -> Sequence[
         )
     )
     return (await session.scalars(stmt)).all()
-
-
-async def get_color(session: AsyncSession, color_id: uuid.UUID) -> ProductColor | None:
-    return await session.get(ProductColor, color_id)
-
-
-async def get_image(session: AsyncSession, image_id: uuid.UUID) -> ProductImage | None:
-    return await session.get(ProductImage, image_id)

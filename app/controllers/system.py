@@ -11,6 +11,7 @@ from app.core.config import get_settings
 from app.core.security import constant_time_equals
 from app.repositories import order_repo
 from app.services import order_service, payment_service
+from app.services.payment_service import Outcome
 
 router = APIRouter()
 
@@ -31,11 +32,15 @@ async def cleanup(db: DB, authorization: str = Header("")) -> JSONResponse:
     from datetime import UTC, datetime, timedelta
 
     cutoff = datetime.now(UTC) - timedelta(minutes=get_settings().unpaid_order_timeout_min)
+    stale_ids = [o.id for o in await order_repo.stale_unpaid_online_orders(db, cutoff)]
+    await db.rollback()  # release the row locks taken by the query
     reconciled = 0
-    for order in await order_repo.stale_unpaid_online_orders(db, cutoff):
-        await db.rollback()  # release the row lock taken by the query
+    for order_id in stale_ids:
+        order = await order_repo.get_order(db, order_id)
+        if order is None:
+            continue
         result = await payment_service.reconcile(db, order)
-        reconciled += int(bool(result))
-    await db.rollback()
+        reconciled += int(result is not None and result.outcome == Outcome.paid)
+        await db.rollback()
     cancelled = await order_service.cancel_stale_online_orders(db)
     return JSONResponse({"cancelled": cancelled, "reconciled": reconciled})

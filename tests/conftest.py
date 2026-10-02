@@ -162,3 +162,86 @@ async def csrf(client: httpx.AsyncClient, path: str = "/track") -> str:
     match = CSRF_RE.search(html)
     assert match, f"no csrf token on {path}"
     return match.group(1)
+
+
+@pytest.fixture
+async def admin_client(
+    client: httpx.AsyncClient, db: AsyncSession
+) -> tuple[httpx.AsyncClient, str]:
+    """A client signed in as an admin, plus a CSRF token for its session."""
+    from app.core.security import hash_password
+    from app.models import AdminUser
+
+    db.add(
+        AdminUser(username="owner", display_name="Owner", password_hash=hash_password("pw-1234567"))
+    )
+    await db.commit()
+    token = await csrf(client, "/admin/login")
+    r = await client.post(
+        "/admin/login", data={"csrf_token": token, "username": "owner", "password": "pw-1234567"}
+    )
+    assert r.status_code == 303
+    return client, await csrf(client, "/admin/blocklist")
+
+
+async def flash(client: httpx.AsyncClient) -> str:
+    """The flash message shown after an admin redirect."""
+    html = (await client.get("/admin/blocklist")).text
+    match = re.search(r'<template id="flash" data-kind="(\w+)">([^<]*)', html)
+    return f"{match.group(1)}: {match.group(2)}" if match else ""
+
+
+@pytest.fixture
+def media_tmp(tmp_path, monkeypatch: pytest.MonkeyPatch):  # type: ignore[no-untyped-def]
+    """Local image storage writes into a temp dir instead of ./media."""
+    from app.integrations import storage
+
+    monkeypatch.setattr(storage, "MEDIA_ROOT", tmp_path)
+    return tmp_path
+
+
+class FakeHTTP:
+    """Intercepts outbound httpx calls made by integrations (not the ASGI test client)."""
+
+    def __init__(self) -> None:
+        self.requests: list[httpx.Request] = []
+        self.routes: dict[str, httpx.Response] = {}
+
+    def on(self, url_part: str, status: int = 200, json: object | None = None) -> None:
+        self.routes[url_part] = httpx.Response(status, json=json if json is not None else {})
+
+    def handler(self, request: httpx.Request) -> httpx.Response:
+        self.requests.append(request)
+        for part, response in self.routes.items():
+            if part in str(request.url):
+                return httpx.Response(
+                    response.status_code,
+                    content=response.content,
+                    headers={"content-type": "application/json"},
+                )
+        return httpx.Response(404, json={"detail": "no fake route"})
+
+    def sent(self, url_part: str) -> list[dict[str, object]]:
+        import json as _json
+
+        out = []
+        for r in self.requests:
+            if url_part in str(r.url) and r.headers.get("content-type", "").startswith(
+                "application/json"
+            ):
+                out.append(_json.loads(r.content or b"{}"))
+        return out
+
+
+@pytest.fixture
+def fake_http(monkeypatch: pytest.MonkeyPatch) -> FakeHTTP:
+    fake = FakeHTTP()
+    real = httpx.AsyncClient
+
+    class Patched(real):  # type: ignore[misc, valid-type]
+        def __init__(self, *args: object, **kwargs: object) -> None:
+            kwargs.setdefault("transport", httpx.MockTransport(fake.handler))
+            super().__init__(*args, **kwargs)  # type: ignore[arg-type]
+
+    monkeypatch.setattr(httpx, "AsyncClient", Patched)
+    return fake

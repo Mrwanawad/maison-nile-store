@@ -112,7 +112,7 @@
         <ul class="mt-8 space-y-3 border-t border-line pt-6 text-sm" role="list">
           <li class="flex gap-3">{{ icon("truck", "size-5 shrink-0 text-ink-soft") }}<span>{{ t("product.delivery_note", min=settings.delivery_days_min, max=settings.delivery_days_max) }}</span></li>
           <li class="flex gap-3">{{ icon("banknote", "size-5 shrink-0 text-ink-soft") }}<span>{{ t("product.payment_note") }}</span></li>
-          <li class="flex gap-3">{{ icon("return", "size-5 shrink-0 text-ink-soft") }}<span>{{ t("product.returns_note") }} <a href="{{ url('/pages/shipping-returns') }}" class="link">{{ t("common.details") }}</a></span></li>
+          <li class="flex gap-3">{{ icon("return", "size-5 shrink-0 text-ink-soft") }}<span>{{ t("product.returns_note", days=settings.exchange_days) }} <a href="{{ url('/pages/shipping-returns') }}" class="link">{{ t("common.details") }}</a></span></li>
         </ul>
 
         {% set desc = localized(product, "description") %}

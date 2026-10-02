@@ -9,7 +9,7 @@
 
 ## Exchanges
 
-- You can exchange an item for a different size within 14 days of delivery.
+- You can exchange an item for a different size within {exchange_days} days of delivery.
 - Items must be unworn, unwashed and with their tags.
 - To start an exchange, message us on WhatsApp or email {support_email} with your order number.
 

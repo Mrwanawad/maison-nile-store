@@ -16,7 +16,7 @@ from markupsafe import Markup
 
 from app.core.config import get_settings
 from app.core.i18n import get_locale, is_rtl, localized, strip_locale, t, url
-from app.core.security import CSRF_FORM_FIELD, csrf_token
+from app.core.security import CSRF_FORM_FIELD, csrf_token, has_session
 from app.services import nav_cache
 from app.utils.governorates import BY_CODE, GOVERNORATES
 from app.utils.money import format_price, percent_off
@@ -76,14 +76,14 @@ def _whatsapp_link(message: str | None = None) -> str:
 
 
 def _cart_count(request: Request) -> int:
-    raw = request.session.get("cart")
+    raw = request.session.get("cart") if has_session(request) else None
     if not isinstance(raw, dict):
         return 0
     return sum(q for q in raw.values() if isinstance(q, int) and q > 0)
 
 
 def _flash(request: Request) -> dict[str, str] | None:
-    value = request.session.pop("flash", None)
+    value = request.session.pop("flash", None) if has_session(request) else None
     return value if isinstance(value, dict) else None
 
 

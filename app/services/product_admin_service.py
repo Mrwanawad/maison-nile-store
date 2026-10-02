@@ -116,9 +116,8 @@ async def delete_product(db: AsyncSession, product_id: uuid.UUID) -> None:
     urls = [i.url for i in product.images]
     await db.delete(product)
     await db.commit()
-    storage = get_storage()
     for url in urls:
-        await storage.delete(url)
+        await _delete_image_files(url)
 
 
 # --- Colors ------------------------------------------------------------------
@@ -201,8 +200,13 @@ async def rebuild_variants(
         elif not variant.is_active:
             variant.is_active = True
     for key, variant in existing.items():
-        if key not in wanted:
-            variant.is_active = False
+        if key in wanted:
+            continue
+        if variant.stock == 0:
+            # Past orders keep their own copy of the item, so this is safe.
+            await db.delete(variant)
+        else:
+            variant.is_active = False  # keep the stock count in case it comes back
     await db.commit()
 
 
@@ -342,10 +346,15 @@ async def delete_image(db: AsyncSession, product_id: uuid.UUID, image_id: uuid.U
     url = image.url
     await db.delete(image)
     await db.commit()
+    await _delete_image_files(url)
+
+
+async def _delete_image_files(url: str) -> None:
+    """Remove an uploaded photo and its small variant. External links are ignored."""
     storage = get_storage()
     await storage.delete(url)
     if url.endswith(".webp"):
-        await storage.delete(url[: -len(".webp")] + "-480.webp")
+        await storage.delete(url.removesuffix(".webp") + "-480.webp")
 
 
 # --- Categories ----------------------------------------------------------------

@@ -21,8 +21,3 @@ def normalize_eg_mobile(raw: str) -> str | None:
     if len(digits) == 10 and digits.startswith("1"):
         digits = "0" + digits
     return digits if _EG_MOBILE.match(digits) else None
-
-
-def to_international(phone: str) -> str:
-    """01XXXXXXXXX -> 201XXXXXXXXX (for WhatsApp links / couriers)."""
-    return "2" + phone if phone.startswith("0") else phone
