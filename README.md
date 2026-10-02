@@ -25,6 +25,15 @@ uv run uvicorn app.main:app --reload
 
 While editing templates, keep `npm run watch:css` running in a second terminal.
 
+**Docker only** (no local Python/Node needed): `cp .env.example .env`, then `docker compose up`.
+That starts Postgres, the app on :8000 (migrations run automatically) and the CSS watcher.
+Then load demo data and an admin in another terminal:
+
+```bash
+docker compose exec app python -m scripts.seed
+docker compose exec app python -m scripts.create_admin owner "Shop Owner"
+```
+
 ## Tests and checks
 
 ```bash

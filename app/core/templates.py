@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote
@@ -27,8 +29,20 @@ templates = Jinja2Templates(directory=str(_VIEWS))
 settings = get_settings()
 
 
-def _static(path: str) -> str:
-    return f"/static/{path}?v={settings.app_version}"
+_STATIC = Path(__file__).resolve().parent.parent / "static"
+
+
+def _static_url(path: str) -> str:
+    """URL with a content hash, so browsers can cache files forever yet see every change."""
+    try:
+        digest = hashlib.sha256((_STATIC / path).read_bytes()).hexdigest()[:10]
+    except OSError:
+        digest = settings.app_version
+    return f"/static/{path}?v={digest}"
+
+
+# Files never change while production runs; in development they are rebuilt often.
+_static = lru_cache(maxsize=64)(_static_url) if settings.is_production else _static_url
 
 
 _UNSPLASH = re.compile(r"^https://images\.unsplash\.com/")

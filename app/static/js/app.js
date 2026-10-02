@@ -176,11 +176,15 @@
     // Restore saved details (this device only) unless the server re-rendered values
     try {
       const saved = JSON.parse(localStorage.getItem(KEY) || "{}");
+      const gov = checkout.querySelector("#governorate");
+      const govWasEmpty = gov && !gov.value;
       fields.forEach((f) => {
         if (!f.value && saved[f.name]) f.value = saved[f.name];
       });
-      const gov = checkout.querySelector("#governorate");
-      if (gov && gov.value && window.htmx) window.htmx.trigger(gov, "change");
+      // Refresh the delivery fee for a restored governorate once HTMX has initialised.
+      if (govWasEmpty && gov.value) {
+        document.addEventListener("DOMContentLoaded", () => window.htmx && window.htmx.trigger(gov, "change"));
+      }
     } catch (_) { /* storage unavailable */ }
 
     const submit = checkout.querySelector("[data-submit]");
