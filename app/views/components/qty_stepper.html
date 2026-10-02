@@ -1,0 +1,12 @@
+{% from "components/icons.html" import icon %}
+{# Needs: line (CartLine), target (CSS selector for hx-target) #}
+<form method="post" action="{{ url('/cart/items/' ~ line.variant.id ~ '/update') }}"
+      hx-post="{{ url('/cart/items/' ~ line.variant.id ~ '/update') }}" hx-target="{{ target }}" hx-swap="innerHTML"
+      class="inline-flex items-center rounded-sm border border-line" data-stepper>
+  {{ csrf_input(request) }}
+  <button type="submit" name="quantity" value="{{ line.quantity - 1 }}" class="flex size-9 items-center justify-center text-ink-soft hover:text-ink"
+          aria-label="{{ t('cart.decrease') }}">{{ icon("minus", "size-4") }}</button>
+  <span class="price w-8 text-center text-sm font-medium" aria-live="polite">{{ line.quantity }}</span>
+  <button type="submit" name="quantity" value="{{ line.quantity + 1 }}" class="flex size-9 items-center justify-center text-ink-soft hover:text-ink disabled:opacity-30"
+          aria-label="{{ t('cart.increase') }}" {% if line.quantity >= line.max_quantity %}disabled{% endif %}>{{ icon("plus", "size-4") }}</button>
+</form>

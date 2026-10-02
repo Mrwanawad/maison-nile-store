@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+{% block title %}Orders{% endblock %}
+{% block content %}
+<div class="flex flex-wrap items-end justify-between gap-4">
+  <h1 class="text-3xl">Orders</h1>
+</div>
+<form method="get" action="/admin/orders" class="mt-6 flex flex-wrap items-end gap-3"
+      hx-get="/admin/orders" hx-target="#orders-table" hx-swap="outerHTML" hx-push-url="true" hx-trigger="change, submit, keyup changed delay:400ms from:#q">
+  <div>
+    <label for="q" class="field-label">Search</label>
+    <input id="q" name="q" type="search" value="{{ filters.q }}" placeholder="#1001, name or phone" class="field w-64">
+  </div>
+  <div>
+    <label for="status" class="field-label">Status</label>
+    <select id="status" name="status" class="field w-40">
+      <option value="">All</option>
+      {% for s in statuses %}<option value="{{ s.value }}" {% if filters.status == s.value %}selected{% endif %}>{{ s.value|capitalize }}</option>{% endfor %}
+    </select>
+  </div>
+  <div>
+    <label for="payment" class="field-label">Payment</label>
+    <select id="payment" name="payment" class="field w-44">
+      <option value="">All</option>
+      {% for s in payment_statuses %}<option value="{{ s.value }}" {% if filters.payment == s.value %}selected{% endif %}>{{ s.value.replace('_', ' ')|capitalize }}</option>{% endfor %}
+    </select>
+  </div>
+  <noscript><button class="btn btn-secondary">Filter</button></noscript>
+</form>
+{% include "admin/partials/orders_table.html" %}
+{% endblock %}

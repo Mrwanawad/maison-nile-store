@@ -1,0 +1,19 @@
+{% macro status_badge(value) -%}
+{% set tones = {
+  "pending": "bg-sand text-ink",
+  "confirmed": "bg-[#E6ECDF] text-olive",
+  "shipped": "bg-[#E3E8EF] text-[#2E3A56]",
+  "delivered": "bg-olive text-white",
+  "cancelled": "bg-danger/10 text-danger",
+  "unpaid": "bg-sand text-ink-soft",
+  "paid": "bg-[#E6ECDF] text-olive",
+  "failed": "bg-danger/10 text-danger",
+  "refunded": "bg-[#EFE6E1] text-accent-ink",
+  "partially_refunded": "bg-[#EFE6E1] text-accent-ink",
+} %}
+<span class="inline-block rounded-xs px-2 py-0.5 text-xs font-semibold {{ tones.get(value, 'bg-sand') }}">{{ value.replace("_", " ") }}</span>
+{%- endmacro %}
+
+{% macro egp(piasters) -%}{{ "{:,}".format(piasters // 100) }}{% if piasters % 100 %}.{{ "%02d"|format(piasters % 100) }}{% endif %} EGP{%- endmacro %}
+
+{% macro when(dt) -%}{{ dt.astimezone(cairo_tz()).strftime("%d %b %Y, %H:%M") if dt else "" }}{%- endmacro %}

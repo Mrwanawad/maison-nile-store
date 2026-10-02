@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ t("error.404_title") }} · {{ brand_name() }}{% endblock %}
+{% block content %}
+<div class="container-page grid gap-8 py-20 md:grid-cols-12 md:py-32">
+  <p class="price font-display text-8xl text-line md:col-span-4 md:text-9xl">404</p>
+  <div class="md:col-span-6 md:col-start-6">
+    <h1 class="text-4xl">{{ t("error.404_title") }}</h1>
+    <p class="mt-4 text-lg text-ink-soft">{{ t("error.404_body") }}</p>
+    <div class="mt-8 flex flex-wrap gap-4">
+      <a href="{{ url('/shop') }}" class="btn btn-primary">{{ t("nav.shop_all") }}</a>
+      <a href="{{ url('/') }}" class="btn btn-ghost">{{ t("nav.home") }}</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

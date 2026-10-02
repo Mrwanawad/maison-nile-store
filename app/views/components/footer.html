@@ -1,0 +1,41 @@
+{% from "components/icons.html" import icon %}
+<footer class="mt-24 border-t border-line bg-sand/60">
+  <div class="container-page grid gap-10 py-14 md:grid-cols-12">
+    <div class="md:col-span-5">
+      <p class="font-display text-2xl">{{ brand_name() }}</p>
+      <p class="mt-3 max-w-sm text-ink-soft">{{ tagline() }}</p>
+      <div class="mt-6 flex items-center gap-1">
+        {% if settings.instagram_url %}<a href="{{ settings.instagram_url }}" class="-ms-2 p-2 text-ink-soft hover:text-ink" target="_blank" rel="noopener" aria-label="Instagram">{{ icon("instagram") }}</a>{% endif %}
+        {% if settings.facebook_url %}<a href="{{ settings.facebook_url }}" class="p-2 text-ink-soft hover:text-ink" target="_blank" rel="noopener" aria-label="Facebook">{{ icon("facebook") }}</a>{% endif %}
+        {% if settings.tiktok_url %}<a href="{{ settings.tiktok_url }}" class="p-2 text-ink-soft hover:text-ink" target="_blank" rel="noopener" aria-label="TikTok">{{ icon("music") }}</a>{% endif %}
+      </div>
+    </div>
+    <div class="md:col-span-3">
+      <p class="label-caps text-ink-soft">{{ t("footer.shop") }}</p>
+      <ul class="mt-4 space-y-2.5" role="list">
+        <li><a href="{{ url('/shop') }}" class="hover:underline">{{ t("nav.shop_all") }}</a></li>
+        {% for c in nav_categories() %}<li><a href="{{ url('/c/' ~ c.slug) }}" class="hover:underline">{{ c.name(locale()) }}</a></li>{% endfor %}
+      </ul>
+    </div>
+    <div class="md:col-span-4">
+      <p class="label-caps text-ink-soft">{{ t("footer.help") }}</p>
+      <ul class="mt-4 space-y-2.5" role="list">
+        <li><a href="{{ url('/track') }}" class="hover:underline">{{ t("nav.track") }}</a></li>
+        <li><a href="{{ url('/pages/shipping-returns') }}" class="hover:underline">{{ t("footer.shipping_returns") }}</a></li>
+        <li><a href="{{ url('/pages/size-guide') }}" class="hover:underline">{{ t("footer.size_guide") }}</a></li>
+        <li><a href="{{ url('/pages/faq') }}" class="hover:underline">{{ t("footer.faq") }}</a></li>
+        <li><a href="{{ url('/pages/contact') }}" class="hover:underline">{{ t("footer.contact") }}</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="border-t border-line">
+    <div class="container-page flex flex-col gap-3 py-6 text-sm text-ink-soft sm:flex-row sm:items-center sm:justify-between">
+      <p>© {{ brand_name() }}. {{ t("footer.made_in") }}</p>
+      <div class="flex gap-5">
+        <a href="{{ url('/pages/privacy') }}" class="hover:text-ink">{{ t("footer.privacy") }}</a>
+        <a href="{{ url('/pages/terms') }}" class="hover:text-ink">{{ t("footer.terms") }}</a>
+        <a href="{{ switch_locale_url(request) }}" class="hover:text-ink" lang="{{ 'en' if locale() == 'ar' else 'ar' }}">{{ "English" if locale() == "ar" else "العربية" }}</a>
+      </div>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,47 @@
+{% from "components/icons.html" import icon %}
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="htmx-config" content='{"includeIndicatorStyles": false, "allowEval": false, "allowScriptTags": false}'>
+  <title>{% block title %}Admin{% endblock %} · {{ settings.brand_name }}</title>
+  <link rel="icon" href="{{ settings.brand_favicon_url }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&family=Manrope:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500&display=swap">
+  <link rel="stylesheet" href="{{ static('css/app.css') }}">
+  <style>:root{--color-accent:{{ settings.brand_accent_color }};--color-accent-ink:{{ settings.brand_accent_hover_color }}}</style>
+</head>
+<body class="min-h-dvh bg-bone text-[15px]" hx-headers='{{ hx_headers(request) }}'>
+  {% if admin is defined %}
+  <header class="border-b border-line bg-paper">
+    <div class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 sm:px-6">
+      <a href="/admin" class="font-display text-lg">{{ settings.brand_name }} <span class="font-sans text-sm text-ink-soft">admin</span></a>
+      {% set path = request.url.path %}
+      <nav class="flex flex-wrap gap-1 text-sm" aria-label="Admin">
+        {% for href, label in [("/admin", "Dashboard"), ("/admin/orders", "Orders"), ("/admin/products", "Products"), ("/admin/categories", "Categories & sizes"), ("/admin/blocklist", "COD blocklist")] %}
+        {% set active = (path == href) if href == "/admin" else path.startswith(href) %}
+        <a href="{{ href }}" class="rounded-sm px-3 py-1.5 {% if active %}bg-ink text-bone{% else %}text-ink-soft hover:bg-sand hover:text-ink{% endif %}" {% if active %}aria-current="page"{% endif %}>{{ label }}</a>
+        {% endfor %}
+      </nav>
+      <div class="ms-auto flex items-center gap-3 text-sm">
+        <a href="/" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-ink-soft hover:text-ink">View store {{ icon("external", "size-3.5") }}</a>
+        <span class="text-ink-soft">·</span>
+        <span>{{ admin.display_name }}</span>
+        <form method="post" action="/admin/logout">{{ csrf_input(request) }}<button class="inline-flex items-center gap-1 text-ink-soft hover:text-ink">{{ icon("log-out", "size-4") }} Log out</button></form>
+      </div>
+    </div>
+  </header>
+  {% endif %}
+  <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+    {% block content %}{% endblock %}
+  </main>
+  <div id="toasts" class="pointer-events-none fixed inset-x-0 top-4 z-[90] flex flex-col items-center gap-2 px-4" aria-live="polite" role="status"></div>
+  {% set flash = pop_flash(request) %}
+  {% if flash %}<template id="flash" data-kind="{{ flash.kind }}">{{ flash.message }}</template>{% endif %}
+  <script src="{{ static('vendor/htmx.min.js') }}" defer></script>
+  <script src="{{ static('js/app.js') }}" defer></script>
+</body>
+</html>

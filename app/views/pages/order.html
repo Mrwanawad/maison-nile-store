@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% from "components/icons.html" import icon %}
+{% block title %}{{ t("order.title", number=order.order_number) }} · {{ brand_name() }}{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<div class="container-page max-w-3xl pt-10 md:pt-16">
+  {% if pay_error %}
+  <div class="mb-6 flex gap-3 rounded-sm border border-danger/30 bg-danger/5 px-4 py-3 text-danger" role="alert">
+    {{ icon("alert", "size-5 shrink-0") }}<p>{{ t("payment.error.unavailable") }}</p>
+  </div>
+  {% endif %}
+
+  <p class="label-caps text-ink-soft">{{ t("order.number_label") }}</p>
+  <p class="price mt-1 font-display text-5xl md:text-6xl">#{{ order.order_number }}</p>
+
+  {% include "partials/order_status.html" %}
+
+  <section class="mt-10 rounded-md border border-line bg-paper">
+    <ul class="divide-y divide-line px-5" role="list">
+      {% for item in order.items %}
+      <li class="flex gap-4 py-4">
+        {% if item.image_url %}<img src="{{ item.image_url }}" alt="" width="64" height="80" loading="lazy" class="h-20 w-16 rounded-xs bg-sand object-cover">{% endif %}
+        <div class="min-w-0 flex-1">
+          <p class="font-medium">{{ item.product_name_ar if locale() == "ar" else item.product_name_en }}</p>
+          {% set label = item.variant_label_ar if locale() == "ar" else item.variant_label_en %}
+          <p class="text-sm text-ink-soft">{% if label %}{{ label }} · {% endif %}{{ t("order.qty", count=item.quantity) }}</p>
+        </div>
+        <p class="price text-sm">{{ price(item.line_total_piasters) }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+    <dl class="space-y-2 border-t border-line px-5 py-4 text-[15px]">
+      <div class="flex justify-between"><dt class="text-ink-soft">{{ t("cart.subtotal") }}</dt><dd class="price">{{ price(order.subtotal_piasters) }}</dd></div>
+      <div class="flex justify-between"><dt class="text-ink-soft">{{ t("cart.shipping") }}</dt><dd class="price">{{ price(order.shipping_piasters) }}</dd></div>
+      <div class="flex items-baseline justify-between border-t border-line pt-3"><dt class="font-medium">{{ t("cart.total") }}</dt><dd class="price font-display text-2xl">{{ price(order.total_piasters) }}</dd></div>
+    </dl>
+  </section>
+
+  <section class="mt-8 grid gap-6 sm:grid-cols-2">
+    <div>
+      <h2 class="label-caps font-sans text-ink-soft">{{ t("order.deliver_to") }}</h2>
+      <p class="mt-2">{{ order.ship_full_name }}<br><span dir="ltr">{{ order.ship_phone }}</span><br>{{ order.ship_address }}<br>{{ governorate_name(order.ship_governorate) }}</p>
+    </div>
+    <div>
+      <h2 class="label-caps font-sans text-ink-soft">{{ t("order.payment") }}</h2>
+      <p class="mt-2">{{ t("order.method." ~ order.payment_method.value) }}<br><span class="text-ink-soft">{{ t("order.payment_status." ~ order.payment_status.value) }}</span></p>
+    </div>
+  </section>
+
+  <div class="mt-10 flex flex-wrap gap-4 border-t border-line pt-8">
+    <a href="{{ url('/shop') }}" class="btn btn-secondary">{{ t("order.continue_shopping") }}</a>
+    {% if settings.whatsapp_number %}
+    <a href="{{ whatsapp_link(t('order.whatsapp_message', number=order.order_number)) }}" target="_blank" rel="noopener" class="btn btn-ghost">{{ icon("chat", "size-4") }} {{ t("order.questions") }}</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

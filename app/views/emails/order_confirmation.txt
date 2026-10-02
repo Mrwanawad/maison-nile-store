@@ -1,0 +1,21 @@
+{{ settings.brand_name_ar if o.locale == "ar" else settings.brand_name }}
+
+{{ t("order.number_label") }}: #{{ o.number }}
+
+{{ t("email.greeting", name=o.name.split(' ')[0]) }}
+{{ t("email.intro_cod") if o.payment_method == "cod" else t("email.intro_paid") }}
+
+{% for line in o.lines %}- {{ line.name }}{% if line.label %} ({{ line.label }}){% endif %} x {{ line.quantity }}: {{ price(line.line_total) }}
+{% endfor %}
+{{ t("cart.subtotal") }}: {{ price(o.subtotal) }}
+{{ t("cart.shipping") }}: {{ price(o.shipping) }}
+{{ t("cart.total") }}: {{ price(o.total) }}
+
+{{ t("order.deliver_to") }}:
+{{ o.name }}
+{{ o.phone }}
+{{ o.address }}, {{ governorate_name(o.governorate) }}
+
+{{ t("email.view_order") }}: {{ o.link }}
+
+{{ t("email.questions") }}

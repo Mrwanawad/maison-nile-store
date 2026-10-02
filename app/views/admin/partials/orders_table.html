@@ -1,0 +1,41 @@
+{% from "admin/_macros.html" import status_badge, egp, when %}
+<div id="orders-table" class="mt-6">
+  <p class="mb-3 text-sm text-ink-soft">{{ total }} order{{ "" if total == 1 else "s" }}</p>
+  <div class="overflow-x-auto rounded-md border border-line bg-paper">
+    <table class="w-full min-w-[760px] text-sm">
+      <thead class="border-b border-line bg-bone text-start text-xs uppercase tracking-wide text-ink-soft">
+        <tr>
+          <th class="px-4 py-3 text-start font-semibold">Order</th>
+          <th class="px-4 py-3 text-start font-semibold">Customer</th>
+          <th class="px-4 py-3 text-start font-semibold">Governorate</th>
+          <th class="px-4 py-3 text-start font-semibold">Status</th>
+          <th class="px-4 py-3 text-start font-semibold">Payment</th>
+          <th class="px-4 py-3 text-start font-semibold">Date</th>
+          <th class="px-4 py-3 text-end font-semibold">Total</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-line">
+      {% for o in orders %}
+        <tr class="hover:bg-bone">
+          <td class="px-4 py-3"><a href="/admin/orders/{{ o.id }}" class="font-medium hover:underline">#{{ o.order_number }}</a></td>
+          <td class="px-4 py-3">{{ o.ship_full_name }}<br><span class="text-ink-soft" dir="ltr">{{ o.ship_phone }}</span></td>
+          <td class="px-4 py-3">{{ governorates|selectattr("code", "equalto", o.ship_governorate)|map(attribute="name_en")|first }}</td>
+          <td class="px-4 py-3">{{ status_badge(o.status.value) }}</td>
+          <td class="px-4 py-3">{{ "COD" if o.payment_method.value == "cod" else "Online" }} {{ status_badge(o.payment_status.value) }}</td>
+          <td class="px-4 py-3 text-ink-soft">{{ when(o.created_at) }}</td>
+          <td class="price px-4 py-3 text-end font-medium">{{ egp(o.total_piasters) }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="7" class="px-4 py-10 text-center text-ink-soft">No orders match.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if pages > 1 %}
+  <nav class="mt-4 flex gap-2" aria-label="Pages">
+    {% for p in range(1, pages + 1) %}
+    <a href="/admin/orders?page={{ p }}&status={{ filters.status }}&payment={{ filters.payment }}&q={{ filters.q|urlencode }}" class="chip {% if p == page %}chip-active{% endif %}">{{ p }}</a>
+    {% endfor %}
+  </nav>
+  {% endif %}
+</div>

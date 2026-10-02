@@ -1,0 +1,52 @@
+{% if request.headers.get("hx-request") == "true" %}{% set oob = true %}{% include "partials/cart_badge.html" %}{% endif %}
+{% if cart.is_empty %}
+  <div class="rounded-md border border-dashed border-line px-6 py-16">
+    <p class="font-display text-2xl">{{ t("cart.empty_title") }}</p>
+    <p class="mt-2 text-ink-soft">{{ t("cart.empty_body") }}</p>
+    <a href="{{ url('/shop') }}" class="btn btn-primary mt-6">{{ t("cart.start_shopping") }}</a>
+  </div>
+{% else %}
+  {% for notice in cart.notices|unique %}
+  <p class="mb-4 rounded-sm bg-sand px-3 py-2 text-sm">{{ t(notice) }}</p>
+  {% endfor %}
+  <div class="grid gap-10 lg:grid-cols-12">
+    <ul class="divide-y divide-line border-y border-line lg:col-span-8" role="list">
+      {% for line in cart.lines %}
+      <li class="flex gap-4 py-6 sm:gap-6">
+        <a href="{{ url('/p/' ~ line.slug) }}" class="shrink-0">
+          <img src="{{ line.image_url }}" alt="" width="112" height="140" loading="lazy" class="h-[140px] w-28 rounded-xs bg-sand object-cover">
+        </a>
+        <div class="flex min-w-0 flex-1 flex-col">
+          <div class="flex items-start justify-between gap-4">
+            <div class="min-w-0">
+              <a href="{{ url('/p/' ~ line.slug) }}" class="font-medium hover:underline">{{ line.product_name }}</a>
+              {% if line.label %}<p class="mt-1 text-sm text-ink-soft">{{ line.label }}</p>{% endif %}
+              <p class="price mt-1 text-sm text-ink-soft">{{ price(line.unit_price) }}</p>
+            </div>
+            <p class="price shrink-0 font-medium">{{ price(line.line_total) }}</p>
+          </div>
+          <div class="mt-auto flex items-center gap-5 pt-4">
+            {% with target="#cart-page", line=line %}{% include "components/qty_stepper.html" %}{% endwith %}
+            <form method="post" action="{{ url('/cart/items/' ~ line.variant.id ~ '/remove') }}"
+                  hx-post="{{ url('/cart/items/' ~ line.variant.id ~ '/remove') }}" hx-target="#cart-page" hx-swap="innerHTML">
+              {{ csrf_input(request) }}
+              <button class="text-sm text-ink-soft underline-offset-4 hover:text-ink hover:underline">{{ t("cart.remove") }}</button>
+            </form>
+          </div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    <aside class="lg:col-span-4">
+      <div class="rounded-md border border-line bg-paper p-6">
+        <h2 class="text-xl">{{ t("cart.summary") }}</h2>
+        <dl class="mt-5 space-y-3 text-[15px]">
+          <div class="flex justify-between"><dt class="text-ink-soft">{{ t("cart.subtotal") }}</dt><dd class="price">{{ price(cart.subtotal) }}</dd></div>
+          <div class="flex justify-between"><dt class="text-ink-soft">{{ t("cart.shipping") }}</dt><dd class="text-ink-soft">{{ t("cart.shipping_at_checkout") }}</dd></div>
+        </dl>
+        <a href="{{ url('/checkout') }}" class="btn btn-primary mt-6 w-full">{{ t("cart.checkout") }}</a>
+        <a href="{{ url('/shop') }}" class="mt-3 block text-center text-sm text-ink-soft hover:text-ink hover:underline">{{ t("cart.continue") }}</a>
+      </div>
+    </aside>
+  </div>
+{% endif %}

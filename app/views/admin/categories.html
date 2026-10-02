@@ -1,0 +1,62 @@
+{% extends "admin/base.html" %}
+{% from "components/icons.html" import icon %}
+{% block title %}Categories & sizes{% endblock %}
+{% block content %}
+<h1 class="text-3xl">Categories &amp; sizes</h1>
+
+<section class="mt-8 rounded-md border border-line bg-paper p-6">
+  <h2 class="text-xl">Categories</h2>
+  <p class="mt-1 text-sm text-ink-soft">Shown in the store menu in this order (lowest number first).</p>
+  <div class="mt-5 space-y-3">
+    {% for c in categories %}
+    <form method="post" action="/admin/categories" class="flex flex-wrap items-end gap-3 border-b border-line pb-3">
+      {{ csrf_input(request) }}<input type="hidden" name="category_id" value="{{ c.id }}">
+      <div><label class="field-label text-xs" for="en-{{ c.id }}">English</label><input id="en-{{ c.id }}" name="name_en" value="{{ c.name_en }}" required class="field w-48"></div>
+      <div><label class="field-label text-xs" for="ar-{{ c.id }}">Arabic</label><input id="ar-{{ c.id }}" name="name_ar" value="{{ c.name_ar }}" dir="rtl" class="field w-48"></div>
+      <div><label class="field-label text-xs" for="so-{{ c.id }}">Order</label><input id="so-{{ c.id }}" name="sort_order" type="number" value="{{ c.sort_order }}" class="field w-20"></div>
+      <label class="inline-flex items-center gap-2 pb-2.5 text-sm"><input type="checkbox" name="is_active" class="size-4 accent-[var(--color-ink)]" {% if c.is_active %}checked{% endif %}> Visible</label>
+      <button class="btn btn-secondary btn-sm mb-1">Save</button>
+      <span class="pb-2.5 text-xs text-ink-soft">/c/{{ c.slug }}</span>
+      <button form="del-{{ c.id }}" class="mb-1 ms-auto p-2 text-ink-soft hover:text-danger" aria-label="Delete {{ c.name_en }}">{{ icon("trash", "size-4") }}</button>
+    </form>
+    <form id="del-{{ c.id }}" method="post" action="/admin/categories/{{ c.id }}/delete" data-confirm="Delete category {{ c.name_en }}? Products stay, without a category.">{{ csrf_input(request) }}</form>
+    {% endfor %}
+    <form method="post" action="/admin/categories" class="flex flex-wrap items-end gap-3 pt-2">
+      {{ csrf_input(request) }}
+      <div><label class="field-label text-xs" for="new-en">New category</label><input id="new-en" name="name_en" required placeholder="Dresses" class="field w-48"></div>
+      <div><label class="field-label text-xs" for="new-ar">Arabic</label><input id="new-ar" name="name_ar" placeholder="فساتين" dir="rtl" class="field w-48"></div>
+      <div><label class="field-label text-xs" for="new-so">Order</label><input id="new-so" name="sort_order" type="number" value="{{ categories|length }}" class="field w-20"></div>
+      <input type="hidden" name="is_active" value="on">
+      <button class="btn btn-primary btn-sm mb-1">Add category</button>
+    </form>
+  </div>
+</section>
+
+<section id="sizes" class="mt-8 scroll-mt-6 rounded-md border border-line bg-paper p-6">
+  <h2 class="text-xl">Sizes</h2>
+  <p class="mt-1 text-sm text-ink-soft">One shared size list keeps the store's size filter consistent. Group sizes (e.g. apparel, waist, shoes) to keep the product page tidy.</p>
+  {% for group, items in sizes|groupby("size_group") %}
+  <div class="mt-5">
+    <p class="text-xs uppercase tracking-wide text-ink-soft">{{ group }}</p>
+    <ul class="mt-2 flex flex-wrap gap-2" role="list">
+      {% for s in items %}
+      <li class="flex items-center gap-1 rounded-sm border border-line py-1 ps-3 pe-1 text-sm">
+        {{ s.label_en }}{% if s.label_ar != s.label_en %} <span class="text-ink-soft" dir="rtl">{{ s.label_ar }}</span>{% endif %}
+        <form method="post" action="/admin/sizes/{{ s.id }}/delete" data-confirm="Delete size {{ s.label_en }}?">{{ csrf_input(request) }}<button class="p-1 text-ink-soft hover:text-danger" aria-label="Delete size {{ s.label_en }}">{{ icon("x", "size-3.5") }}</button></form>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endfor %}
+  <form method="post" action="/admin/sizes" class="mt-6 flex flex-wrap items-end gap-3 border-t border-line pt-5">
+    {{ csrf_input(request) }}
+    <div><label class="field-label text-xs" for="s-code">Code</label><input id="s-code" name="code" required maxlength="20" placeholder="M" class="field w-24"></div>
+    <div><label class="field-label text-xs" for="s-en">Label</label><input id="s-en" name="label_en" maxlength="40" placeholder="Medium (optional)" class="field w-40"></div>
+    <div><label class="field-label text-xs" for="s-ar">Arabic label</label><input id="s-ar" name="label_ar" maxlength="40" dir="rtl" class="field w-32"></div>
+    <div><label class="field-label text-xs" for="s-group">Group</label><input id="s-group" name="size_group" value="apparel" list="groups" class="field w-32"></div>
+    <datalist id="groups">{% for group, _ in sizes|groupby("size_group") %}<option value="{{ group }}">{% endfor %}</datalist>
+    <div><label class="field-label text-xs" for="s-order">Order</label><input id="s-order" name="sort_order" type="number" value="{{ sizes|length }}" class="field w-20"></div>
+    <button class="btn btn-primary btn-sm mb-1">Add size</button>
+  </form>
+</section>
+{% endblock %}

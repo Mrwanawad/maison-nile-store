@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% from "components/icons.html" import icon %}
+{% set heading = localized(category, "name") if category else (t("search.results_for", q=filters.q) if filters.q else t("nav.shop_all")) %}
+{% block title %}{{ heading }} · {{ brand_name() }}{% endblock %}
+{% block content %}
+{% set base_path = url('/c/' ~ category.slug) if category else url('/shop') %}
+<div class="container-page pt-8 md:pt-12">
+  <nav aria-label="{{ t('nav.breadcrumb') }}" class="text-sm text-ink-soft">
+    <a href="{{ url('/') }}" class="hover:text-ink">{{ t("nav.home") }}</a>
+    <span class="mx-1.5">/</span>
+    {% if category %}<a href="{{ url('/shop') }}" class="hover:text-ink">{{ t("nav.shop_all") }}</a><span class="mx-1.5">/</span>{% endif %}
+    <span class="text-ink" aria-current="page">{{ heading }}</span>
+  </nav>
+  <div class="mt-4 flex flex-wrap items-end justify-between gap-4">
+    <h1 class="text-4xl md:text-5xl">{{ heading }}</h1>
+  </div>
+
+  <form id="filters" action="{{ base_path }}" method="get"
+        hx-get="{{ base_path }}" hx-target="#results" hx-swap="outerHTML" hx-push-url="true" hx-trigger="change, submit, keyup changed delay:400ms from:#filter-q"
+        class="mt-8 flex flex-col gap-4 border-y border-line py-4 lg:flex-row lg:items-center">
+    <div class="relative lg:w-64">
+      <label for="filter-q" class="sr-only">{{ t("search.label") }}</label>
+      <input id="filter-q" name="q" type="search" value="{{ filters.q }}" placeholder="{{ t('search.placeholder') }}" class="field ps-9">
+      <span class="pointer-events-none absolute inset-y-0 start-3 flex items-center text-ink-soft">{{ icon("search", "size-4") }}</span>
+    </div>
+
+    {% if not category and nav_categories() %}
+    <div>
+      <label for="filter-category" class="sr-only">{{ t("filters.category") }}</label>
+      <select id="filter-category" name="category" class="field lg:w-48">
+        <option value="">{{ t("filters.all_categories") }}</option>
+        {% for c in categories %}<option value="{{ c.slug }}" {% if request.query_params.get('category') == c.slug %}selected{% endif %}>{{ localized(c, "name") }}</option>{% endfor %}
+      </select>
+    </div>
+    {% endif %}
+
+    {% if sizes %}
+    <fieldset class="flex flex-wrap items-center gap-1.5">
+      <legend class="sr-only">{{ t("filters.size") }}</legend>
+      <label class="cursor-pointer">
+        <input type="radio" name="size" value="" class="peer sr-only" {% if not filters.size %}checked{% endif %}>
+        <span class="chip peer-checked:border-ink peer-checked:bg-ink peer-checked:text-bone peer-focus-visible:outline-2 peer-focus-visible:outline-accent">{{ t("filters.any_size") }}</span>
+      </label>
+      {% for s in sizes %}
+      <label class="cursor-pointer">
+        <input type="radio" name="size" value="{{ s.code }}" class="peer sr-only" {% if filters.size == s.code %}checked{% endif %}>
+        <span class="chip peer-checked:border-ink peer-checked:bg-ink peer-checked:text-bone peer-focus-visible:outline-2 peer-focus-visible:outline-accent">{{ localized(s, "label") }}</span>
+      </label>
+      {% endfor %}
+    </fieldset>
+    {% endif %}
+
+    <div class="flex items-center gap-4 lg:ms-auto">
+      <label class="inline-flex cursor-pointer items-center gap-2 text-sm">
+        <input type="checkbox" name="in_stock" value="true" class="size-4 accent-[var(--color-ink)]" {% if filters.in_stock %}checked{% endif %}>
+        {{ t("filters.in_stock") }}
+      </label>
+      <label for="filter-sort" class="sr-only">{{ t("filters.sort") }}</label>
+      <select id="filter-sort" name="sort" class="field w-auto py-2">
+        {% for key in ["featured", "newest", "price_asc", "price_desc"] %}
+        <option value="{{ key }}" {% if filters.sort == key %}selected{% endif %}>{{ t("filters.sort." ~ key) }}</option>
+        {% endfor %}
+      </select>
+      <noscript><button class="btn btn-secondary btn-sm">{{ t("filters.apply") }}</button></noscript>
+    </div>
+  </form>
+
+  {% include "partials/listing_results.html" %}
+</div>
+{% endblock %}

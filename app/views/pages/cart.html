@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ t("cart.title") }} · {{ brand_name() }}{% endblock %}
+{% block content %}
+<div class="container-page pt-8 md:pt-12">
+  <h1 class="text-4xl md:text-5xl">{{ t("cart.title") }}</h1>
+  <div id="cart-page" class="mt-8">
+    {% include "partials/cart_page_body.html" %}
+  </div>
+</div>
+{% endblock %}

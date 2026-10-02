@@ -1,0 +1,11 @@
+<dl id="checkout-totals" class="mt-4 space-y-2.5 border-t border-line pt-4 text-[15px]" aria-live="polite">
+  <div class="flex justify-between"><dt class="text-ink-soft">{{ t("cart.subtotal") }}</dt><dd class="price">{{ price(cart.subtotal) }}</dd></div>
+  <div class="flex justify-between">
+    <dt class="text-ink-soft">{{ t("cart.shipping") }}</dt>
+    <dd class="price {% if shipping is none %}text-ink-soft{% endif %}">{{ price(shipping) if shipping is not none else t("checkout.choose_governorate_short") }}</dd>
+  </div>
+  <div class="flex items-baseline justify-between border-t border-line pt-3">
+    <dt class="font-medium">{{ t("cart.total") }}</dt>
+    <dd class="price font-display text-2xl">{{ price(total) }}</dd>
+  </div>
+</dl>

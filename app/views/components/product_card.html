@@ -1,0 +1,40 @@
+{# Needs: card (ProductCard). Optional: eager (bool) for above-the-fold images. #}
+<article class="group relative">
+  <a href="{{ url('/p/' ~ card.slug) }}" class="block">
+    <div class="relative aspect-[4/5] overflow-hidden rounded-xs bg-sand">
+      <img src="{{ card.image_url }}" alt="{{ card.image_alt }}" width="400" height="500"
+           {% if eager is defined and eager %}fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async"
+           class="img-zoom size-full object-cover{% if not card.in_stock %} opacity-60{% endif %}">
+      {% if card.hover_image_url %}
+      <img src="{{ card.hover_image_url }}" alt="" width="400" height="500" loading="lazy" decoding="async" aria-hidden="true"
+           class="absolute inset-0 size-full object-cover opacity-0 transition-opacity duration-200 group-hover:opacity-100 max-md:hidden">
+      {% endif %}
+      <div class="absolute start-3 top-3 flex flex-col items-start gap-1.5">
+        {% if not card.in_stock %}
+          <span class="label-caps rounded-xs bg-paper px-2 py-1 text-ink">{{ t("product.sold_out") }}</span>
+        {% elif card.percent_off %}
+          <span class="label-caps rounded-xs bg-accent px-2 py-1 text-white">−{{ card.percent_off }}%</span>
+        {% elif card.is_new %}
+          <span class="label-caps rounded-xs bg-paper px-2 py-1 text-ink">{{ t("product.new") }}</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="mt-3 flex items-start justify-between gap-3">
+      <h3 class="font-sans text-[15px] font-medium leading-snug tracking-normal">{{ card.name }}</h3>
+      <p class="price shrink-0 text-[15px]">
+        {% if card.compare_at_piasters %}<span class="sr-only">{{ t("product.sale_price") }}</span>{% endif %}
+        <span class="{% if card.compare_at_piasters %}text-accent{% endif %}">{{ price(card.price_piasters) }}</span>
+      </p>
+    </div>
+    <div class="mt-1 flex items-center justify-between gap-3 text-sm text-ink-soft">
+      {% if card.colors|length > 1 %}
+        <span class="flex items-center gap-1.5" aria-label="{{ t('product.colors_count', count=card.colors|length) }}">
+          {% for c in card.colors[:5] %}<span class="size-3 rounded-full border border-ink/15" style="background: {{ c.hex }}" title="{{ c.name }}"></span>{% endfor %}
+        </span>
+      {% elif card.low_stock %}
+        <span class="text-accent-ink">{{ t("product.low_stock_short") }}</span>
+      {% else %}<span></span>{% endif %}
+      {% if card.compare_at_piasters %}<s class="price">{{ price(card.compare_at_piasters) }}</s>{% endif %}
+    </div>
+  </a>
+</article>

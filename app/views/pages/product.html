@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% from "components/icons.html" import icon %}
+{% set name = localized(product, "name") %}
+{% set whatsapp_message = t("product.whatsapp_message", name=name, url=settings.base_url ~ url('/p/' ~ product.slug)) %}
+{% block title %}{{ name }} · {{ brand_name() }}{% endblock %}
+{% block description %}{{ localized(product, "description")|truncate(155) }}{% endblock %}
+{% block content %}
+<div class="container-page pt-6 md:pt-10">
+  <nav aria-label="{{ t('nav.breadcrumb') }}" class="text-sm text-ink-soft">
+    <a href="{{ url('/') }}" class="hover:text-ink">{{ t("nav.home") }}</a><span class="mx-1.5">/</span>
+    {% if product.category %}<a href="{{ url('/c/' ~ product.category.slug) }}" class="hover:text-ink">{{ localized(product.category, "name") }}</a><span class="mx-1.5">/</span>{% endif %}
+    <span class="text-ink" aria-current="page">{{ name }}</span>
+  </nav>
+
+  <div class="mt-6 grid gap-8 md:grid-cols-12 lg:gap-14" data-picker>
+    <script type="application/json" data-picker-json>{{ picker|tojson }}</script>
+
+    {# Gallery: swipe on mobile, stacked on desktop #}
+    <div class="md:col-span-7">
+      <div class="-mx-4 flex snap-x snap-mandatory gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0 md:grid md:grid-cols-2 md:gap-3 md:overflow-visible" data-gallery aria-label="{{ t('product.gallery') }}">
+        {% for img in product.images %}
+        <figure class="relative aspect-[4/5] w-[85%] shrink-0 snap-center overflow-hidden rounded-xs bg-sand md:w-auto {% if loop.first %}md:col-span-2{% endif %}"
+                data-image-color="{{ img.color_id or '' }}">
+          <img src="{{ img.url }}" alt="{{ localized(img, 'alt') or name }}" width="{{ img.width }}" height="{{ img.height }}"
+               {% if loop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async" class="size-full object-cover">
+        </figure>
+        {% else %}
+        <figure class="aspect-[4/5] w-full overflow-hidden rounded-xs bg-sand md:col-span-2">
+          <img src="{{ static('img/placeholder.svg') }}" alt="" width="400" height="500" class="size-full object-cover">
+        </figure>
+        {% endfor %}
+      </div>
+    </div>
+
+    {# Details #}
+    <div class="md:col-span-5">
+      <div class="md:sticky md:top-28">
+        {% if product.category %}<p class="label-caps text-ink-soft">{{ localized(product.category, "name") }}</p>{% endif %}
+        <h1 class="mt-2 text-4xl md:text-[44px]">{{ name }}</h1>
+        <div class="mt-4 flex items-baseline gap-3">
+          <p class="price font-display text-2xl {% if product.compare_at_piasters %}text-accent{% endif %}" data-price>{{ price(product.price_piasters) }}</p>
+          {% if product.compare_at_piasters %}
+            <s class="price text-ink-soft">{{ price(product.compare_at_piasters) }}</s>
+            <span class="label-caps rounded-xs bg-accent px-2 py-1 text-white">−{{ card.percent_off }}%</span>
+          {% endif %}
+        </div>
+        <p class="mt-2 text-sm text-ink-soft">{{ t("product.shipping_from", fee=price(shipping_from)) }}</p>
+
+        <form class="mt-8" method="post" action="{{ url('/cart/items') }}"
+              hx-post="{{ url('/cart/items') }}" hx-target="#cart-drawer-body" hx-swap="innerHTML" data-add-form>
+          {{ csrf_input(request) }}
+          <input type="hidden" name="product_id" value="{{ product.id }}">
+          {% if single_variant %}<input type="hidden" name="variant_id" value="{{ single_variant.id }}">{% endif %}
+
+          {% if colors and not single_variant %}
+          <fieldset class="mb-6">
+            <legend class="mb-3 text-sm"><span class="font-medium">{{ t("product.color") }}:</span> <span class="text-ink-soft" data-color-name>{% if colors|length == 1 %}{{ localized(colors[0], "name") }}{% endif %}</span></legend>
+            <div class="flex flex-wrap gap-2.5">
+              {% for c in colors %}
+              <label class="cursor-pointer" title="{{ localized(c, 'name') }}">
+                <input type="radio" name="color_id" value="{{ c.id }}" class="peer sr-only" data-color data-name="{{ localized(c, 'name') }}"
+                       {% if colors|length == 1 %}checked{% endif %} {% if not color_available(c.id) %}data-soldout{% endif %} required>
+                <span class="block size-9 rounded-full border border-line p-0.5 transition peer-checked:border-ink peer-checked:ring-1 peer-checked:ring-ink peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent peer-data-[soldout]:opacity-40">
+                  <span class="block size-full rounded-full border border-ink/10" style="background: {{ c.hex }}"></span>
+                </span>
+                <span class="sr-only">{{ localized(c, 'name') }}{% if not color_available(c.id) %} ({{ t("product.sold_out") }}){% endif %}</span>
+              </label>
+              {% endfor %}
+            </div>
+          </fieldset>
+          {% endif %}
+
+          {% if sizes and not single_variant %}
+          <fieldset class="mb-6">
+            <div class="mb-3 flex items-center justify-between">
+              <legend class="text-sm font-medium">{{ t("product.size") }}</legend>
+              <a href="{{ url('/pages/size-guide') }}" class="inline-flex items-center gap-1.5 text-sm text-ink-soft underline-offset-4 hover:text-ink hover:underline">{{ icon("ruler", "size-4") }} {{ t("product.size_guide") }}</a>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              {% for s in sizes %}
+              <label class="cursor-pointer">
+                <input type="radio" name="size_id" value="{{ s.id }}" class="peer sr-only" data-size {% if not size_available(s.id) %}data-soldout{% endif %} required>
+                <span class="chip min-w-12 peer-checked:border-ink peer-checked:bg-ink peer-checked:text-bone peer-focus-visible:outline-2 peer-focus-visible:outline-accent peer-data-[soldout]:text-ink-soft/50 peer-data-[soldout]:line-through">{{ localized(s, "label") }}</span>
+                <span class="sr-only" data-size-state>{% if not size_available(s.id) %} ({{ t("product.sold_out") }}){% endif %}</span>
+              </label>
+              {% endfor %}
+            </div>
+          </fieldset>
+          {% endif %}
+
+          <p class="mb-4 min-h-5 text-sm" data-stock aria-live="polite"
+             data-msg-in="{{ t('product.in_stock') }}" data-msg-low="{{ t('product.low_stock', count='{n}') }}" data-msg-out="{{ t('product.sold_out_long') }}"
+             data-msg-add="{{ t('product.add_to_cart') }}" data-msg-soldout="{{ t('product.sold_out') }}">
+            {% if not card.in_stock %}<span class="text-danger">{{ t("product.sold_out_long") }}</span>
+            {% elif single_variant and single_variant.stock <= settings.low_stock_threshold %}<span class="text-accent-ink">{{ t("product.low_stock", count=single_variant.stock) }}</span>
+            {% elif single_variant %}<span class="text-olive">{{ t("product.in_stock") }}</span>{% endif %}
+          </p>
+
+          <div class="flex gap-3">
+            <label for="qty" class="sr-only">{{ t("product.quantity") }}</label>
+            <select id="qty" name="quantity" class="field w-20 shrink-0">
+              {% for n in range(1, 6) %}<option value="{{ n }}">{{ n }}</option>{% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary flex-1" data-add-button {% if not card.in_stock %}disabled{% endif %}>
+              <span data-add-label>{{ t("product.add_to_cart") if card.in_stock else t("product.sold_out") }}</span>
+              {{ icon("loader", "htmx-indicator size-4 animate-spin") }}
+            </button>
+          </div>
+        </form>
+
+        <ul class="mt-8 space-y-3 border-t border-line pt-6 text-sm" role="list">
+          <li class="flex gap-3">{{ icon("truck", "size-5 shrink-0 text-ink-soft") }}<span>{{ t("product.delivery_note", min=settings.delivery_days_min, max=settings.delivery_days_max) }}</span></li>
+          <li class="flex gap-3">{{ icon("banknote", "size-5 shrink-0 text-ink-soft") }}<span>{{ t("product.payment_note") }}</span></li>
+          <li class="flex gap-3">{{ icon("return", "size-5 shrink-0 text-ink-soft") }}<span>{{ t("product.returns_note") }} <a href="{{ url('/pages/shipping-returns') }}" class="link">{{ t("common.details") }}</a></span></li>
+        </ul>
+
+        {% set desc = localized(product, "description") %}
+        {% if desc %}
+        <div class="mt-8 border-t border-line pt-6">
+          <h2 class="label-caps font-sans text-ink-soft">{{ t("product.details") }}</h2>
+          <div class="prose-store mt-3 whitespace-pre-line">{{ desc }}</div>
+        </div>
+        {% endif %}
+
+        {% if settings.whatsapp_number %}
+        <a href="{{ whatsapp_link(whatsapp_message) }}" target="_blank" rel="noopener" class="mt-6 inline-flex items-center gap-2 text-sm font-medium underline-offset-4 hover:underline">
+          {{ icon("chat", "size-4") }} {{ t("product.ask_whatsapp") }}
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% if related %}
+  <section class="mt-24" aria-labelledby="related-heading">
+    <h2 id="related-heading" class="mb-8 text-3xl">{{ t("product.related") }}</h2>
+    <div class="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4 lg:gap-x-6">
+      {% for card in related %}{% include "components/product_card.html" %}{% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

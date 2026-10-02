@@ -1,0 +1,221 @@
+{% extends "admin/base.html" %}
+{% from "components/icons.html" import icon %}
+{% block title %}{{ product.name_en if product else "New product" }}{% endblock %}
+{% block content %}
+<a href="/admin/products" class="inline-flex items-center gap-1 text-sm text-ink-soft hover:text-ink">{{ icon("arrow-left", "size-4") }} Products</a>
+<div class="mt-2 flex flex-wrap items-center justify-between gap-3">
+  <h1 class="text-3xl">{{ product.name_en if product else "New product" }}</h1>
+  {% if product %}<a href="/p/{{ product.slug }}" target="_blank" rel="noopener" class="link inline-flex items-center gap-1 text-sm">View in store {{ icon("external", "size-3.5") }}</a>{% endif %}
+</div>
+
+{# ---------------------------------------------------------------- details #}
+<form method="post" action="{{ '/admin/products/' ~ product.id if product else '/admin/products' }}" class="mt-8 rounded-md border border-line bg-paper p-6">
+  {{ csrf_input(request) }}
+  <h2 class="text-xl">Details</h2>
+  <div class="mt-5 grid gap-5 md:grid-cols-2">
+    <div>
+      <label for="name_en" class="field-label">Name (English)</label>
+      <input id="name_en" name="name_en" required maxlength="160" value="{{ product.name_en if product else '' }}" class="field">
+    </div>
+    <div>
+      <label for="name_ar" class="field-label">Name (Arabic)</label>
+      <input id="name_ar" name="name_ar" maxlength="160" dir="rtl" lang="ar" value="{{ product.name_ar if product else '' }}" class="field">
+    </div>
+    <div>
+      <label for="description_en" class="field-label">Description (English)</label>
+      <textarea id="description_en" name="description_en" rows="5" class="field">{{ product.description_en if product else '' }}</textarea>
+    </div>
+    <div>
+      <label for="description_ar" class="field-label">Description (Arabic)</label>
+      <textarea id="description_ar" name="description_ar" rows="5" dir="rtl" lang="ar" class="field">{{ product.description_ar if product else '' }}</textarea>
+    </div>
+    <div>
+      <label for="price_egp" class="field-label">Price (EGP)</label>
+      <input id="price_egp" name="price_egp" required inputmode="decimal" value="{{ egp(product.price_piasters) if product else '' }}" class="field" placeholder="450">
+    </div>
+    <div>
+      <label for="compare_at_egp" class="field-label">Compare-at price (EGP) <span class="font-normal text-ink-soft">— optional, shows as a sale</span></label>
+      <input id="compare_at_egp" name="compare_at_egp" inputmode="decimal" value="{{ egp(product.compare_at_piasters) if product and product.compare_at_piasters else '' }}" class="field" placeholder="600">
+    </div>
+    <div>
+      <label for="category_id" class="field-label">Category</label>
+      <select id="category_id" name="category_id" class="field">
+        <option value="">No category</option>
+        {% for c in categories %}<option value="{{ c.id }}" {% if product and product.category_id == c.id %}selected{% endif %}>{{ c.name_en }}{% if not c.is_active %} (hidden){% endif %}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label for="slug" class="field-label">URL name</label>
+        <input id="slug" name="slug" maxlength="160" value="{{ product.slug if product else '' }}" placeholder="auto" class="field" dir="ltr">
+      </div>
+      <div>
+        <label for="sort_order" class="field-label">Sort order</label>
+        <input id="sort_order" name="sort_order" type="number" value="{{ product.sort_order if product else 0 }}" class="field">
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-6 md:col-span-2">
+      <label class="inline-flex items-center gap-2"><input type="checkbox" name="is_active" class="size-4 accent-[var(--color-ink)]" {% if not product or product.is_active %}checked{% endif %}> Visible in store</label>
+      <label class="inline-flex items-center gap-2"><input type="checkbox" name="is_featured" class="size-4 accent-[var(--color-ink)]" {% if product and product.is_featured %}checked{% endif %}> Featured on home page</label>
+    </div>
+  </div>
+  <button class="btn btn-primary mt-6">{{ "Save details" if product else "Create product" }}</button>
+</form>
+
+{% if product %}
+{# ---------------------------------------------------------------- options #}
+<section id="variants" class="mt-8 scroll-mt-6 rounded-md border border-line bg-paper p-6">
+  <h2 class="text-xl">Colors, sizes &amp; stock</h2>
+  <p class="mt-1 text-sm text-ink-soft">Add the colors this product comes in and tick its sizes. Every color × size combination gets its own stock below.</p>
+
+  <div class="mt-6 grid gap-8 lg:grid-cols-2">
+    <div>
+      <h3 class="font-sans text-sm font-semibold">Colors</h3>
+      <ul class="mt-3 flex flex-wrap gap-2" role="list">
+        {% for c in product.colors %}
+        <li class="flex items-center gap-2 rounded-sm border border-line py-1 ps-2 pe-1 text-sm">
+          <span class="size-4 rounded-full border border-ink/15" style="background: {{ c.hex }}"></span>
+          {{ c.name_en }} <span class="text-ink-soft" dir="rtl">{{ c.name_ar }}</span>
+          <form method="post" action="/admin/products/{{ product.id }}/colors/{{ c.id }}/delete" data-confirm="Remove {{ c.name_en }}? Its stock rows are removed too.">
+            {{ csrf_input(request) }}<button class="p-1 text-ink-soft hover:text-danger" aria-label="Remove {{ c.name_en }}">{{ icon("x", "size-3.5") }}</button>
+          </form>
+        </li>
+        {% else %}
+        <li class="text-sm text-ink-soft">No colors — the product is sold as a single color.</li>
+        {% endfor %}
+      </ul>
+      <form method="post" action="/admin/products/{{ product.id }}/colors" class="mt-4 flex flex-wrap items-end gap-2">
+        {{ csrf_input(request) }}
+        <div><label for="c-en" class="field-label text-xs">Color name</label><input id="c-en" name="name_en" required maxlength="60" placeholder="Olive" class="field w-32"></div>
+        <div><label for="c-ar" class="field-label text-xs">Arabic</label><input id="c-ar" name="name_ar" maxlength="60" placeholder="زيتي" dir="rtl" class="field w-28"></div>
+        <div><label for="c-hex" class="field-label text-xs">Swatch</label><input id="c-hex" name="hex" type="color" value="#4A5A3F" class="h-[42px] w-14 cursor-pointer rounded-sm border border-line bg-paper p-1"></div>
+        <button class="btn btn-secondary">Add color</button>
+      </form>
+    </div>
+
+    <form method="post" action="/admin/products/{{ product.id }}/sizes">
+      {{ csrf_input(request) }}
+      <h3 class="font-sans text-sm font-semibold">Sizes</h3>
+      {% set groups = sizes|groupby("size_group") %}
+      {% for group, items in groups %}
+      <fieldset class="mt-3">
+        <legend class="text-xs uppercase tracking-wide text-ink-soft">{{ group.replace("_", " ") }}</legend>
+        <div class="mt-1.5 flex flex-wrap gap-1.5">
+          {% for s in items %}
+          <label class="cursor-pointer">
+            <input type="checkbox" name="size_ids" value="{{ s.id }}" class="peer sr-only" {% if s.id in used_sizes %}checked{% endif %}>
+            <span class="chip peer-checked:border-ink peer-checked:bg-ink peer-checked:text-bone peer-focus-visible:outline-2 peer-focus-visible:outline-accent">{{ s.label_en }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </fieldset>
+      {% else %}
+      <p class="mt-3 text-sm text-ink-soft">No sizes defined yet. <a href="/admin/categories#sizes" class="link">Add sizes</a>.</p>
+      {% endfor %}
+      <p class="mt-3 text-xs text-ink-soft">No size ticked = one size. Missing a size? <a href="/admin/categories#sizes" class="link">Manage sizes</a>.</p>
+      <button class="btn btn-secondary mt-3">Update sizes</button>
+    </form>
+  </div>
+
+  <form method="post" action="/admin/products/{{ product.id }}/variants" class="mt-8">
+    {{ csrf_input(request) }}
+    <div class="overflow-x-auto rounded-sm border border-line">
+      <table class="w-full min-w-[640px] text-sm">
+        <thead class="border-b border-line bg-bone text-xs uppercase tracking-wide text-ink-soft">
+          <tr>
+            <th class="px-3 py-2.5 text-start font-semibold">Option</th>
+            <th class="px-3 py-2.5 text-start font-semibold">Stock</th>
+            <th class="px-3 py-2.5 text-start font-semibold">Price override (EGP)</th>
+            <th class="px-3 py-2.5 text-start font-semibold">SKU</th>
+            <th class="px-3 py-2.5 text-start font-semibold">On sale</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-line">
+          {% for v in variants %}
+          <tr class="{% if not v.is_active %}bg-bone text-ink-soft{% endif %}">
+            <td class="px-3 py-2">
+              <input type="hidden" name="variant_id" value="{{ v.id }}">
+              <span class="inline-flex items-center gap-2">
+                {% if v.color %}<span class="size-3.5 rounded-full border border-ink/15" style="background: {{ v.color.hex }}"></span>{% endif %}
+                {{ v.color.name_en if v.color else "" }}{% if v.color and v.size %} / {% endif %}{{ v.size.label_en if v.size else "" }}{% if not v.color and not v.size %}Default{% endif %}
+                {% if not v.is_active %}<span class="text-xs">(not offered)</span>{% endif %}
+              </span>
+            </td>
+            <td class="px-3 py-2"><input name="stock_{{ v.id }}" type="number" min="0" value="{{ v.stock }}" class="field w-24 py-1.5 {% if v.stock == 0 and v.is_active %}border-danger/50{% endif %}" aria-label="Stock"></td>
+            <td class="px-3 py-2"><input name="price_{{ v.id }}" inputmode="decimal" value="{{ egp(v.price_override_piasters) if v.price_override_piasters else '' }}" placeholder="{{ egp(product.price_piasters) }}" class="field w-28 py-1.5" aria-label="Price override"></td>
+            <td class="px-3 py-2"><input name="sku_{{ v.id }}" value="{{ v.sku }}" class="field w-48 py-1.5 font-mono text-xs" aria-label="SKU" dir="ltr"></td>
+            <td class="px-3 py-2"><input type="checkbox" name="active_{{ v.id }}" class="size-4 accent-[var(--color-ink)]" {% if v.is_active %}checked{% endif %} aria-label="Offered"></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <button class="btn btn-primary mt-4">Save stock &amp; prices</button>
+  </form>
+</section>
+
+{# ---------------------------------------------------------------- images #}
+<section id="images" class="mt-8 scroll-mt-6 rounded-md border border-line bg-paper p-6">
+  <h2 class="text-xl">Photos</h2>
+  <p class="mt-1 text-sm text-ink-soft">The first photo is the main one. Link a photo to a color so it shows when customers pick that color. Photos are converted to WebP and resized automatically.</p>
+
+  <ul class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5" role="list">
+    {% for img in product.images %}
+    <li class="rounded-sm border border-line p-2">
+      <img src="{{ img.url }}" alt="" width="200" height="250" loading="lazy" class="aspect-[4/5] w-full rounded-xs bg-sand object-cover">
+      <form method="post" action="/admin/products/{{ product.id }}/images/{{ img.id }}" class="mt-2 space-y-2">
+        {{ csrf_input(request) }}
+        {% if product.colors %}
+        <label class="sr-only" for="img-color-{{ img.id }}">Color</label>
+        <select id="img-color-{{ img.id }}" name="color_id" class="field py-1.5 text-xs">
+          <option value="">All colors</option>
+          {% for c in product.colors %}<option value="{{ c.id }}" {% if img.color_id == c.id %}selected{% endif %}>{{ c.name_en }}</option>{% endfor %}
+        </select>
+        {% endif %}
+        <div class="flex items-center justify-between gap-1">
+          <div class="flex">
+            <button name="action" value="up" class="p-1.5 text-ink-soft hover:text-ink disabled:opacity-30" aria-label="Move earlier" {% if loop.first %}disabled{% endif %}>{{ icon("chevron-left", "size-4") }}</button>
+            <button name="action" value="down" class="p-1.5 text-ink-soft hover:text-ink disabled:opacity-30" aria-label="Move later" {% if loop.last %}disabled{% endif %}>{{ icon("chevron-right", "size-4") }}</button>
+          </div>
+          {% if product.colors %}<button name="action" value="color" class="text-xs text-ink-soft hover:text-ink hover:underline">Save color</button>{% endif %}
+          <button name="action" value="delete" class="p-1.5 text-ink-soft hover:text-danger" aria-label="Delete photo" formnovalidate>{{ icon("trash", "size-4") }}</button>
+        </div>
+      </form>
+    </li>
+    {% else %}
+    <li class="col-span-full text-sm text-ink-soft">No photos yet.</li>
+    {% endfor %}
+  </ul>
+
+  <form method="post" action="/admin/products/{{ product.id }}/images" enctype="multipart/form-data" class="mt-6 flex flex-wrap items-end gap-3 border-t border-line pt-6">
+    {{ csrf_input(request) }}
+    <div>
+      <label for="files" class="field-label">Upload photos</label>
+      <input id="files" name="files" type="file" accept="image/jpeg,image/png,image/webp" multiple class="block text-sm file:me-3 file:rounded-sm file:border file:border-ink file:bg-paper file:px-3 file:py-2 file:text-sm file:font-medium">
+    </div>
+    <div>
+      <label for="image_url" class="field-label">…or paste an image link</label>
+      <input id="image_url" name="image_url" type="url" placeholder="https://" class="field w-64" dir="ltr">
+    </div>
+    {% if product.colors %}
+    <div>
+      <label for="upload-color" class="field-label">For color</label>
+      <select id="upload-color" name="color_id" class="field w-40">
+        <option value="">All colors</option>
+        {% for c in product.colors %}<option value="{{ c.id }}">{{ c.name_en }}</option>{% endfor %}
+      </select>
+    </div>
+    {% endif %}
+    <button class="btn btn-primary">Add photos</button>
+  </form>
+</section>
+
+<section class="mt-8 rounded-md border border-danger/30 p-6">
+  <h2 class="text-xl">Delete product</h2>
+  <p class="mt-1 text-sm text-ink-soft">To hide it temporarily, untick "Visible in store" instead. Past orders keep their details either way.</p>
+  <form method="post" action="/admin/products/{{ product.id }}/delete" class="mt-4" data-confirm="Delete {{ product.name_en }} permanently? This can't be undone.">
+    {{ csrf_input(request) }}<button class="btn btn-secondary border-danger text-danger hover:bg-danger hover:text-white">Delete permanently</button>
+  </form>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+{% from "admin/_macros.html" import egp %}
+{% block title %}Products{% endblock %}
+{% block content %}
+<div class="flex flex-wrap items-end justify-between gap-4">
+  <h1 class="text-3xl">Products</h1>
+  <a href="/admin/products/new" class="btn btn-primary">New product</a>
+</div>
+<form method="get" action="/admin/products" class="mt-6">
+  <label for="q" class="sr-only">Search</label>
+  <input id="q" name="q" type="search" value="{{ q }}" placeholder="Search products" class="field max-w-sm">
+</form>
+<div class="mt-6 overflow-x-auto rounded-md border border-line bg-paper">
+  <table class="w-full min-w-[720px] text-sm">
+    <thead class="border-b border-line bg-bone text-xs uppercase tracking-wide text-ink-soft">
+      <tr>
+        <th class="px-4 py-3 text-start font-semibold">Product</th>
+        <th class="px-4 py-3 text-start font-semibold">Category</th>
+        <th class="px-4 py-3 text-start font-semibold">Price</th>
+        <th class="px-4 py-3 text-start font-semibold">Stock</th>
+        <th class="px-4 py-3 text-start font-semibold">Visible</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-line">
+    {% for p in products %}
+      {% set stock = p.variants|selectattr("is_active")|sum(attribute="stock") %}
+      <tr class="hover:bg-bone">
+        <td class="px-4 py-3">
+          <a href="/admin/products/{{ p.id }}" class="flex items-center gap-3">
+            {% if p.images %}<img src="{{ p.images[0].url }}" alt="" width="40" height="50" loading="lazy" class="h-[50px] w-10 rounded-xs bg-sand object-cover">{% else %}<span class="h-[50px] w-10 rounded-xs bg-sand"></span>{% endif %}
+            <span><span class="font-medium hover:underline">{{ p.name_en }}</span><br><span class="text-ink-soft" lang="ar" dir="rtl">{{ p.name_ar }}</span></span>
+          </a>
+        </td>
+        <td class="px-4 py-3">{{ p.category.name_en if p.category else "—" }}</td>
+        <td class="price px-4 py-3">{{ egp(p.price_piasters) }}{% if p.compare_at_piasters %} <s class="text-ink-soft">{{ egp(p.compare_at_piasters) }}</s>{% endif %}</td>
+        <td class="price px-4 py-3 {% if stock == 0 %}text-danger{% elif stock <= settings.low_stock_threshold %}text-accent-ink{% endif %}">{{ stock }}</td>
+        <td class="px-4 py-3">{% if p.is_active %}<span class="text-olive">Yes</span>{% else %}<span class="text-ink-soft">Hidden</span>{% endif %}{% if p.is_featured %} · Featured{% endif %}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5" class="px-4 py-10 text-center text-ink-soft">No products yet. <a href="/admin/products/new" class="link">Add the first one</a>.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

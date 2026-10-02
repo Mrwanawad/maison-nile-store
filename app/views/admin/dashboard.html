@@ -1,0 +1,57 @@
+{% extends "admin/base.html" %}
+{% from "admin/_macros.html" import status_badge, egp, when %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1 class="text-3xl">Good to see you, {{ admin.display_name.split(' ')[0] }}.</h1>
+
+<div class="mt-8 grid gap-px overflow-hidden rounded-md border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
+  <div class="bg-paper p-5"><p class="text-sm text-ink-soft">Orders today</p><p class="price mt-1 font-display text-3xl">{{ today.orders }}</p></div>
+  <div class="bg-paper p-5"><p class="text-sm text-ink-soft">Sales today</p><p class="price mt-1 font-display text-3xl">{{ egp(today.revenue) }}</p></div>
+  <div class="bg-paper p-5"><p class="text-sm text-ink-soft">Orders, last 7 days</p><p class="price mt-1 font-display text-3xl">{{ week.orders }}</p></div>
+  <div class="bg-paper p-5"><p class="text-sm text-ink-soft">Sales, last 7 days</p><p class="price mt-1 font-display text-3xl">{{ egp(week.revenue) }}</p></div>
+</div>
+
+<div class="mt-6 flex flex-wrap gap-2">
+  {% for s in ["pending", "confirmed", "shipped", "delivered", "cancelled"] %}
+  <a href="/admin/orders?status={{ s }}" class="chip gap-2">{{ s|capitalize }} <span class="price text-ink-soft">{{ by_status.get(s, 0) }}</span></a>
+  {% endfor %}
+</div>
+
+<div class="mt-10 grid gap-10 lg:grid-cols-3">
+  <section class="lg:col-span-2">
+    <div class="flex items-baseline justify-between"><h2 class="text-xl">Latest orders</h2><a href="/admin/orders" class="link text-sm">All orders</a></div>
+    <div class="mt-4 overflow-x-auto rounded-md border border-line bg-paper">
+      <table class="w-full text-sm">
+        <tbody class="divide-y divide-line">
+        {% for o in recent %}
+          <tr class="hover:bg-bone">
+            <td class="px-4 py-3"><a href="/admin/orders/{{ o.id }}" class="font-medium hover:underline">#{{ o.order_number }}</a></td>
+            <td class="px-4 py-3">{{ o.ship_full_name }}</td>
+            <td class="px-4 py-3">{{ status_badge(o.status.value) }}</td>
+            <td class="px-4 py-3 text-ink-soft">{{ when(o.created_at) }}</td>
+            <td class="price px-4 py-3 text-end">{{ egp(o.total_piasters) }}</td>
+          </tr>
+        {% else %}
+          <tr><td class="px-4 py-8 text-center text-ink-soft">No orders yet.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <section>
+    <h2 class="text-xl">Low stock</h2>
+    <ul class="mt-4 divide-y divide-line rounded-md border border-line bg-paper text-sm" role="list">
+      {% for v in low_stock[:12] %}
+      <li class="flex items-center justify-between gap-3 px-4 py-2.5">
+        <a href="/admin/products/{{ v.product_id }}#variants" class="min-w-0 truncate hover:underline">
+          {{ v.product.name_en }}{% if v.color or v.size %} <span class="text-ink-soft">· {{ v.color.name_en if v.color }}{% if v.color and v.size %} / {% endif %}{{ v.size.label_en if v.size }}</span>{% endif %}
+        </a>
+        <span class="price shrink-0 font-semibold {% if v.stock == 0 %}text-danger{% else %}text-accent-ink{% endif %}">{{ v.stock }}</span>
+      </li>
+      {% else %}
+      <li class="px-4 py-6 text-center text-ink-soft">All stocked up.</li>
+      {% endfor %}
+    </ul>
+  </section>
+</div>
+{% endblock %}

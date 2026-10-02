@@ -1,0 +1,16 @@
+{
+  "name": "brand-store-assets",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i app/static/css/input.css -o app/static/css/app.css --minify",
+    "watch:css": "tailwindcss -i app/static/css/input.css -o app/static/css/app.css --watch=always",
+    "vendor": "node scripts/vendor.mjs",
+    "build": "npm run vendor && npm run build:css"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "htmx.org": "^2.0.11",
+    "preline": "^4.2.0",
+    "tailwindcss": "^4.3.3"
+  }
+}

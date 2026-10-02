@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% from "components/icons.html" import icon %}
+{% block content %}
+<section class="container-page grid items-end gap-8 pt-8 pb-16 md:grid-cols-12 md:gap-10 md:pt-14 md:pb-24">
+  <div class="md:col-span-5 md:pb-10">
+    <p class="label-caps text-accent">{{ t("home.eyebrow") }}</p>
+    <h1 class="mt-4 text-[44px] font-normal sm:text-6xl lg:text-7xl">{{ t("home.headline") }}</h1>
+    <p class="mt-6 max-w-md text-lg text-ink-soft">{{ tagline() }}</p>
+    <div class="mt-8 flex flex-wrap items-center gap-4">
+      <a href="{{ url('/shop') }}" class="btn btn-primary">{{ t("home.cta") }} {{ icon("arrow-right", "size-4", flip=true) }}</a>
+      <a href="{{ url('/shop?sort=newest') }}" class="link text-sm font-medium">{{ t("home.cta_new") }}</a>
+    </div>
+  </div>
+  <div class="md:col-span-7">
+    <div class="relative aspect-[4/5] overflow-hidden rounded-md bg-sand sm:aspect-[5/4] md:aspect-[4/3.6]">
+      <img src="{{ settings.hero_image_url or static('img/placeholder.svg') }}" alt="{{ t('home.hero_alt') }}"
+           width="1200" height="1080" fetchpriority="high" class="size-full object-cover">
+    </div>
+  </div>
+</section>
+
+{% if nav_categories() %}
+<section class="container-page" aria-labelledby="cat-heading">
+  <h2 id="cat-heading" class="sr-only">{{ t("home.categories") }}</h2>
+  <div class="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0">
+    <a href="{{ url('/shop') }}" class="chip shrink-0">{{ t("nav.shop_all") }}</a>
+    {% for c in nav_categories() %}<a href="{{ url('/c/' ~ c.slug) }}" class="chip shrink-0">{{ c.name(locale()) }}</a>{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="container-page mt-10" aria-labelledby="featured-heading">
+  <div class="mb-8 flex items-end justify-between gap-4">
+    <h2 id="featured-heading" class="text-3xl md:text-4xl">{{ t("home.featured") }}</h2>
+    <a href="{{ url('/shop') }}" class="link shrink-0 text-sm font-medium">{{ t("home.view_all") }}</a>
+  </div>
+  <div class="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-6">
+    {% for card in cards %}{% set eager = loop.index <= 2 %}{% include "components/product_card.html" %}{% endfor %}
+  </div>
+</section>
+
+<section class="container-page mt-24">
+  <div class="grid gap-px overflow-hidden rounded-md border border-line bg-line sm:grid-cols-3">
+    {% for key, ic in [("delivery", "truck"), ("payment", "shield"), ("returns", "return")] %}
+    <div class="bg-bone p-6 md:p-8">
+      {{ icon(ic, "size-6 text-accent") }}
+      <p class="mt-4 font-medium">{{ t("home.promise." ~ key ~ ".title") }}</p>
+      <p class="mt-1 text-sm text-ink-soft">{{ t("home.promise." ~ key ~ ".body", min=settings.delivery_days_min, max=settings.delivery_days_max) }}</p>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="container-page mt-24 grid gap-8 md:grid-cols-12">
+  <h2 class="text-3xl md:col-span-5 md:text-4xl">{{ t("home.story_title") }}</h2>
+  <div class="md:col-span-6 md:col-start-7">
+    <p class="text-lg leading-8 text-ink-soft">{{ t("home.story_body", brand=brand_name()) }}</p>
+    <a href="{{ url('/pages/about') }}" class="link mt-6 inline-block text-sm font-medium">{{ t("home.story_cta") }}</a>
+  </div>
+</section>
+{% endblock %}
