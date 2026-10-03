@@ -5,6 +5,18 @@
 
 ---
 
+## 0a. Deploy hand-off (2026-10-03, branch `claude/nifty-davinci-f88xxv`)
+
+- `609ce36`: `cleanup.yml` / `backup.yml` now skip with a notice until their GitHub secrets exist (the cleanup cron was failing every 30 min with `curl: (3) No host part` because `SITE_URL` was unset). Backup installs the `pg_dump` major matching the server. **Not on `main` yet**: scheduled workflows only run from the default branch, so failure emails continue until merged.
+- `161930d`: `.mcp.json` with the Supabase MCP server (project ref `bmswdsenobkgcdmmalcu`, full features, not read-only). Needs interactive approval + browser OAuth, so unusable in cloud sessions. Recommended: add `&read_only=true`.
+- Supabase project already exists: ref `bmswdsenobkgcdmmalcu`.
+- Deploy is to be automated from a cloud session via APIs: the user adds `RENDER_API_KEY` and `SUPABASE_ACCESS_TOKEN` as environment variables and allows `api.render.com`, `api.supabase.com` in the environment's network policy. Plan:
+  1. Supabase Management API: confirm the project (region, Postgres version), create public bucket `products`, get the transaction pooler URL (6543, for Render `DATABASE_URL` with `postgresql+asyncpg://`), the session pooler URL (5432, for GitHub `BACKUP_DATABASE_URL`), the project URL and the `service_role` key. The DB password is not retrievable via API; reset it via API if the user doesn't have it.
+  2. Render API: create a free Docker web service in Frankfurt from `Mrwanawad/maison-nile-store` (`main`, `docker/Dockerfile`, health check `/health`) with the env vars from `render.yaml` + the Supabase values; `BASE_URL` = the service's `onrender.com` URL (https). Requires the user's Render account to be connected to GitHub.
+  3. Verify `/health`, storefront, `/admin`; create the two admins (Render shell may be paid-only; otherwise run `create_admin` against Supabase from the session).
+  4. The user sets the 4 GitHub Actions secrets (`SITE_URL`, `INTERNAL_CRON_TOKEN`, `BACKUP_DATABASE_URL`, `BACKUP_PASSPHRASE`); then dispatch both scheduled workflows.
+  5. Tell the user to revoke both API tokens afterwards (they are full-access).
+
 ## 0. Changes made in the latest sessions (2026-10-03)
 
 **Session B: "Cairo pop" frontend redesign (commit `3190a5b`).** The user found the v2 design "basic and AI-looking" and asked for ready-made components, animation and a full polish. They chose: direction **Bold street / Cairo pop**, motion **rich but tasteful**, palette/fonts **free to change**.
