@@ -1,23 +1,26 @@
 # CHECKPOINT — Brand Store (Egyptian e-commerce MVP)
 
-> Hand-off file for a fresh session. Read this first, then `docs/DESIGN.md` (section 15 overrides older sections) and `README.md`.
-> Last updated: 2026-10-03. Branch `main`, 9 local commits (latest `156b9c4`), **no git remote yet**. Uncommitted: `docker/` + `docs/` moves and related README/CI/render edits (see §0).
+> Hand-off file for a fresh session. Read this first, then `docs/DESIGN.md` (section 15 overrides older sections; the last bullet, "Visual identity v3", overrides all earlier visual specs) and `README.md`.
+> Last updated: 2026-10-03. Branch `main`, all work committed (latest feature commit `3190a5b`), working tree clean. **No git remote yet** (`gh` is logged in as `Mrwanawad`; repo not created).
 
 ---
 
-## 0. Changes made in the latest session (2026-10-03)
+## 0. Changes made in the latest sessions (2026-10-03)
 
-Repo restructure, all committed except where noted:
+**Session B: "Cairo pop" frontend redesign (commit `3190a5b`).** The user found the v2 design "basic and AI-looking" and asked for ready-made components, animation and a full polish. They chose: direction **Bold street / Cairo pop**, motion **rich but tasteful**, palette/fonts **free to change**.
+- **Identity:** Lalezar (Cairo cinema-poster display, Latin + Arabic, one weight) + Readex Pro (body). Tokens in `src/frontend/static/css/input.css`: chalk `#F6F6F1`, ink `#10133A`, cobalt accent `#1E3FE0` / `#1530B8` (default in `config.py`, `.env.example` and local `.env`), mango `#FFC21A`, hibiscus `#E5306B` (new `hibiscus` token). 2px ink borders, hard offset shadows (`--shadow-pop`), sticker badges (`.badge-sale/.badge-new/.badge-soldout`), `.btn-pop` (mango CTA, one per screen), `.panel-pop`, `.marquee`, `.card`/`.card-media`. Alexandria removed.
+- **Components (Preline, vendored per plugin):** overlay (cart drawer, mobile menu, size-guide modal), accordion (product details / delivery), collapse (mobile filters). `app.js` re-inits all three after HTMX swaps.
+- **Motion:** Motion One (`motion` npm, vendored to `static/vendor/motion.js`, ~47 KB gz) driven by new `static/js/fx.js`: hero load sequence (`[data-hero]`, `[data-hero-part]`), scroll reveals (`[data-reveal]`, `[data-reveal-stagger]`), header hide-on-scroll (`[data-header]`), cart badge pop + bag wiggle, drawer item cascade, toast entrance. New blocking `static/js/boot.js` adds `.js` before paint; `.fx-off` shows everything if Motion is missing (2.5 s) or reduced motion is on. CSS marquees. Cross-document View Transitions: card photo and product gallery share `view-transition-name: p-<slug>`.
+- **Pages:** new `components/announcement.html` (mango ticker); new header/menu/drawer/footer (giant wordmark); home (bilingual poster hero, tilted photo, spinning "New drop / وصل حديثًا" sticker, category marquee, three sticker promise cards, story); listing (mango header + category chips, sticky filter bar); product (accordion, size-guide modal via `hx-select=".prose-store"`); cart, checkout (numbered 1-2-3 steps), order, track, 404, content, error restyled. Email colors updated.
+- **New locale keys (EN + AR):** `bar.delivery_short`, `bar.cod`, `bar.exchange`, `bar.made`, `home.sticker`, `home.shop_by`, `home.promise.title`, `filters.toggle`, `product.info`. The rewrite dropped blank lines between key groups in both JSON files (cosmetic).
+- **Bugs found and fixed:** the add-form `htmx:configRequest` guard blocked bubbled requests from links inside the form (size guide stuck on the loader); it now checks `e.detail.elt === form`. Marquees rendered empty and the SVG sticker text vanished in RTL; both containers are now `dir="ltr"` (Arabic still shapes; RTL pages scroll the other way).
+- **Checks:** 72 pytest pass, ruff + mypy clean, 16/16 Playwright browser checks pass (EN + AR), no JS console errors. Desktop + 390px screenshots reviewed for home, shop, product, drawer, size guide, checkout, menu, filters, 404, AR home, admin login.
 
-- **`src/backend/`**: `app/`, `migrations/`, `scripts/` moved here (commit `6437b0d`). pytest `pythonpath`, ruff `src`, mypy `mypy_path`, alembic `script_location` and `prepend_sys_path` updated. Package built with hatchling (`[build-system]` added, `uv.lock` regenerated), so `app` and `scripts` import everywhere after `uv sync`.
-- **`src/frontend/`**: Tailwind source, `static/` (css input, js, img, fonts, vendor build output), `package.json`, `package-lock.json`, `scripts/vendor.mjs` (commit `2f64891`). Tailwind `@source` scans `../../../backend/app/views`.
-- **`docker/`**: `Dockerfile`, `docker-compose.yml`, `Dockerfile.dockerignore` (BuildKit auto-picks it). Compose runs from repo root with `-f docker/docker-compose.yml`. `render.yaml` and CI point to `docker/Dockerfile`. Uncommitted at last check.
-- **`docs/`**: `DESIGN.md`, `CHECKPOINT.md` moved here. `README.md` stays at root. Uncommitted at last check.
-- **Local run**: DB up (`docker compose -f docker/docker-compose.yml up -d db`), migrations applied, app running on `http://localhost:8000` (`uvicorn app.main:app --app-dir src/backend`). Store `/`, `/ar`, admin `/admin`, API docs `/api/docs`, health `/health`.
-- **Checks after restructure**: ruff, ruff format, mypy, 72 pytest pass, alembic check clean, runtime image builds and runs.
-- **Removed**: root `node_modules` (regenerable). `src/frontend/node_modules` is the new install location.
-
-Next session: commit the uncommitted `docker/` + `docs/` + README/CI/render changes, or confirm they are already committed.
+**Session A: repo restructure (commits `6437b0d`, `2f64891`, `156b9c4`, `3836bf3`, `baea3aa`).**
+- **`src/backend/`**: `app/`, `migrations/`, `scripts/`. pytest `pythonpath`, ruff `src`, mypy `mypy_path`, alembic paths updated; hatchling build so `app` and `scripts` import after `uv sync`.
+- **`src/frontend/`**: Tailwind source, `static/`, `package.json`, `scripts/vendor.mjs`. Tailwind `@source` scans `../../../backend/app/views`. `src/frontend/node_modules` is the install location.
+- **`docker/`**: `Dockerfile`, `docker-compose.yml`, `Dockerfile.dockerignore`. Compose runs from repo root with `-f docker/docker-compose.yml`. `render.yaml` and CI point to `docker/Dockerfile`.
+- **`docs/`**: `DESIGN.md`, `CHECKPOINT.md`. `README.md` stays at root.
 
 ---
 
@@ -39,7 +42,7 @@ The MVP is **built, tested and committed locally**. A bilingual (EN/AR) store fo
 
 ## 3. Stack (fixed by the user)
 
-FastAPI + Uvicorn (1 worker) · Jinja2 server-rendered HTML · HTMX 2 · Tailwind CSS v4 (built at build time) + Preline (only the **overlay** plugin) · SQLAlchemy 2 async + asyncpg · Alembic · PostgreSQL 16 locally / Supabase in prod · Pydantic v2 · httpx · slowapi · Pillow · bcrypt · Sentry SDK (optional) · pytest · ruff · mypy --strict.
+FastAPI + Uvicorn (1 worker) · Jinja2 server-rendered HTML · HTMX 2 · Tailwind CSS v4 (built at build time) + Preline (**overlay, accordion, collapse** plugins) + Motion One (animations) · SQLAlchemy 2 async + asyncpg · Alembic · PostgreSQL 16 locally / Supabase in prod · Pydantic v2 · httpx · slowapi · Pillow · bcrypt · Sentry SDK (optional) · pytest · ruff · mypy --strict.
 Hosting plan: Render free web service (Docker) + Supabase free + UptimeRobot + GitHub Actions.
 
 ---
@@ -62,10 +65,11 @@ src/backend/app/
   views/           base.html, components/, pages/, partials/, admin/, emails/
   locales/         en.json, ar.json (admin.* keys English only)
   content/         en|ar/*.md: about, shipping-returns, size-guide, faq, contact, privacy, terms (PLACEHOLDER text)
-  (src/frontend/static/)  css/input.css (tokens + @font-face), js/app.js; build output: css/app.css, vendor/, fonts/ (gitignored)
+  (src/frontend/static/)  css/input.css (tokens + @font-face + components), js/boot.js (pre-paint .js flag), js/app.js (toasts, drawer, picker, checkout),
+                   js/fx.js (Motion One animations); build output: css/app.css, vendor/ (htmx, preline-*, motion), fonts/ (lalezar-*, readex-*) (gitignored)
 src/backend/migrations/  Alembic, single initial migration a2cf68da34bd (+ enables RLS on all tables)
 src/backend/scripts/ seed.py, create_admin.py, browser_check.py (Playwright)
-src/frontend/scripts/vendor.mjs  copies htmx/preline/fonts into src/frontend/static
+src/frontend/scripts/vendor.mjs  copies htmx, Preline overlay/accordion/collapse, Motion and fonts into src/frontend/static
 tests/             unit/test_utils.py; integration/ test_orders, test_http, test_admin_catalog, test_integrations, test_storefront
 .github/workflows/ ci.yml, backup.yml (nightly encrypted pg_dump), cleanup.yml (every 30 min)
 docker/Dockerfile  stages: assets (node) → base → dev (compose) / runtime (prod, runs alembic then uvicorn)
@@ -90,13 +94,13 @@ Rule: controllers → services → repositories/integrations. Routers never touc
 ## 6. Features — DONE ✅
 
 **Storefront**
-- EN at `/`, AR at `/ar/...` (RTL, logical CSS). Fonts self-hosted: Fraunces + Manrope (EN), Alexandria + IBM Plex Sans Arabic (AR).
-- Home (asymmetric hero, categories, featured grid, promises, story), shop listing with search / category / size / in-stock filters and sort (HTMX, URL updates), category pages, product page (swatches, size buttons, sold-out marked, "Only N left", sale %, gallery per color, size guide, WhatsApp prefilled), related products.
+- EN at `/`, AR at `/ar/...` (RTL, logical CSS). Visual identity "Cairo pop" (DESIGN.md last bullet): Lalezar + Readex Pro, cobalt / mango / hibiscus on chalk, Preline overlay+accordion+collapse, Motion One animations (fx.js), View Transitions.
+- Home (bilingual poster hero + sticker, category marquee, featured grid, sticker promise cards, story), shop listing with search / category / size / in-stock filters and sort (HTMX, URL updates), category pages, product page (swatches, size buttons, sold-out marked, "Only N left", sale %, gallery per color, size-guide modal, info accordion, WhatsApp prefilled), related products.
 - Cart in signed session cookie (`{variant_id: qty}` only). HTMX slide-out drawer + full cart page, toasts, badge. Quantity capped by stock and `MAX_QTY_PER_LINE`. Cart fixes itself when stock drops or a product is hidden.
 - Checkout: inline bilingual validation, Egyptian phone normalization (Arabic digits, +20), governorate select with live fee, details remembered in localStorage, honeypot, double-submit guard.
 - Order page via signed link `/order/{id}?t=...`, progress steps, payment-pending polling, retry payment, Bosta tracking link. Track page (order number + phone).
 - Content pages from Markdown with `.env` values substituted. Branded 404 and 500 pages (500 is localized and shows a reference id).
-- Works without JS for the core flow, except the mobile hamburger menu.
+- Works without JS for the core flow, except the mobile hamburger menu (mobile filters and accordions fall back to open via `<noscript>` styles).
 
 **Orders & money**
 - `order_service.place_order`: one transaction, `SELECT … FOR UPDATE` on variants in id order, prices from DB, stock decremented. Tested: concurrent buyers of the last unit → exactly one succeeds.
@@ -128,9 +132,9 @@ Rule: controllers → services → repositories/integrations. Routers never touc
 
 **Quality**
 - 72 pytest tests on real Postgres (database `store_test`, created automatically); fake HTTP transport for third parties.
-- `src/backend/scripts/browser_check.py`: 16 Playwright checks (EN + AR, 390px).
+- `src/backend/scripts/browser_check.py`: 16 Playwright checks (EN + AR, 390px; opens the mobile filter panel before picking a size).
 - ruff + mypy --strict clean. Pre-commit config present (not installed yet: `uv run pre-commit install`).
-- Lighthouse mobile: Performance 90–97, Accessibility 100, Best practices 100. No horizontal scroll at 360/768/1280.
+- Lighthouse mobile (before the v3 redesign): Performance 90–97, Accessibility 100, Best practices 100. **Not re-measured after v3** (Motion + 2 Preline plugins + Lalezar added; re-run before deploy).
 
 ---
 
@@ -141,7 +145,8 @@ Rule: controllers → services → repositories/integrations. Routers never touc
 3. **Verify against live accounts:** Paymob (Apple Pay can't be tested in Paymob test mode and likely needs a custom domain); Bosta payload (city names/fields may need adjusting; city = governorate English name).
 4. User's **manual local testing** (instructions were given; README has them). Await their feedback.
 5. Deferred by the user to future versions: Meta Pixel / CAPI, GA4, sitemap / OG / structured data / product feeds, SMS OTP provider, Bosta status webhook, customer accounts, discounts/coupons.
-6. Nice-to-have, not started: mobile menu without JS, admin UI in Arabic, image `srcset` for pasted external image links (only Unsplash and our own uploads get srcset), shrinking the 565 MB Docker image.
+6. Re-run Lighthouse after the v3 redesign; check contrast of white text on hibiscus and of mango/ink pairs; real campaign photos will matter a lot for the poster hero.
+7. Nice-to-have, not started: mobile menu without JS, admin UI in Arabic, image `srcset` for pasted external image links (only Unsplash and our own uploads get srcset), shrinking the 565 MB Docker image.
 
 ---
 
@@ -157,11 +162,14 @@ Rule: controllers → services → repositories/integrations. Routers never touc
 - Tailwind v4: can't `@apply` component classes → use `class="btn btn-primary"`; `peer-checked:` needs utilities, not component classes.
 - HTMX filter syntax (`load[this.value]`) needs eval, which CSP blocks → removed; `allowEval:false`.
 - Paymob redirect params can't be trusted → inquiry API reconciliation instead.
+- v3 redesign: a form-level `htmx:configRequest` listener also catches events bubbling from child elements with `hx-*` → always check `e.detail.elt`.
+- v3 redesign: CSS marquees and SVG `textPath` break in RTL documents → give those containers `dir="ltr"`.
+- Tailwind v4: `@apply` of a custom component class (e.g. `.sticker`) fails → group selectors share one `@apply` instead.
 
 **Environment quirks (Windows)**
 - Docker Desktop is not running after a reboot → start it (`"C:\Program Files\Docker\Docker\Docker Desktop.exe"`), then `docker compose -f docker/docker-compose.yml up -d db`. Tests fail with `ConnectionRefusedError` otherwise.
 - `uvicorn --reload` hung once after a change → restart, or run without `--reload`.
-- Git Bash heredocs sometimes mangle content/backslashes → write files with the Write tool or a Python script instead. Use `MSYS_NO_PATHCONV=1` when passing `/paths` as args to Python.
+- Git Bash heredocs sometimes mangle content/backslashes (long Python heredocs with Jinja and quotes fail with `unexpected EOF`) → write files with the Write tool or a Python script file instead. Use `MSYS_NO_PATHCONV=1` when passing `/paths` as args to Python.
 - The Chrome extension window can't be resized (maximized) → use headless Playwright for viewport screenshots (`uv run --with playwright ...`; chromium already installed).
 - CRLF warnings on commit are harmless (`.gitattributes` normalizes to LF).
 
@@ -200,6 +208,13 @@ Local DB state at hand-off: 10 demo products, 0 orders, 1 admin (`owner`).
 ## 11. Commit log
 
 ```
+3190a5b feat: "Cairo pop" storefront redesign with Preline components and Motion animations
+baea3aa docs: move DESIGN and CHECKPOINT into docs/ and fix paths
+3836bf3 refactor: move Docker config into docker/
+156b9c4 docs: update paths for src/backend and src/frontend split
+2f64891 refactor: split frontend assets into src/frontend
+6437b0d refactor: move backend code into src/backend
+262c02e docs: add CHECKPOINT.md hand-off for new sessions
 a462c73 chore: add browser end-to-end check script
 ebbc76d fix: restore delivery fee after saved checkout details; content-hash static URLs
 2466c5f fix: audit fixes from expanded test suite
@@ -209,7 +224,8 @@ d090985 feat: bilingual storefront, checkout, admin and integrations MVP
 
 ## 12. Suggested next steps for the new session
 
-1. Ask the user how their manual test went and fix any issues they report.
-2. Get the deployment accounts (section 7.1) and deploy; verify `/health`, the storefront and admin on the live URL; set up UptimeRobot and the GitHub secrets.
-3. Once client keys arrive: test Paymob in test mode end to end (card first, then Apple Pay on a custom domain), test a Bosta staging shipment, test Telegram and Brevo.
-4. Replace placeholder content and photos; then hand over to the client.
+1. Ask the user for feedback on the v3 "Cairo pop" design and their manual test; fix what they report.
+2. Create the GitHub remote (user asked to "sync"; no remote existed) and push `main`.
+3. Get the deployment accounts (section 7.1) and deploy; verify `/health`, the storefront and admin on the live URL; set up UptimeRobot and the GitHub secrets.
+4. Once client keys arrive: test Paymob in test mode end to end (card first, then Apple Pay on a custom domain), test a Bosta staging shipment, test Telegram and Brevo.
+5. Replace placeholder content and photos; then hand over to the client.
