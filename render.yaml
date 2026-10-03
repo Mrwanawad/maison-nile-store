@@ -21,7 +21,12 @@ services:
         generateValue: true
       - key: INTERNAL_CRON_TOKEN
         generateValue: true
-      - key: BASE_URL
+      # BASE_URL defaults to Render's RENDER_EXTERNAL_URL; set it only for a custom domain.
+      - key: SEED_DEMO_DATA
+        value: "true"
+      - key: ADMIN_BOOTSTRAP_USERNAME
+        sync: false
+      - key: ADMIN_BOOTSTRAP_PASSWORD
         sync: false
       - key: DATABASE_URL
         sync: false

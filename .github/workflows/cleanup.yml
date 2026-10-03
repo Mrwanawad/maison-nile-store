@@ -1,5 +1,6 @@
 # Cancels online orders left unpaid and returns their stock (every 30 minutes).
 # Secrets: SITE_URL (e.g. https://yourbrand.onrender.com), INTERNAL_CRON_TOKEN.
+# Until both secrets are set (before the first deploy) the job skips with a notice.
 name: Unpaid order cleanup
 
 on:
@@ -7,11 +8,25 @@ on:
     - cron: "*/30 * * * *"
   workflow_dispatch:
 
+concurrency:
+  group: cleanup
+  cancel-in-progress: false
+
 jobs:
   cleanup:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SITE_URL: ${{ secrets.SITE_URL }}
+      INTERNAL_CRON_TOKEN: ${{ secrets.INTERNAL_CRON_TOKEN }}
     steps:
-      - run: |
-          curl -fsS --retry 3 --retry-delay 20 --max-time 90 -X POST \
-            -H "Authorization: Bearer ${{ secrets.INTERNAL_CRON_TOKEN }}" \
-            "${{ secrets.SITE_URL }}/internal/cleanup"
+      - name: Call /internal/cleanup
+        run: |
+          set -euo pipefail
+          if [ -z "${SITE_URL}" ] || [ -z "${INTERNAL_CRON_TOKEN}" ]; then
+            echo "::notice::SITE_URL or INTERNAL_CRON_TOKEN secret is not set; skipping cleanup (app not deployed yet)."
+            exit 0
+          fi
+          curl -fsS --retry 3 --retry-delay 20 --retry-all-errors --max-time 90 -X POST \
+            -H "Authorization: Bearer ${INTERNAL_CRON_TOKEN}" \
+            "${SITE_URL%/}/internal/cleanup"

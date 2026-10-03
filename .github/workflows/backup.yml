@@ -1,5 +1,8 @@
 # Nightly database backup (Supabase free tier has no backups).
-# Secrets: BACKUP_DATABASE_URL (direct postgres:// URL, port 5432), BACKUP_PASSPHRASE.
+# Secrets: BACKUP_DATABASE_URL (Supabase *session pooler* URL, postgresql://...pooler.supabase.com:5432/postgres;
+#          the direct db.<ref>.supabase.co host is IPv6-only and unreachable from GitHub runners),
+#          BACKUP_PASSPHRASE.
+# Until both secrets are set (before the first deploy) the job skips with a notice.
 name: Nightly backup
 
 on:
@@ -10,24 +13,47 @@ on:
 jobs:
   backup:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+      PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
     steps:
-      - name: Install PostgreSQL client
+      - name: Check configuration
+        id: config
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq postgresql-client
-      - name: Dump and encrypt
-        env:
-          DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
-          PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+          if [ -z "${DATABASE_URL}" ] || [ -z "${PASSPHRASE}" ]; then
+            echo "::notice::BACKUP_DATABASE_URL or BACKUP_PASSPHRASE secret is not set; skipping backup."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+      # pg_dump refuses to dump a server newer than itself, so install the client
+      # matching the server's major version from the PostgreSQL apt repository.
+      - name: Install matching PostgreSQL client
+        if: steps.config.outputs.enabled == 'true'
         run: |
           set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-common postgresql-client
+          major="$(psql "$DATABASE_URL" -tAc 'SHOW server_version_num' | cut -c1-2)"
+          echo "Server major version: ${major}"
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y -qq "postgresql-client-${major}"
+          echo "/usr/lib/postgresql/${major}/bin" >> "$GITHUB_PATH"
+      - name: Dump and encrypt
+        if: steps.config.outputs.enabled == 'true'
+        run: |
+          set -euo pipefail
+          pg_dump --version
           file="backup-$(date -u +%Y%m%d-%H%M).sql.gz"
           pg_dump --no-owner --no-privileges "$DATABASE_URL" | gzip -9 > "$file"
           gpg --batch --yes --pinentry-mode loopback --passphrase "$PASSPHRASE" -c "$file"
           rm "$file"
           ls -lh
       - uses: actions/upload-artifact@v4
+        if: steps.config.outputs.enabled == 'true'
         with:
           name: db-backup
           path: "*.gpg"
           retention-days: 14
+          if-no-files-found: error
