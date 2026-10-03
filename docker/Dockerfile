@@ -36,5 +36,5 @@ COPY --from=assets /build/src/frontend/static src/frontend/static
 RUN useradd --create-home --uid 10001 appuser && mkdir -p media && chown appuser media
 USER appuser
 EXPOSE 8000
-# Render sets $PORT. Migrations run on start (idempotent).
-CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1 --proxy-headers --forwarded-allow-ips='*'"]
+# Render sets $PORT. Migrations and the bootstrap (demo seed / first admin) run on start (idempotent).
+CMD ["sh", "-c", "alembic upgrade head && python -m scripts.bootstrap && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1 --proxy-headers --forwarded-allow-ips='*'"]

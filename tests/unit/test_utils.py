@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from app.core.config import Settings, normalize_database_url
 from app.core.i18n import strip_locale, url
 from app.core.security import (
     hash_password,
@@ -140,3 +141,50 @@ def test_locale_catalogs_match() -> None:
     placeholders = re.compile(r"\{(\w+)\}")
     for key in ar:
         assert set(placeholders.findall(en[key])) == set(placeholders.findall(ar[key])), key
+
+
+# --- deploy config -----------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        (
+            "postgresql://postgres.ref:pw@aws-0-eu-central-1.pooler.supabase.com:6543/postgres",
+            "postgresql+asyncpg://postgres.ref:pw@aws-0-eu-central-1.pooler.supabase.com:6543/postgres",
+        ),
+        ("postgres://u:p@h:5432/db", "postgresql+asyncpg://u:p@h:5432/db"),
+        ("postgresql+asyncpg://u:p@h/db", "postgresql+asyncpg://u:p@h/db"),
+        (
+            "postgresql://u:p@h/db?sslmode=require&pgbouncer=true",
+            "postgresql+asyncpg://u:p@h/db?ssl=require",
+        ),
+        ("  postgresql://u:p%40x@h/db\n", "postgresql+asyncpg://u:p%40x@h/db"),
+    ],
+)
+def test_normalize_database_url(raw: str, expected: str) -> None:
+    assert normalize_database_url(raw) == expected
+
+
+def test_supabase_transaction_pooler_enables_pooler_mode() -> None:
+    s = Settings(
+        _env_file=None,
+        database_url="postgresql://postgres.ref:pw@aws-0-eu-central-1.pooler.supabase.com:6543/postgres",
+    )
+    assert s.database_use_pooler is True
+    session = Settings(
+        _env_file=None,
+        database_url="postgresql://postgres.ref:pw@aws-0-eu-central-1.pooler.supabase.com:5432/postgres",
+    )
+    assert session.database_use_pooler is False
+
+
+def test_base_url_falls_back_to_render_url() -> None:
+    s = Settings(_env_file=None, render_external_url="https://brand-store.onrender.com/")
+    assert s.base_url == "https://brand-store.onrender.com"
+    explicit = Settings(
+        _env_file=None,
+        base_url="https://shop.example.com",
+        render_external_url="https://brand-store.onrender.com",
+    )
+    assert explicit.base_url == "https://shop.example.com"

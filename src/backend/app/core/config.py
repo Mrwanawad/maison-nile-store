@@ -6,14 +6,35 @@ Every business-tunable value lives here so nothing is hard-coded elsewhere.
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Literal
+from typing import Literal, Self
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 def _csv(value: str) -> list[str]:
     return [item.strip() for item in value.split(",") if item.strip()]
+
+
+_DEFAULT_BASE_URL = "http://localhost:8000"
+_SYNC_SCHEMES = ("postgres", "postgresql", "postgresql+psycopg2", "postgresql+psycopg")
+
+
+def normalize_database_url(url: str) -> str:
+    """Accept a URL copied as-is from Supabase/Render and make it asyncpg-ready.
+
+    - `postgres://` / `postgresql://` -> `postgresql+asyncpg://`
+    - libpq's `sslmode=` -> asyncpg's `ssl=`; drop `pgbouncer=` (a Prisma-only flag)
+    """
+    parts = urlsplit(url.strip())
+    scheme = "postgresql+asyncpg" if parts.scheme in _SYNC_SCHEMES else parts.scheme
+    query = []
+    for key, value in parse_qsl(parts.query, keep_blank_values=True):
+        if key == "pgbouncer":
+            continue
+        query.append(("ssl" if key == "sslmode" else key, value))
+    return urlunsplit((scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
 
 
 class Settings(BaseSettings):
@@ -23,7 +44,9 @@ class Settings(BaseSettings):
     app_name: str = "brand-store"
     app_version: str = "0.1.0"
     app_env: Literal["development", "production", "test"] = "development"
-    base_url: str = "http://localhost:8000"
+    base_url: str = _DEFAULT_BASE_URL
+    # Set by Render on every service; used as BASE_URL when BASE_URL is not set.
+    render_external_url: str = ""
     secret_key: str = "change-me-to-a-long-random-string"
 
     # Brand
@@ -49,6 +72,12 @@ class Settings(BaseSettings):
     # Database
     database_url: str = "postgresql+asyncpg://store:store@localhost:5432/store"
     database_use_pooler: bool = False
+
+    # First-boot bootstrap (runs after migrations on every start; both steps are idempotent)
+    seed_demo_data: bool = False
+    admin_bootstrap_username: str = ""
+    admin_bootstrap_password: str = ""
+    admin_bootstrap_name: str = "Owner"
 
     # Storage
     storage_backend: Literal["local", "supabase"] = "local"
@@ -118,6 +147,21 @@ class Settings(BaseSettings):
     @classmethod
     def _strip_slash(cls, v: str) -> str:
         return v.rstrip("/")
+
+    @field_validator("database_url")
+    @classmethod
+    def _normalize_db_url(cls, v: str) -> str:
+        return normalize_database_url(v)
+
+    @model_validator(mode="after")
+    def _derive_defaults(self) -> Self:
+        if self.base_url == _DEFAULT_BASE_URL and self.render_external_url:
+            self.base_url = self.render_external_url.rstrip("/")
+        parts = urlsplit(self.database_url)
+        if (parts.hostname or "").endswith(".pooler.supabase.com") and parts.port == 6543:
+            # Supabase transaction-mode pooler: prepared statements must not be cached.
+            self.database_use_pooler = True
+        return self
 
     @property
     def is_production(self) -> bool:
