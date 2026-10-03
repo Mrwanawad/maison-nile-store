@@ -4,20 +4,36 @@
 {% block title %}{{ heading }} · {{ brand_name() }}{% endblock %}
 {% block content %}
 {% set base_path = url('/c/' ~ category.slug) if category else url('/shop') %}
-<div class="container-page pt-8 md:pt-12">
-  <nav aria-label="{{ t('nav.breadcrumb') }}" class="text-sm text-ink-soft">
-    <a href="{{ url('/') }}" class="hover:text-ink">{{ t("nav.home") }}</a>
-    <span class="mx-1.5">/</span>
-    {% if category %}<a href="{{ url('/shop') }}" class="hover:text-ink">{{ t("nav.shop_all") }}</a><span class="mx-1.5">/</span>{% endif %}
-    <span class="text-ink" aria-current="page">{{ heading }}</span>
-  </nav>
-  <div class="mt-4 flex flex-wrap items-end justify-between gap-4">
-    <h1 class="text-4xl md:text-5xl">{{ heading }}</h1>
+<div class="border-b-2 border-ink bg-mango">
+  <div class="container-page pt-8 pb-8 md:pt-12 md:pb-12">
+    <nav aria-label="{{ t('nav.breadcrumb') }}" class="text-sm font-medium">
+      <a href="{{ url('/') }}" class="hover:underline">{{ t("nav.home") }}</a>
+      <span class="mx-1.5 opacity-50">/</span>
+      {% if category %}<a href="{{ url('/shop') }}" class="hover:underline">{{ t("nav.shop_all") }}</a><span class="mx-1.5 opacity-50">/</span>{% endif %}
+      <span aria-current="page">{{ heading }}</span>
+    </nav>
+    <h1 class="mt-4 text-6xl md:text-8xl" data-reveal>{{ heading }}</h1>
+    {% if nav_categories() %}
+    <div class="-mx-4 mt-6 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0">
+      <a href="{{ url('/shop') }}" class="chip shrink-0 border-ink {% if not category and not request.query_params.get('category') %}chip-active{% endif %}">{{ t("nav.shop_all") }}</a>
+      {% for c in nav_categories() %}<a href="{{ url('/c/' ~ c.slug) }}" class="chip shrink-0 border-ink {% if category and category.slug == c.slug %}chip-active{% endif %}">{{ c.name(locale()) }}</a>{% endfor %}
+    </div>
+    {% endif %}
   </div>
+</div>
 
+<div class="container-page">
   <form id="filters" action="{{ base_path }}" method="get"
         hx-get="{{ base_path }}" hx-target="#results" hx-swap="outerHTML" hx-push-url="true" hx-trigger="change, submit, keyup changed delay:400ms from:#filter-q"
-        class="mt-8 flex flex-col gap-4 border-y border-line py-4 lg:flex-row lg:items-center">
+        class="sticky top-0 z-20 -mx-4 border-b-2 border-ink bg-bone px-4 py-3 sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10">
+    <div class="flex items-center gap-3 lg:hidden">
+      <button type="button" class="hs-collapse-toggle btn btn-secondary btn-sm" id="filters-toggle" aria-expanded="false" aria-controls="filters-panel" data-hs-collapse="#filters-panel">
+        {{ icon("sliders", "size-4") }} {{ t("filters.toggle") }}
+      </button>
+    </div>
+    <noscript><style>#filters-panel{display:block!important}</style></noscript>
+    <div id="filters-panel" class="hs-collapse hidden w-full overflow-hidden transition-[height] duration-300 lg:block" aria-labelledby="filters-toggle">
+    <div class="flex flex-col gap-4 pt-4 lg:flex-row lg:items-center lg:pt-0">
     <div class="relative lg:w-64">
       <label for="filter-q" class="sr-only">{{ t("search.label") }}</label>
       <input id="filter-q" name="q" type="search" value="{{ filters.q }}" placeholder="{{ t('search.placeholder') }}" class="field ps-9">
@@ -52,7 +68,7 @@
 
     <div class="flex items-center gap-4 lg:ms-auto">
       <label class="inline-flex cursor-pointer items-center gap-2 text-sm">
-        <input type="checkbox" name="in_stock" value="true" class="size-4 accent-[var(--color-ink)]" {% if filters.in_stock %}checked{% endif %}>
+        <input type="checkbox" name="in_stock" value="true" class="size-5 rounded accent-[var(--color-accent)]" {% if filters.in_stock %}checked{% endif %}>
         {{ t("filters.in_stock") }}
       </label>
       <label for="filter-sort" class="sr-only">{{ t("filters.sort") }}</label>
@@ -62,6 +78,8 @@
         {% endfor %}
       </select>
       <noscript><button class="btn btn-secondary btn-sm">{{ t("filters.apply") }}</button></noscript>
+    </div>
+    </div>
     </div>
   </form>
 

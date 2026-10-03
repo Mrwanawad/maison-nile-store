@@ -5,21 +5,21 @@
 {% block content %}
 <div class="container-page max-w-3xl pt-10 md:pt-16">
   {% if pay_error %}
-  <div class="mb-6 flex gap-3 rounded-sm border border-danger/30 bg-danger/5 px-4 py-3 text-danger" role="alert">
+  <div class="mb-6 flex gap-3 rounded-sm border-2 border-danger bg-danger/5 font-medium px-4 py-3 text-danger" role="alert">
     {{ icon("alert", "size-5 shrink-0") }}<p>{{ t("payment.error.unavailable") }}</p>
   </div>
   {% endif %}
 
   <p class="label-caps text-ink-soft">{{ t("order.number_label") }}</p>
-  <p class="price mt-1 font-display text-5xl md:text-6xl">#{{ order.order_number }}</p>
+  <p class="price mt-1 font-display text-7xl text-accent md:text-8xl">#{{ order.order_number }}</p>
 
   {% include "partials/order_status.html" %}
 
-  <section class="mt-10 rounded-md border border-line bg-paper">
+  <section class="mt-10 panel-pop">
     <ul class="divide-y divide-line px-5" role="list">
       {% for item in order.items %}
       <li class="flex gap-4 py-4">
-        {% if item.image_url %}<img src="{{ item.image_url }}" alt="" width="64" height="80" loading="lazy" class="h-20 w-16 rounded-xs bg-sand object-cover">{% endif %}
+        {% if item.image_url %}<img src="{{ item.image_url }}" alt="" width="64" height="80" loading="lazy" class="h-20 w-16 rounded-sm border-2 border-ink bg-sand object-cover">{% endif %}
         <div class="min-w-0 flex-1">
           <p class="font-medium">{{ item.product_name_ar if locale() == "ar" else item.product_name_en }}</p>
           {% set label = item.variant_label_ar if locale() == "ar" else item.variant_label_en %}
@@ -32,7 +32,7 @@
     <dl class="space-y-2 border-t border-line px-5 py-4 text-[15px]">
       <div class="flex justify-between"><dt class="text-ink-soft">{{ t("cart.subtotal") }}</dt><dd class="price">{{ price(order.subtotal_piasters) }}</dd></div>
       <div class="flex justify-between"><dt class="text-ink-soft">{{ t("cart.shipping") }}</dt><dd class="price">{{ price(order.shipping_piasters) }}</dd></div>
-      <div class="flex items-baseline justify-between border-t border-line pt-3"><dt class="font-medium">{{ t("cart.total") }}</dt><dd class="price font-display text-2xl">{{ price(order.total_piasters) }}</dd></div>
+      <div class="flex items-baseline justify-between border-t border-line pt-3"><dt class="font-medium">{{ t("cart.total") }}</dt><dd class="price font-display text-3xl">{{ price(order.total_piasters) }}</dd></div>
     </dl>
   </section>
 
@@ -47,7 +47,7 @@
     </div>
   </section>
 
-  <div class="mt-10 flex flex-wrap gap-4 border-t border-line pt-8">
+  <div class="mt-10 flex flex-wrap gap-4 border-t-2 border-ink pt-8">
     <a href="{{ url('/shop') }}" class="btn btn-secondary">{{ t("order.continue_shopping") }}</a>
     {% if settings.whatsapp_number %}
     <a href="{{ whatsapp_link(t('order.whatsapp_message', number=order.order_number)) }}" target="_blank" rel="noopener" class="btn btn-ghost">{{ icon("chat", "size-4") }} {{ t("order.questions") }}</a>

@@ -1,6 +1,9 @@
 {
-  "bar.delivery": "توصيل لكل محافظات مصر خلال {min}-{max} أيام عمل · الدفع عند الاستلام متاح",
-
+  "bar.delivery": "توصيل لكل محافظات مصر خلال {min}-{max} أيام عمل. الدفع عند الاستلام متاح.",
+  "bar.delivery_short": "توصيل لكل الـ٢٧ محافظة خلال {min}-{max} أيام",
+  "bar.cod": "ادفع كاش عند الاستلام",
+  "bar.exchange": "استبدال المقاس مجانًا خلال {days} يوم",
+  "bar.made": "صُنع في مصر، بكميات صغيرة",
   "nav.skip": "انتقل إلى المحتوى",
   "nav.menu": "القائمة",
   "nav.main": "الرئيسية",
@@ -11,14 +14,11 @@
   "nav.track": "تتبّع طلبك",
   "nav.breadcrumb": "مسار التصفح",
   "nav.pagination": "الصفحات",
-
   "common.close": "إغلاق",
   "common.details": "التفاصيل",
   "common.optional": "اختياري",
   "common.go_back": "رجوع",
-
   "contact.whatsapp": "تواصل معنا على واتساب",
-
   "search.label": "ابحث في المنتجات",
   "search.placeholder": "بحث",
   "search.results_for": "نتائج البحث عن «{q}»",
@@ -26,7 +26,6 @@
   "search.empty_title": "لا توجد منتجات مطابقة حالياً.",
   "search.empty_body": "جرّب مقاساً آخر أو امسح الفلاتر.",
   "search.clear": "مسح الفلاتر",
-
   "filters.category": "القسم",
   "filters.all_categories": "كل الأقسام",
   "filters.size": "المقاس",
@@ -38,7 +37,7 @@
   "filters.sort.price_asc": "السعر: من الأقل للأعلى",
   "filters.sort.price_desc": "السعر: من الأعلى للأقل",
   "filters.apply": "تطبيق",
-
+  "filters.toggle": "الفلاتر",
   "home.eyebrow": "الموسم الجديد",
   "home.headline": "مصنوعة بتأنٍّ. تُلبس كل يوم.",
   "home.cta": "تسوّق المجموعة",
@@ -56,7 +55,9 @@
   "home.story_title": "كميات صغيرة، صُنعت في مصر.",
   "home.story_body": "تعمل {brand} مع ورش محلية لصناعة ملابس نحب أن نرتديها كل يوم: خامات صادقة، قصّات مدروسة، ولا شيء يُصنع بكميات ضخمة ليبقى على الرف.",
   "home.story_cta": "اقرأ قصتنا",
-
+  "home.sticker": "وصل حديثًا",
+  "home.shop_by": "تسوّق حسب القسم",
+  "home.promise.title": "إزاي بنوصّلك",
   "product.sold_out": "نفدت الكمية",
   "product.sold_out_long": "هذا الاختيار غير متوفر حالياً.",
   "product.new": "جديد",
@@ -79,7 +80,7 @@
   "product.ask_whatsapp": "عندك سؤال؟ اسألنا على واتساب",
   "product.whatsapp_message": "مرحباً! أنا مهتم بـ {name}: {url}",
   "product.related": "قد يعجبك أيضاً",
-
+  "product.info": "التوصيل والاستبدال",
   "cart.title": "حقيبتك",
   "cart.items_count": "{count} قطعة في الحقيبة",
   "cart.added": "تمت الإضافة إلى حقيبتك",
@@ -106,7 +107,6 @@
   "cart.error.max_qty": "يمكنك إضافة {max} قطع كحد أقصى من هذا المنتج.",
   "cart.error.too_many_lines": "حقيبتك ممتلئة. أتمّ طلبك أولاً.",
   "cart.error.choose_options": "من فضلك اختر اللون والمقاس.",
-
   "checkout.title": "إتمام الطلب",
   "checkout.back_to_cart": "العودة للحقيبة",
   "checkout.fix_errors": "من فضلك راجع الحقول المحددة.",
@@ -147,11 +147,9 @@
   "checkout.error.cod_limit": "الدفع عند الاستلام متاح للطلبات حتى {limit} جنيه. من فضلك ادفع أونلاين أو قسّم طلبك.",
   "checkout.error.cod_open_orders": "لديك طلبات في الطريق بالفعل. انتظر وصولها أو ادفع أونلاين.",
   "checkout.error.cod_blocked": "الدفع عند الاستلام غير متاح لهذا الرقم. من فضلك ادفع أونلاين أو تواصل معنا.",
-
   "payment.error.unavailable": "تعذّر فتح صفحة الدفع. طلبك محفوظ، من فضلك حاول مرة أخرى.",
   "payment.error.not_online": "هذا الطلب بالدفع عند الاستلام.",
   "payment.error.not_payable": "لا يمكن دفع هذا الطلب الآن.",
-
   "order.title": "طلب رقم #{number}",
   "order.number_label": "رقم الطلب",
   "order.thanks": "شكراً لك يا {name}.",
@@ -185,13 +183,11 @@
   "order.continue_shopping": "متابعة التسوّق",
   "order.questions": "عندك سؤال عن طلبك؟",
   "order.whatsapp_message": "مرحباً! عندي سؤال عن الطلب رقم #{number}.",
-
   "track.title": "تتبّع طلبك",
   "track.body": "اكتب رقم الطلب ورقم الموبايل الذي استخدمته عند الطلب.",
   "track.order_number": "رقم الطلب",
   "track.submit": "ابحث عن طلبي",
   "track.not_found": "لم نجد طلباً بهذه البيانات. من فضلك راجعها وحاول مرة أخرى.",
-
   "footer.shop": "تسوّق",
   "footer.help": "مساعدة",
   "footer.shipping_returns": "التوصيل والاستبدال",
@@ -201,14 +197,12 @@
   "footer.privacy": "الخصوصية",
   "footer.terms": "الشروط",
   "footer.made_in": "صُنع في مصر.",
-
   "email.subject": "تم تأكيد طلبك رقم #{number}",
   "email.greeting": "مرحباً {name}،",
   "email.intro_cod": "شكراً لطلبك. سنتصل بك قريباً لتأكيده ثم يبدأ في الطريق إليك. ستدفع للمندوب عند الاستلام.",
   "email.intro_paid": "شكراً لطلبك. استلمنا الدفع وجاري تجهيز طلبك.",
   "email.view_order": "عرض طلبك",
   "email.questions": "عندك سؤال؟ ردّ على هذا البريد أو راسلنا على واتساب.",
-
   "error.title": "حدث خطأ ما",
   "error.generic": "حدث خطأ. من فضلك حاول مرة أخرى.",
   "error.server": "عذراً، حدث خطأ من جهتنا. من فضلك حاول بعد قليل.",

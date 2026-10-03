@@ -1,9 +1,9 @@
 {% set base_path = url('/c/' ~ category.slug) if category else url('/shop') %}
 <section id="results" class="mt-8" aria-live="polite">
   <h2 class="sr-only">{{ t("nav.shop_all") }}</h2>
-  <p class="mb-6 text-sm text-ink-soft">{{ t("search.count", count=listing.total) }}</p>
+  <p class="mb-6 text-sm font-medium text-ink-soft">{{ t("search.count", count=listing.total) }}</p>
   {% if listing.cards %}
-  <div class="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-6">
+  <div class="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-7 lg:gap-y-14" data-reveal data-reveal-stagger>
     {% for card in listing.cards %}{% set eager = loop.index <= 2 %}{% include "components/product_card.html" %}{% endfor %}
   </div>
   {% if listing.pages > 1 %}
@@ -16,10 +16,10 @@
   </nav>
   {% endif %}
   {% else %}
-  <div class="rounded-md border border-dashed border-line px-6 py-16 text-center">
-    <p class="font-display text-2xl">{{ t("search.empty_title") }}</p>
-    <p class="mt-2 text-ink-soft">{{ t("search.empty_body") }}</p>
-    <a href="{{ url('/shop') }}" class="btn btn-secondary mt-6">{{ t("search.clear") }}</a>
+  <div class="panel-pop mx-auto max-w-lg -rotate-1 bg-mango px-6 py-14 text-center">
+    <p class="font-display text-4xl">{{ t("search.empty_title") }}</p>
+    <p class="mt-2 font-medium">{{ t("search.empty_body") }}</p>
+    <a href="{{ url('/shop') }}" class="btn btn-primary mt-6">{{ t("search.clear") }}</a>
   </div>
   {% endif %}
 </section>

@@ -1,62 +1,98 @@
 {% extends "base.html" %}
 {% from "components/icons.html" import icon %}
 {% block content %}
-<section class="container-page grid items-end gap-8 pt-8 pb-16 md:grid-cols-12 md:gap-10 md:pt-14 md:pb-24">
-  <div class="md:col-span-5 md:pb-10">
-    <p class="label-caps text-accent">{{ t("home.eyebrow") }}</p>
-    <h1 class="mt-4 text-[44px] font-normal sm:text-6xl lg:text-7xl">{{ t("home.headline") }}</h1>
-    <p class="mt-6 max-w-md text-lg text-ink-soft">{{ tagline() }}</p>
-    <div class="mt-8 flex flex-wrap items-center gap-4">
-      <a href="{{ url('/shop') }}" class="btn btn-primary">{{ t("home.cta") }} {{ icon("arrow-right", "size-4", flip=true) }}</a>
-      <a href="{{ url('/shop?sort=newest') }}" class="link text-sm font-medium">{{ t("home.cta_new") }}</a>
+{# Hero: the headline in both languages, poster-sized, with the photo pinned on crooked
+   and a spinning "new drop" sticker. fx.js runs the one load sequence for [data-hero]. #}
+{% set primary = locale() %}
+{% set secondary = 'en' if primary == 'ar' else 'ar' %}
+<section class="relative overflow-hidden border-b-2 border-ink bg-accent text-bone" aria-labelledby="hero-heading" data-hero>
+  <div class="container-page grid gap-10 pt-10 pb-14 md:grid-cols-12 md:items-center md:gap-6 md:pt-14 md:pb-20">
+    <div class="relative z-10 md:col-span-7">
+      <h1 id="hero-heading" class="hero-lockup">
+        {% for lang in [primary, secondary] %}
+        <span class="reveal-line md:whitespace-nowrap{% if not loop.first %} text-mango{% endif %}" lang="{{ lang }}" dir="{{ 'rtl' if lang == 'ar' else 'ltr' }}" data-hero-part="line"><span>{{ t_in(lang, "home.eyebrow") }}</span></span>
+        {% endfor %}
+      </h1>
+      <div class="mt-8 max-w-md" data-hero-part="copy">
+        <p class="text-xl font-medium leading-snug sm:text-2xl">{{ t("home.headline") }}</p>
+        <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
+          <a href="{{ url('/shop') }}" class="btn btn-pop btn-lg">{{ t("home.cta") }}</a>
+          <a href="{{ url('/shop?sort=newest') }}" class="font-semibold text-bone underline decoration-mango decoration-2 underline-offset-[6px] transition-colors hover:text-mango">{{ t("home.cta_new") }}</a>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="md:col-span-7">
-    <div class="relative aspect-[4/5] overflow-hidden rounded-md bg-sand sm:aspect-[5/4] md:aspect-[4/3.6]">
-      {% set hero = settings.hero_image_url or static('img/placeholder.svg') %}
-      <img src="{{ hero }}" alt="{{ t('home.hero_alt') }}" {% if srcset(hero) %}srcset="{{ srcset(hero) }}" sizes="(min-width: 768px) 55vw, 92vw"{% endif %}
-           width="1200" height="1080" fetchpriority="high" class="size-full object-cover">
+
+    <div class="relative mx-auto w-[86%] max-w-md md:col-span-5 md:w-full">
+      <div class="relative aspect-[4/5] -rotate-3 overflow-hidden rounded-md border-2 border-ink bg-accent-ink shadow-[10px_10px_0_0_var(--color-ink)] rtl:rotate-3" data-hero-part="photo">
+        {% set hero = settings.hero_image_url or static('img/placeholder.svg') %}
+        <img src="{{ hero }}" alt="{{ t('home.hero_alt') }}" {% if srcset(hero) %}srcset="{{ srcset(hero) }}" sizes="(min-width: 768px) 36vw, 86vw"{% endif %}
+             width="1200" height="1500" fetchpriority="high" class="size-full object-cover">
+      </div>
+      {# Spinning sticker; text runs around the circle in both languages. #}
+      <div class="absolute -top-8 -end-6 size-32 md:-top-10 md:-end-10 md:size-40" data-hero-part="sticker" aria-hidden="true">
+        <div class="relative size-full rounded-full border-2 border-ink bg-mango text-ink">
+          <svg viewBox="0 0 200 200" dir="ltr" direction="ltr" class="absolute inset-0 size-full animate-spin-slow">
+            <defs><path id="sticker-circle" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0"/></defs>
+            <text class="fill-current font-sans text-[19px] font-bold"><textPath href="#sticker-circle" textLength="462">{{ t_in('en', 'home.sticker') }} ✦ {{ t_in('ar', 'home.sticker') }} ✦ {{ t_in('en', 'home.sticker') }} ✦ {{ t_in('ar', 'home.sticker') }} ✦</textPath></text>
+          </svg>
+          <svg viewBox="0 0 24 24" class="absolute inset-0 m-auto size-10 text-hibiscus md:size-12" fill="currentColor"><path d="M12 0l2.6 8.4L24 12l-9.4 3.6L12 24l-2.6-8.4L0 12l9.4-3.6z"/></svg>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
 {% if nav_categories() %}
-<section class="container-page" aria-labelledby="cat-heading">
-  <h2 id="cat-heading" class="sr-only">{{ t("home.categories") }}</h2>
-  <div class="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0">
-    <a href="{{ url('/shop') }}" class="chip shrink-0">{{ t("nav.shop_all") }}</a>
-    {% for c in nav_categories() %}<a href="{{ url('/c/' ~ c.slug) }}" class="chip shrink-0">{{ c.name(locale()) }}</a>{% endfor %}
+{# Category ticker: big poster type, every word is a link. Pauses on hover/focus. #}
+<section class="border-b-2 border-ink bg-ink py-5 text-bone md:py-7" aria-labelledby="cat-heading">
+  <h2 id="cat-heading" class="sr-only">{{ t("home.shop_by") }}</h2>
+  <div dir="ltr" class="marquee" style="--marquee-speed: 28s">
+    {% for copy in [0, 1] %}
+    <ul class="marquee-track" role="list" {% if copy %}aria-hidden="true"{% endif %}>
+      {% for _ in range(2) %}
+      {% for c in nav_categories() %}
+      <li class="flex items-center">
+        <a href="{{ url('/c/' ~ c.slug) }}" dir="auto" {% if copy %}tabindex="-1"{% endif %}
+           class="px-5 font-display text-5xl leading-none transition-colors md:px-8 md:text-7xl {% if loop.index is odd %}text-mango hover:text-bone{% else %}text-transparent [-webkit-text-stroke:2px_var(--color-bone)] hover:text-bone{% endif %}">{{ c.name(locale()) }}</a>
+        <svg viewBox="0 0 24 24" class="size-6 shrink-0 text-hibiscus md:size-8" fill="currentColor" aria-hidden="true"><path d="M12 0l2.6 8.4L24 12l-9.4 3.6L12 24l-2.6-8.4L0 12l9.4-3.6z"/></svg>
+      </li>
+      {% endfor %}
+      {% endfor %}
+    </ul>
+    {% endfor %}
   </div>
 </section>
 {% endif %}
 
-<section class="container-page mt-10" aria-labelledby="featured-heading">
-  <div class="mb-8 flex items-end justify-between gap-4">
-    <h2 id="featured-heading" class="text-3xl md:text-4xl">{{ t("home.featured") }}</h2>
-    <a href="{{ url('/shop') }}" class="link shrink-0 text-sm font-medium">{{ t("home.view_all") }}</a>
+<section class="container-page mt-16 md:mt-24" aria-labelledby="featured-heading">
+  <div class="mb-8 flex items-end justify-between gap-4 md:mb-10">
+    <h2 id="featured-heading" class="text-5xl md:text-7xl" data-reveal>{{ t("home.featured") }}</h2>
+    <a href="{{ url('/shop') }}" class="btn btn-secondary btn-sm shrink-0">{{ t("home.view_all") }}</a>
   </div>
-  <div class="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-6">
+  <div class="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-7 lg:gap-y-14" data-reveal data-reveal-stagger>
     {% for card in cards %}{% set eager = loop.index <= 2 %}{% include "components/product_card.html" %}{% endfor %}
   </div>
 </section>
 
-<section class="container-page mt-24">
-  <div class="grid gap-px overflow-hidden rounded-md border border-line bg-line sm:grid-cols-3">
-    {% for key, ic in [("delivery", "truck"), ("payment", "shield"), ("returns", "return")] %}
-    <div class="bg-bone p-6 md:p-8">
-      {{ icon(ic, "size-6 text-accent") }}
-      <p class="mt-4 font-medium">{{ t("home.promise." ~ key ~ ".title") }}</p>
-      <p class="mt-1 text-sm text-ink-soft">{{ t("home.promise." ~ key ~ ".body", min=settings.delivery_days_min, max=settings.delivery_days_max, days=settings.exchange_days) }}</p>
+{# Promises as three printed stickers, each in a brand color, slightly crooked. #}
+<section class="container-page mt-24 md:mt-32" aria-labelledby="promise-heading">
+  <h2 id="promise-heading" class="sr-only">{{ t("home.promise.title") }}</h2>
+  <div class="grid gap-6 sm:grid-cols-3 sm:gap-7" data-reveal data-reveal-stagger>
+    {% for key, ic, tone, tilt in [("delivery", "truck", "bg-accent text-bone", "-rotate-1"), ("payment", "banknote", "bg-mango text-ink", "rotate-1"), ("returns", "return", "bg-hibiscus text-paper", "-rotate-1")] %}
+    <div class="panel-pop {{ tone }} {{ tilt }} p-7 transition-transform duration-200 hover:rotate-0">
+      <span class="flex size-12 items-center justify-center rounded-full border-2 border-current">{{ icon(ic, "size-6") }}</span>
+      <p class="mt-6 font-display text-3xl leading-tight">{{ t("home.promise." ~ key ~ ".title") }}</p>
+      <p class="mt-2 font-medium opacity-90">{{ t("home.promise." ~ key ~ ".body", min=settings.delivery_days_min, max=settings.delivery_days_max, days=settings.exchange_days) }}</p>
     </div>
     {% endfor %}
   </div>
 </section>
 
-<section class="container-page mt-24 grid gap-8 md:grid-cols-12">
-  <h2 class="text-3xl md:col-span-5 md:text-4xl">{{ t("home.story_title") }}</h2>
-  <div class="md:col-span-6 md:col-start-7">
-    <p class="text-lg leading-8 text-ink-soft">{{ t("home.story_body", brand=brand_name()) }}</p>
-    <a href="{{ url('/pages/about') }}" class="link mt-6 inline-block text-sm font-medium">{{ t("home.story_cta") }}</a>
+<section class="container-page mt-24 grid gap-10 md:mt-32 md:grid-cols-12 md:items-end" data-reveal>
+  <h2 class="text-6xl text-accent md:col-span-7 md:text-8xl">{{ t("home.story_title") }}</h2>
+  <div class="md:col-span-5">
+    <p class="text-lg leading-8">{{ t("home.story_body", brand=brand_name()) }}</p>
+    <a href="{{ url('/pages/about') }}" class="btn btn-primary mt-8">{{ t("home.story_cta") }}</a>
   </div>
 </section>
 {% endblock %}

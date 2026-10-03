@@ -2,37 +2,37 @@
 <!doctype html>
 <html lang="{{ o.locale }}" dir="{{ 'rtl' if ar else 'ltr' }}">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>{{ t("email.subject", number=o.number) }}</title></head>
-<body style="margin:0;background:#F6F3EE;font-family:{{ "Tahoma,Arial" if ar else "Helvetica,Arial" }},sans-serif;color:#1C1B19;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F6F3EE;padding:32px 12px;">
+<body style="margin:0;background:#F3F4F1;font-family:{{ "Tahoma,Arial" if ar else "Helvetica,Arial" }},sans-serif;color:#13203A;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F3F4F1;padding:32px 12px;">
     <tr><td align="center">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FFFFFF;border:1px solid #E4DFD6;border-radius:6px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FFFFFF;border:1px solid #D4D8DE;border-radius:6px;">
         <tr><td style="padding:28px 28px 8px;font-family:Georgia,serif;font-size:22px;">{{ settings.brand_name_ar if ar else settings.brand_name }}</td></tr>
         <tr><td style="padding:8px 28px 0;">
-          <p style="margin:0 0 6px;font-size:13px;color:#5C5A55;">{{ t("order.number_label") }}</p>
+          <p style="margin:0 0 6px;font-size:13px;color:#5B6475;">{{ t("order.number_label") }}</p>
           <p style="margin:0 0 20px;font-family:Georgia,serif;font-size:32px;">#{{ o.number }}</p>
           <p style="margin:0 0 10px;font-size:15px;line-height:24px;">{{ t("email.greeting", name=o.name.split(' ')[0]) }}</p>
           <p style="margin:0 0 20px;font-size:15px;line-height:24px;">{{ t("email.intro_cod") if o.payment_method == "cod" else t("email.intro_paid") }}</p>
         </td></tr>
         <tr><td style="padding:0 28px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #E4DFD6;font-size:14px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #D4D8DE;font-size:14px;">
             {% for line in o.lines %}
             <tr>
-              <td style="padding:10px 0;border-bottom:1px solid #E4DFD6;">{{ line.name }}{% if line.label %} <span style="color:#5C5A55;">· {{ line.label }}</span>{% endif %} × {{ line.quantity }}</td>
-              <td style="padding:10px 0;border-bottom:1px solid #E4DFD6;text-align:{{ 'left' if ar else 'right' }};white-space:nowrap;">{{ price(line.line_total) }}</td>
+              <td style="padding:10px 0;border-bottom:1px solid #D4D8DE;">{{ line.name }}{% if line.label %} <span style="color:#5B6475;">· {{ line.label }}</span>{% endif %} × {{ line.quantity }}</td>
+              <td style="padding:10px 0;border-bottom:1px solid #D4D8DE;text-align:{{ 'left' if ar else 'right' }};white-space:nowrap;">{{ price(line.line_total) }}</td>
             </tr>
             {% endfor %}
-            <tr><td style="padding:8px 0 0;color:#5C5A55;">{{ t("cart.subtotal") }}</td><td style="padding:8px 0 0;text-align:{{ 'left' if ar else 'right' }};">{{ price(o.subtotal) }}</td></tr>
-            <tr><td style="padding:4px 0;color:#5C5A55;">{{ t("cart.shipping") }}</td><td style="padding:4px 0;text-align:{{ 'left' if ar else 'right' }};">{{ price(o.shipping) }}</td></tr>
+            <tr><td style="padding:8px 0 0;color:#5B6475;">{{ t("cart.subtotal") }}</td><td style="padding:8px 0 0;text-align:{{ 'left' if ar else 'right' }};">{{ price(o.subtotal) }}</td></tr>
+            <tr><td style="padding:4px 0;color:#5B6475;">{{ t("cart.shipping") }}</td><td style="padding:4px 0;text-align:{{ 'left' if ar else 'right' }};">{{ price(o.shipping) }}</td></tr>
             <tr><td style="padding:8px 0;font-weight:bold;">{{ t("cart.total") }}</td><td style="padding:8px 0;font-weight:bold;text-align:{{ 'left' if ar else 'right' }};">{{ price(o.total) }}</td></tr>
           </table>
         </td></tr>
         <tr><td style="padding:20px 28px;">
-          <p style="margin:0 0 4px;font-size:13px;color:#5C5A55;">{{ t("order.deliver_to") }}</p>
+          <p style="margin:0 0 4px;font-size:13px;color:#5B6475;">{{ t("order.deliver_to") }}</p>
           <p style="margin:0;font-size:14px;line-height:22px;">{{ o.name }}<br>{{ o.phone }}<br>{{ o.address }}<br>{{ governorate_name(o.governorate) }}</p>
         </td></tr>
         <tr><td style="padding:0 28px 28px;">
-          <a href="{{ o.link }}" style="display:inline-block;background:#1C1B19;color:#F6F3EE;text-decoration:none;padding:12px 20px;border-radius:4px;font-size:14px;font-weight:bold;">{{ t("email.view_order") }}</a>
-          <p style="margin:20px 0 0;font-size:13px;color:#5C5A55;">{{ t("email.questions") }}</p>
+          <a href="{{ o.link }}" style="display:inline-block;background:#13203A;color:#F3F4F1;text-decoration:none;padding:12px 20px;border-radius:999px;font-size:14px;font-weight:bold;">{{ t("email.view_order") }}</a>
+          <p style="margin:20px 0 0;font-size:13px;color:#5B6475;">{{ t("email.questions") }}</p>
         </td></tr>
       </table>
     </td></tr>

@@ -4,82 +4,116 @@
 @source "../../../backend/app/views";
 @source "../js";
 @source "../../node_modules/preline/dist/overlay.js";
+@source "../../node_modules/preline/dist/accordion.js";
+@source "../../node_modules/preline/dist/collapse.js";
 @import "../../node_modules/preline/src/plugins/overlay/variants.css";
+@import "../../node_modules/preline/src/plugins/accordion/variants.css";
+@import "../../node_modules/preline/src/plugins/collapse/variants.css";
 
-/* Self-hosted fonts (copied by scripts/vendor.mjs). */
-@font-face { font-family: "Fraunces"; font-style: normal; font-weight: 100 900; font-display: swap;
-  src: url("../fonts/fraunces-latin.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-@font-face { font-family: "Manrope"; font-style: normal; font-weight: 200 800; font-display: swap;
-  src: url("../fonts/manrope-latin.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-@font-face { font-family: "Alexandria"; font-style: normal; font-weight: 100 900; font-display: swap;
-  src: url("../fonts/alexandria-arabic.woff2") format("woff2"); unicode-range: U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC; }
-@font-face { font-family: "IBM Plex Sans Arabic"; font-style: normal; font-weight: 400; font-display: swap;
-  src: url("../fonts/plex-arabic-400.woff2") format("woff2"); unicode-range: U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC; }
-@font-face { font-family: "IBM Plex Sans Arabic"; font-style: normal; font-weight: 500; font-display: swap;
-  src: url("../fonts/plex-arabic-500.woff2") format("woff2"); unicode-range: U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC; }
-@font-face { font-family: "IBM Plex Sans Arabic"; font-style: normal; font-weight: 600; font-display: swap;
-  src: url("../fonts/plex-arabic-600.woff2") format("woff2"); unicode-range: U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC; }
+/* Self-hosted fonts (copied by scripts/vendor.mjs). Both families cover Latin + Arabic,
+   so EN and AR pages share one type system. Lalezar is a Cairo cinema-poster face. */
+@font-face { font-family: "Lalezar"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("../fonts/lalezar-latin.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: "Lalezar"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("../fonts/lalezar-arabic.woff2") format("woff2"); unicode-range: U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC; }
+@font-face { font-family: "Readex Pro"; font-style: normal; font-weight: 160 700; font-display: swap;
+  src: url("../fonts/readex-latin.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: "Readex Pro"; font-style: normal; font-weight: 160 700; font-display: swap;
+  src: url("../fonts/readex-arabic.woff2") format("woff2"); unicode-range: U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC; }
 
 /* ---------------------------------------------------------------------------
-   Design tokens: warm boutique palette (see docs/DESIGN.md section 8).
-   --color-accent / --color-accent-ink are overridden at runtime from .env.
+   Design tokens — "Cairo pop": street-sign cobalt, taxi mango, karkadeh pink,
+   printed on chalk. Token names stay stable for templates (admin shares them):
+   bone = page, sand = image well, ink = text, accent = cobalt (overridable
+   from .env), mango = highlight, hibiscus = sale.
    --------------------------------------------------------------------------- */
 @theme {
-  --color-bone: #f6f3ee;
+  --color-bone: #f6f6f1;
   --color-paper: #ffffff;
-  --color-sand: #ece6dc;
-  --color-ink: #1c1b19;
-  --color-ink-soft: #5c5a55;
-  --color-line: #e4dfd6;
-  --color-accent: #b4532a;
-  --color-accent-ink: #8e3f1e;
-  --color-olive: #4a5a3f;
-  --color-danger: #b42318;
+  --color-sand: #e8e8e0;
+  --color-ink: #10133a;
+  --color-ink-soft: #565a78;
+  --color-line: #d9d9d0;
+  --color-accent: #1e3fe0;
+  --color-accent-ink: #1530b8;
+  --color-mango: #ffc21a;
+  --color-hibiscus: #e5306b;
+  --color-olive: #1f8a5b;
+  --color-danger: #c8102e;
 
-  --font-display: "Fraunces", "Alexandria", Georgia, serif;
-  --font-sans: "Manrope", "IBM Plex Sans Arabic", ui-sans-serif, sans-serif;
-  --font-arabic: "IBM Plex Sans Arabic", "Manrope", sans-serif;
-  --font-arabic-display: "Alexandria", "IBM Plex Sans Arabic", sans-serif;
+  --font-display: "Lalezar", "Readex Pro", ui-sans-serif, sans-serif;
+  --font-sans: "Readex Pro", ui-sans-serif, sans-serif;
 
-  --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-md: 6px;
+  /* Shape follows role: photos square-ish (xs), fields (sm), panels (md),
+     buttons/chips pills. Pop surfaces get a hard printed offset, never a blur. */
+  --radius-xs: 4px;
+  --radius-sm: 12px;
+  --radius-md: 20px;
+
+  --shadow-pop: 4px 4px 0 0 var(--color-ink);
+  --shadow-pop-lg: 7px 7px 0 0 var(--color-ink);
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --animate-marquee: marquee var(--marquee-speed, 32s) linear infinite;
+  --animate-spin-slow: spin 18s linear infinite;
+  --animate-pop: pop 0.45s var(--ease-spring);
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes pop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.35); }
+    100% { transform: scale(1); }
+  }
 }
+
+/* Cross-document page transitions (Chrome/Edge/Safari 18+); plain navigation elsewhere. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root) { animation: 160ms var(--ease-out) both vt-out; }
+  ::view-transition-new(root) { animation: 260ms var(--ease-out) both vt-in; }
+  ::view-transition-group(*) { animation-duration: 380ms; animation-timing-function: var(--ease-out); }
+}
+@keyframes vt-out { to { opacity: 0; } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(10px); } }
 
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    scroll-padding-top: 6rem;
   }
   body {
     @apply bg-bone text-ink font-sans text-base leading-relaxed;
   }
   [dir="rtl"] body {
-    font-family: var(--font-arabic);
+    line-height: 1.8;
   }
   h1, h2, h3, .font-display {
     font-family: var(--font-display);
-    font-optical-sizing: auto;
-    line-height: 1.1;
-    letter-spacing: -0.015em;
-  }
-  [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] .font-display {
-    font-family: var(--font-arabic-display);
+    font-weight: 400;
+    line-height: 0.98;
     letter-spacing: 0;
+  }
+  /* Arabic glyphs need room for dots and descenders. */
+  [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] .font-display, :lang(ar).font-display, [lang="ar"] .font-display {
     line-height: 1.3;
   }
   a {
     text-underline-offset: 3px;
   }
   :focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 3px solid var(--color-accent);
     outline-offset: 2px;
   }
   ::selection {
-    background: var(--color-sand);
+    background: var(--color-mango);
+    color: var(--color-ink);
   }
   input, select, textarea, button {
     font: inherit;
@@ -90,6 +124,7 @@
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
@@ -98,50 +133,65 @@
 
 @layer components {
   .container-page {
-    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10;
+    @apply mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-10;
   }
+  /* Small label: sentence case, no tracking. */
   .label-caps {
-    @apply text-[11px] font-semibold uppercase tracking-[0.08em];
-  }
-  [dir="rtl"] .label-caps {
-    @apply text-xs tracking-normal;
+    @apply text-xs font-medium;
   }
   .price {
     font-variant-numeric: tabular-nums;
   }
 
-  /* Buttons: use as class="btn btn-primary" */
+  /* Buttons: class="btn btn-primary". Every button presses down on click. */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-sm px-5 py-3 text-sm font-semibold
-      transition-colors duration-150 ease-out disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-full border-2 border-ink px-6 py-3 text-sm font-semibold
+      transition-[background-color,color,transform,box-shadow] duration-150 ease-out
+      active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-primary {
-    @apply bg-ink text-bone hover:bg-[#33312d];
+    @apply bg-ink text-bone hover:border-accent hover:bg-accent;
   }
   .btn-secondary {
-    @apply border border-ink text-ink hover:bg-ink hover:text-bone;
+    @apply bg-transparent text-ink hover:bg-ink hover:text-bone;
   }
   .btn-ghost {
-    @apply px-3 text-ink-soft hover:text-ink;
+    @apply border-transparent px-3 text-ink-soft hover:text-ink;
+  }
+  /* The loud one: mango sticker with a printed offset. One per screen. */
+  .btn-pop {
+    @apply bg-mango text-ink;
+    box-shadow: var(--shadow-pop);
+  }
+  .btn-pop:hover:not(:disabled) {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 0 var(--color-ink);
+  }
+  .btn-pop:active:not(:disabled) {
+    transform: translate(4px, 4px);
+    box-shadow: 0 0 0 0 var(--color-ink);
   }
   .btn-sm {
-    @apply px-3 py-2 text-xs;
+    @apply px-4 py-2 text-xs;
+  }
+  .btn-lg {
+    @apply px-8 py-4 text-base;
   }
 
   /* Forms */
   .field-label {
-    @apply mb-1.5 block text-sm font-medium text-ink;
+    @apply mb-1.5 block text-sm font-semibold text-ink;
   }
   .field {
-    @apply block w-full rounded-sm border border-line bg-paper px-3.5 py-2.5 text-[15px] text-ink
-      placeholder:text-ink-soft/70 transition-colors duration-150
-      focus:border-ink focus:outline-none focus:ring-0;
+    @apply block w-full rounded-sm border-2 border-ink/15 bg-paper px-3.5 py-2.5 text-[15px] text-ink
+      placeholder:text-ink-soft/60 transition-[border-color,box-shadow] duration-150
+      focus:border-ink focus:outline-none focus:ring-4 focus:ring-mango/60;
   }
   .field[aria-invalid="true"] {
-    @apply border-danger;
+    @apply border-danger focus:ring-danger/20;
   }
   .field-error {
-    @apply mt-1.5 text-sm text-danger;
+    @apply mt-1.5 text-sm font-medium text-danger;
   }
   .field-hint {
     @apply mt-1.5 text-sm text-ink-soft;
@@ -149,27 +199,89 @@
 
   /* Chips (filters, sizes) */
   .chip {
-    @apply inline-flex min-w-11 items-center justify-center rounded-sm border border-line bg-paper px-3 py-2
-      text-sm font-medium text-ink transition-colors duration-150 hover:border-ink;
+    @apply inline-flex min-w-11 items-center justify-center rounded-full border-2 border-ink/15 bg-paper px-4 py-2
+      text-sm font-semibold text-ink transition-[border-color,background-color,color,transform] duration-150 hover:border-ink active:scale-95;
   }
   .chip-active {
     @apply border-ink bg-ink text-bone;
   }
 
   .link {
-    @apply underline decoration-line decoration-1 underline-offset-4 transition-colors hover:decoration-ink;
+    @apply font-semibold text-accent underline decoration-accent/30 decoration-2 underline-offset-4 transition-colors hover:decoration-accent;
   }
 
   .divider {
     @apply border-t border-line;
   }
 
-  /* Product image hover */
-  .img-zoom {
-    @apply transition-transform duration-200 ease-out;
+  /* Stickers: slapped-on badges, slightly crooked. */
+  .sticker {
+    @apply inline-flex items-center rounded-full border-2 border-ink px-2.5 py-0.5 text-xs font-bold text-ink;
+    transform: rotate(-4deg);
   }
-  .group:hover .img-zoom {
-    transform: scale(1.02);
+  .badge-sale, .badge-new, .badge-soldout {
+    @apply inline-flex items-center rounded-full border-2 border-ink px-2.5 py-0.5 text-xs font-bold;
+    transform: rotate(-4deg);
+  }
+  .badge-sale {
+    @apply bg-hibiscus text-paper;
+  }
+  .badge-new {
+    @apply bg-mango text-ink;
+  }
+  .badge-soldout {
+    @apply bg-ink text-bone;
+    transform: rotate(3deg);
+  }
+
+  /* Pop panel: paper card with a printed offset. */
+  .panel-pop {
+    @apply rounded-md border-2 border-ink bg-paper;
+    box-shadow: var(--shadow-pop-lg);
+  }
+
+  /* Marquee: content is duplicated once in markup; track slides half its width. */
+  .marquee {
+    @apply flex overflow-hidden;
+    mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  }
+  .marquee-track {
+    @apply flex w-max shrink-0 animate-marquee items-center;
+  }
+  [dir="rtl"] .marquee-track {
+    animation-direction: reverse;
+  }
+  .marquee:hover .marquee-track, .marquee:focus-within .marquee-track {
+    animation-play-state: paused;
+  }
+
+  /* Product card: lifts and gets its printed shadow on hover. */
+  .card-media {
+    @apply relative aspect-[4/5] overflow-hidden rounded-sm border-2 border-transparent bg-sand
+      transition-[transform,box-shadow,border-color] duration-200 ease-out;
+  }
+  .card:hover .card-media, .card:focus-within .card-media {
+    @apply border-ink;
+    transform: translate(-3px, -3px);
+    box-shadow: var(--shadow-pop-lg);
+  }
+
+  /* Bilingual hero lockup */
+  .hero-lockup {
+    @apply font-display text-bone;
+    font-size: clamp(3.2rem, 8.2vw, 8.75rem);
+    line-height: 0.9;
+  }
+  .hero-lockup [lang="ar"] {
+    font-size: 0.86em;
+    line-height: 1.25;
+  }
+  /* Headline lines rise out of a mask on load (JS adds data-ready). */
+  .reveal-line {
+    @apply block overflow-hidden pb-[0.08em];
+  }
+  .reveal-line > span {
+    @apply inline-block;
   }
 
   /* Rich text from markdown pages / descriptions */
@@ -177,22 +289,31 @@
     @apply max-w-prose text-[15px] leading-7 text-ink;
   }
   .prose-store h2 {
-    @apply mt-10 mb-3 text-2xl;
+    @apply mt-10 mb-3 text-3xl;
   }
   .prose-store h3 {
-    @apply mt-8 mb-2 text-lg;
+    @apply mt-8 mb-2 text-xl;
   }
   .prose-store p, .prose-store ul, .prose-store ol {
     @apply mb-4;
   }
   .prose-store ul {
-    @apply list-disc ps-5;
+    @apply list-disc ps-5 marker:text-accent;
   }
   .prose-store ol {
-    @apply list-decimal ps-5;
+    @apply list-decimal ps-5 marker:font-semibold marker:text-accent;
   }
   .prose-store a {
-    @apply underline decoration-line decoration-1 underline-offset-4 hover:decoration-ink;
+    @apply font-semibold text-accent underline decoration-accent/30 decoration-2 underline-offset-4 hover:decoration-accent;
+  }
+  .prose-store table {
+    @apply mb-6 w-full border-collapse text-sm;
+  }
+  .prose-store th, .prose-store td {
+    @apply border-b border-line px-3 py-2 text-start;
+  }
+  .prose-store th {
+    @apply bg-sand font-semibold;
   }
 
   /* HTMX request indicator */
@@ -205,4 +326,10 @@
   .htmx-request.btn, .htmx-request .btn-busy {
     @apply pointer-events-none opacity-70;
   }
+}
+
+/* Scroll reveal targets start hidden only when JS + motion are available. */
+@media (prefers-reduced-motion: no-preference) {
+  .js:not(.fx-off) [data-reveal] { opacity: 0; }
+  .js:not(.fx-off) [data-hero-part] { opacity: 0; }
 }

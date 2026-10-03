@@ -1,5 +1,5 @@
 {% set _count = cart_count(request) %}
 <span id="cart-badge"{% if oob is defined and oob %} hx-swap-oob="true"{% endif %}
-      class="absolute -end-0.5 top-0.5 flex min-w-[18px] items-center justify-center rounded-full bg-accent px-1 text-[11px] font-semibold leading-[18px] text-white price{% if not _count %} hidden{% endif %}">
+      class="absolute -end-1.5 -top-1.5 flex min-w-[22px] items-center justify-center rounded-full border-2 border-ink bg-mango px-1 text-[11px] font-bold leading-[18px] text-ink price{% if not _count %} hidden{% endif %}">
   <span class="sr-only">{{ t("cart.items_count", count=_count) }}: </span>{{ _count }}
 </span>

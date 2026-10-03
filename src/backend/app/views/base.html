@@ -6,19 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ brand_name() }}{% endblock %}</title>
   <meta name="description" content="{% block description %}{{ tagline() }}{% endblock %}">
-  <meta name="theme-color" content="#F6F3EE">
+  <meta name="theme-color" content="{{ settings.brand_accent_color }}">
   <meta name="htmx-config" content='{"includeIndicatorStyles": false, "allowEval": false, "allowScriptTags": false}'>
   <link rel="icon" href="{{ settings.brand_favicon_url }}">
   <link rel="alternate" hreflang="en" href="{{ settings.base_url }}{{ url(request.url.path, 'en') }}">
   <link rel="alternate" hreflang="ar" href="{{ settings.base_url }}{{ url(request.url.path, 'ar') }}">
-  {% if is_rtl() %}
-  <link rel="preload" href="/static/fonts/plex-arabic-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/static/fonts/alexandria-arabic.woff2" as="font" type="font/woff2" crossorigin>
-  {% else %}
-  <link rel="preload" href="/static/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/static/fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin>
-  {% endif %}
+  {% set script = 'arabic' if is_rtl() else 'latin' %}
+  <link rel="preload" href="/static/fonts/readex-{{ script }}.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/static/fonts/lalezar-{{ script }}.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{{ static('css/app.css') }}">
+  <script src="{{ static('js/boot.js') }}"></script>
   <style>:root{--color-accent:{{ settings.brand_accent_color }};--color-accent-ink:{{ settings.brand_accent_hover_color }}}</style>
   {% block head %}{% endblock %}
 </head>
@@ -26,9 +23,7 @@
   <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-[100] focus:bg-paper focus:px-4 focus:py-2">{{ t("nav.skip") }}</a>
 
   {% block chrome_top %}
-  <div class="bg-ink text-bone">
-    <p class="container-page py-2 text-center text-xs sm:text-[13px]">{{ t("bar.delivery", min=settings.delivery_days_min, max=settings.delivery_days_max) }}</p>
-  </div>
+  {% include "components/announcement.html" %}
   {% include "components/header.html" %}
   {% endblock %}
 
@@ -42,7 +37,7 @@
   {% include "components/mobile_nav.html" %}
   {% if settings.whatsapp_number %}
   <a href="{{ whatsapp_link(whatsapp_message if whatsapp_message is defined else None) }}" target="_blank" rel="noopener"
-     class="fixed bottom-5 end-5 z-40 flex size-13 items-center justify-center rounded-full bg-[#1f7a4d] text-white shadow-[0_6px_20px_rgba(28,27,25,0.25)] transition-transform duration-150 hover:scale-105"
+     class="fixed bottom-5 end-5 z-40 flex size-14 items-center justify-center rounded-full border-2 border-ink bg-[#25d366] text-ink shadow-[3px_3px_0_0_var(--color-ink)] transition-transform duration-150 hover:-translate-y-0.5 hover:rotate-6 active:translate-y-0.5"
      aria-label="{{ t('contact.whatsapp') }}">
     <svg viewBox="0 0 24 24" class="size-6" fill="currentColor" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.79-1.47-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.75-.72 2-1.41.25-.69.25-1.28.17-1.41-.07-.12-.27-.2-.57-.35M12.05 21.5h-.01a9.4 9.4 0 0 1-4.8-1.31l-.34-.2-3.57.94.95-3.48-.22-.36a9.4 9.4 0 0 1-1.44-5.01c0-5.2 4.23-9.43 9.44-9.43 2.52 0 4.89.98 6.67 2.77a9.37 9.37 0 0 1 2.76 6.67c0 5.2-4.23 9.43-9.44 9.43m8.03-17.46A11.3 11.3 0 0 0 12.05.7C5.79.7.7 5.79.7 12.05c0 2 .52 3.95 1.52 5.67L.6 23.6l6.02-1.58a11.3 11.3 0 0 0 5.42 1.38h.01c6.26 0 11.35-5.09 11.35-11.35 0-3.03-1.18-5.88-3.33-8.02"/></svg>
   </a>
@@ -56,7 +51,11 @@
 
   <script src="{{ static('vendor/htmx.min.js') }}" defer></script>
   <script src="{{ static('vendor/preline-overlay.js') }}" defer></script>
+  <script src="{{ static('vendor/preline-accordion.js') }}" defer></script>
+  <script src="{{ static('vendor/preline-collapse.js') }}" defer></script>
   <script src="{{ static('js/app.js') }}" defer></script>
+  <script src="{{ static('vendor/motion.js') }}" defer></script>
+  <script src="{{ static('js/fx.js') }}" defer></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

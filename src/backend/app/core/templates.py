@@ -17,7 +17,7 @@ from fastapi.templating import Jinja2Templates
 from markupsafe import Markup
 
 from app.core.config import get_settings
-from app.core.i18n import get_locale, is_rtl, localized, strip_locale, t, url
+from app.core.i18n import get_locale, is_rtl, localized, strip_locale, t, t_in, url
 from app.core.security import CSRF_FORM_FIELD, csrf_token, has_session
 from app.services import nav_cache
 from app.utils.governorates import BY_CODE, GOVERNORATES
@@ -118,6 +118,7 @@ env = templates.env
 env.globals.update(
     settings=settings,
     t=t,
+    t_in=t_in,
     url=url,
     static=_static,
     price=_price,

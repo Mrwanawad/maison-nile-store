@@ -98,6 +98,10 @@ with sync_playwright() as p:
         def filters_htmx() -> None:
             page.goto(B + prefix + "/shop")
             before = page.locator("#results article").count()
+            toggle = page.locator("#filters-toggle")
+            if toggle.is_visible():  # mobile: filters live in a collapsed panel
+                toggle.click()
+                expect(page.locator("#filters-panel")).to_be_visible()
             page.locator("label:has(input[name=size][value='30'])").click()
             page.wait_for_url("**size=30**")
             after = page.locator("#results article").count()

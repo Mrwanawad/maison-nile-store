@@ -1,6 +1,9 @@
 {
-  "bar.delivery": "Delivery across Egypt in {min}-{max} working days · Cash on delivery available",
-
+  "bar.delivery": "Delivery across Egypt in {min}-{max} working days. Cash on delivery available.",
+  "bar.delivery_short": "Delivery to all 27 governorates in {min}-{max} days",
+  "bar.cod": "Pay cash when it arrives",
+  "bar.exchange": "Free size exchange within {days} days",
+  "bar.made": "Made in Egypt, in small batches",
   "nav.skip": "Skip to content",
   "nav.menu": "Menu",
   "nav.main": "Main",
@@ -11,14 +14,11 @@
   "nav.track": "Track your order",
   "nav.breadcrumb": "Breadcrumb",
   "nav.pagination": "Pages",
-
   "common.close": "Close",
   "common.details": "Details",
   "common.optional": "optional",
   "common.go_back": "Go back",
-
   "contact.whatsapp": "Chat with us on WhatsApp",
-
   "search.label": "Search products",
   "search.placeholder": "Search",
   "search.results_for": "Results for “{q}”",
@@ -26,7 +26,6 @@
   "search.empty_title": "Nothing matches that yet.",
   "search.empty_body": "Try a different size or clear the filters.",
   "search.clear": "Clear filters",
-
   "filters.category": "Category",
   "filters.all_categories": "All categories",
   "filters.size": "Size",
@@ -38,7 +37,7 @@
   "filters.sort.price_asc": "Price: low to high",
   "filters.sort.price_desc": "Price: high to low",
   "filters.apply": "Apply",
-
+  "filters.toggle": "Filters",
   "home.eyebrow": "New season",
   "home.headline": "Made slowly. Worn often.",
   "home.cta": "Shop the collection",
@@ -56,7 +55,9 @@
   "home.story_title": "Small batches, made in Egypt.",
   "home.story_body": "{brand} works with local workshops to make clothes we actually want to wear every day: honest fabrics, careful cuts, and nothing made in bulk just to sit on a shelf.",
   "home.story_cta": "Read our story",
-
+  "home.sticker": "New drop",
+  "home.shop_by": "Shop by category",
+  "home.promise.title": "How we deliver",
   "product.sold_out": "Sold out",
   "product.sold_out_long": "This option is sold out.",
   "product.new": "New",
@@ -79,7 +80,7 @@
   "product.ask_whatsapp": "Questions? Ask us on WhatsApp",
   "product.whatsapp_message": "Hi! I'm interested in {name}: {url}",
   "product.related": "You may also like",
-
+  "product.info": "Delivery and exchanges",
   "cart.title": "Your bag",
   "cart.items_count": "{count} items in bag",
   "cart.added": "Added to your bag",
@@ -106,7 +107,6 @@
   "cart.error.max_qty": "You can add up to {max} of this item.",
   "cart.error.too_many_lines": "Your bag is full. Please check out first.",
   "cart.error.choose_options": "Please choose a color and size.",
-
   "checkout.title": "Checkout",
   "checkout.back_to_cart": "Back to bag",
   "checkout.fix_errors": "Please check the highlighted fields.",
@@ -147,11 +147,9 @@
   "checkout.error.cod_limit": "Cash on delivery is available for orders up to {limit} EGP. Please pay online or split your order.",
   "checkout.error.cod_open_orders": "You already have orders on the way. Please wait for them to arrive or pay online.",
   "checkout.error.cod_blocked": "Cash on delivery isn't available for this number. Please pay online or contact us.",
-
   "payment.error.unavailable": "We couldn't open the payment page. Your order is saved; please try again.",
   "payment.error.not_online": "This order is cash on delivery.",
   "payment.error.not_payable": "This order can't be paid now.",
-
   "order.title": "Order #{number}",
   "order.number_label": "Order number",
   "order.thanks": "Thank you, {name}.",
@@ -185,13 +183,11 @@
   "order.continue_shopping": "Continue shopping",
   "order.questions": "Questions about your order?",
   "order.whatsapp_message": "Hi! I have a question about order #{number}.",
-
   "track.title": "Track your order",
   "track.body": "Enter your order number and the mobile number you used at checkout.",
   "track.order_number": "Order number",
   "track.submit": "Find my order",
   "track.not_found": "We couldn't find an order with these details. Please check and try again.",
-
   "footer.shop": "Shop",
   "footer.help": "Help",
   "footer.shipping_returns": "Delivery & exchanges",
@@ -201,14 +197,12 @@
   "footer.privacy": "Privacy",
   "footer.terms": "Terms",
   "footer.made_in": "Made in Egypt.",
-
   "email.subject": "Your order #{number} is confirmed",
   "email.greeting": "Hi {name},",
   "email.intro_cod": "Thanks for your order. We'll call you shortly to confirm it, then it's on its way. You'll pay the courier on delivery.",
   "email.intro_paid": "Thanks for your order. Your payment was received and we're preparing your items.",
   "email.view_order": "View your order",
   "email.questions": "Questions? Reply to this email or message us on WhatsApp.",
-
   "error.title": "Something went wrong",
   "error.generic": "Something went wrong. Please try again.",
   "error.server": "Sorry, something went wrong on our side. Please try again in a moment.",
@@ -220,7 +214,6 @@
   "error.csrf": "Your session expired. Please refresh the page and try again.",
   "error.contact": "If this keeps happening, message us on",
   "error.reference": "Error reference:",
-
   "admin.error.transition": "Can't change status from {old} to {new}.",
   "admin.error.refund_not_paid": "Only paid orders can be refunded.",
   "admin.error.refund_no_txn": "No Paymob transaction is stored for this order.",
@@ -234,7 +227,7 @@
   "admin.error.price": "Enter a valid price in EGP, e.g. 450 or 450.50.",
   "admin.error.compare_at": "The 'compare at' price must be higher than the price.",
   "admin.error.color_name": "Enter a color name.",
-  "admin.error.color_hex": "Pick a color (hex like #B4532A).",
+  "admin.error.color_hex": "Pick a color (hex like #1E3FE0).",
   "admin.error.stock": "Stock can't be negative.",
   "admin.error.sku_taken": "That SKU is already used by another item.",
   "admin.error.image_invalid": "That file isn't a readable image (JPG, PNG, WebP, HEIC not supported).",

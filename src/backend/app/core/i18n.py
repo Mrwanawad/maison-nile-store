@@ -34,6 +34,12 @@ def t(key: str, /, **params: Any) -> str:
     return text.format(**params) if params else text
 
 
+def t_in(locale: str, key: str, /, **params: Any) -> str:
+    """Translate `key` into a specific locale (e.g. the bilingual home hero)."""
+    text = catalog(locale).get(key) or catalog("en").get(key) or key
+    return text.format(**params) if params else text
+
+
 def get_locale() -> Locale:
     return current_locale.get()
 

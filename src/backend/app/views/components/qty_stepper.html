@@ -2,7 +2,7 @@
 {# Needs: line (CartLine), target (CSS selector for hx-target) #}
 <form method="post" action="{{ url('/cart/items/' ~ line.variant.id ~ '/update') }}"
       hx-post="{{ url('/cart/items/' ~ line.variant.id ~ '/update') }}" hx-target="{{ target }}" hx-swap="innerHTML"
-      class="inline-flex items-center rounded-sm border border-line" data-stepper>
+      class="inline-flex items-center rounded-full border-2 border-ink bg-paper" data-stepper>
   {{ csrf_input(request) }}
   <button type="submit" name="quantity" value="{{ line.quantity - 1 }}" class="flex size-9 items-center justify-center text-ink-soft hover:text-ink"
           aria-label="{{ t('cart.decrease') }}">{{ icon("minus", "size-4") }}</button>

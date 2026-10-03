@@ -12,12 +12,12 @@
     const el = document.createElement("div");
     const tone =
       kind === "error"
-        ? "border-danger/30 text-danger"
+        ? "bg-danger text-paper"
         : kind === "info"
-          ? "border-line text-ink"
-          : "border-olive/30 text-olive";
+          ? "bg-paper text-ink"
+          : "bg-mango text-ink";
     el.className =
-      "pointer-events-auto max-w-sm rounded-sm border bg-paper px-4 py-3 text-sm font-medium shadow-[0_8px_24px_rgba(28,27,25,0.12)] transition-opacity duration-200 " +
+      "pointer-events-auto max-w-sm rounded-full border-2 border-ink px-5 py-3 text-sm font-semibold shadow-[4px_4px_0_0_var(--color-ink)] transition-opacity duration-200 " +
       tone;
     el.setAttribute("role", kind === "error" ? "alert" : "status");
     el.textContent = message;
@@ -48,7 +48,10 @@
 
   // ---------------------------------------------------------------- Preline
   function reinitPreline() {
-    if (window.HSOverlay && typeof window.HSOverlay.autoInit === "function") window.HSOverlay.autoInit();
+    ["HSOverlay", "HSAccordion", "HSCollapse"].forEach((name) => {
+      const plugin = window[name];
+      if (plugin && typeof plugin.autoInit === "function") plugin.autoInit();
+    });
   }
   document.addEventListener("htmx:afterSwap", reinitPreline);
 
@@ -62,6 +65,11 @@
       e.preventDefault();
       openDrawer();
     }
+  });
+
+  // Size guide: open the modal right away; HTMX fills it from the size-guide page.
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("[data-size-guide]") && window.HSOverlay && window.htmx) window.HSOverlay.open("#size-guide");
   });
 
   // ---------------------------------------------------------------- variant picker
@@ -92,7 +100,7 @@
 
     function setMessage(kind, n) {
       if (!stockEl) return;
-      const map = { in: ["text-olive", stockEl.dataset.msgIn], low: ["text-accent-ink", (stockEl.dataset.msgLow || "").replace("{n}", n)], out: ["text-danger", stockEl.dataset.msgOut] };
+      const map = { in: ["text-olive", stockEl.dataset.msgIn], low: ["text-hibiscus", (stockEl.dataset.msgLow || "").replace("{n}", n)], out: ["text-danger", stockEl.dataset.msgOut] };
       if (!kind) { stockEl.innerHTML = ""; return; }
       const [cls, text] = map[kind];
       stockEl.innerHTML = "";
@@ -159,7 +167,8 @@
       }
     });
     form.addEventListener("htmx:configRequest", (e) => {
-      if (!form.checkValidity()) {
+      // Only guard the add-to-bag post, not requests from links inside the form (size guide).
+      if (e.detail.elt === form && !form.checkValidity()) {
         e.preventDefault();
         form.reportValidity();
       }
