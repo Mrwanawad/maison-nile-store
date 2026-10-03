@@ -100,7 +100,7 @@ FastAPI on Render (Docker)
 │       └── scripts/vendor.mjs
 ├── sql/place_order.sql         # Postgres function
 ├── tests/
-├── Dockerfile                  # multi-stage: node (css build) → python (runtime)
+├── docker/Dockerfile           # multi-stage: node (css build) → python (runtime)
 ├── pyproject.toml
 ├── .env.example
 └── DESIGN.md
@@ -369,7 +369,7 @@ Use Supabase's **connection pooler** URL (transaction mode) and disable asyncpg 
 ## 11. Deployment
 
 ### MVP ($0)
-- **Render free Web Service** from `Dockerfile`:
+- **Render free Web Service** from `docker/Dockerfile`:
   - Stage 1 (node:lts-slim): `npm ci && npx @tailwindcss/cli -i src/frontend/static/css/input.css -o src/frontend/static/css/app.css --minify`; copy Preline JS from `node_modules`.
   - Stage 2 (python:3.12-slim): install deps, copy src/backend + built assets, run `uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --proxy-headers`.
 - **UptimeRobot:** ping `/health` every 10 min. Keeps Render awake **and** keeps Supabase from pausing.

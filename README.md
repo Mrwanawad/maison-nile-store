@@ -2,7 +2,7 @@
 
 A bilingual (English / Arabic) online store for a local Egyptian brand: products with colors and sizes, a bag, checkout with cash on delivery or Paymob, and an admin panel for the owners.
 
-Stack: FastAPI · Jinja2 + HTMX · Tailwind v4 + Preline · PostgreSQL (Supabase) · Paymob · Bosta · Telegram. Full design notes are in [DESIGN.md](DESIGN.md).
+Stack: FastAPI · Jinja2 + HTMX · Tailwind v4 + Preline · PostgreSQL (Supabase) · Paymob · Bosta · Telegram. Full design notes are in [docs/DESIGN.md](docs/DESIGN.md).
 
 ## Run it locally (Windows, macOS or Linux)
 
@@ -10,7 +10,7 @@ Requirements: Docker Desktop, [uv](https://docs.astral.sh/uv/), Node 20+.
 
 ```bash
 cp .env.example .env              # every setting lives here, with comments
-docker compose up -d db           # Postgres 16 on localhost:5432
+docker compose -f docker/docker-compose.yml up -d db   # Postgres 16 on localhost:5432
 uv sync                           # Python dependencies
 cd src/frontend && npm install && npm run build && cd ../..   # CSS + vendored JS (once, or after template changes)
 uv run alembic upgrade head       # create tables
@@ -25,13 +25,13 @@ uv run uvicorn app.main:app --app-dir src/backend --reload
 
 While editing templates, keep `npm run watch:css` (run in `src/frontend`) going in a second terminal.
 
-**Docker only** (no local Python/Node needed): `cp .env.example .env`, then `docker compose up`.
+**Docker only** (no local Python/Node needed): `cp .env.example .env`, then `docker compose -f docker/docker-compose.yml up`.
 That starts Postgres, the app on :8000 (migrations run automatically) and the CSS watcher.
 Then load demo data and an admin in another terminal:
 
 ```bash
-docker compose exec app python -m scripts.seed
-docker compose exec app python -m scripts.create_admin owner "Shop Owner"
+docker compose -f docker/docker-compose.yml exec app python -m scripts.seed
+docker compose -f docker/docker-compose.yml exec app python -m scripts.create_admin owner "Shop Owner"
 ```
 
 ## Tests and checks

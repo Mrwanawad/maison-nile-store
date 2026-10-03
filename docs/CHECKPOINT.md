@@ -1,7 +1,23 @@
 # CHECKPOINT — Brand Store (Egyptian e-commerce MVP)
 
-> Hand-off file for a fresh session. Read this first, then `DESIGN.md` (section 15 overrides older sections) and `README.md`.
-> Last updated: 2026-10-03. Branch `main`, 5 local commits, **no git remote yet**, working tree clean.
+> Hand-off file for a fresh session. Read this first, then `docs/DESIGN.md` (section 15 overrides older sections) and `README.md`.
+> Last updated: 2026-10-03. Branch `main`, 9 local commits (latest `156b9c4`), **no git remote yet**. Uncommitted: `docker/` + `docs/` moves and related README/CI/render edits (see §0).
+
+---
+
+## 0. Changes made in the latest session (2026-10-03)
+
+Repo restructure, all committed except where noted:
+
+- **`src/backend/`**: `app/`, `migrations/`, `scripts/` moved here (commit `6437b0d`). pytest `pythonpath`, ruff `src`, mypy `mypy_path`, alembic `script_location` and `prepend_sys_path` updated. Package built with hatchling (`[build-system]` added, `uv.lock` regenerated), so `app` and `scripts` import everywhere after `uv sync`.
+- **`src/frontend/`**: Tailwind source, `static/` (css input, js, img, fonts, vendor build output), `package.json`, `package-lock.json`, `scripts/vendor.mjs` (commit `2f64891`). Tailwind `@source` scans `../../../backend/app/views`.
+- **`docker/`**: `Dockerfile`, `docker-compose.yml`, `Dockerfile.dockerignore` (BuildKit auto-picks it). Compose runs from repo root with `-f docker/docker-compose.yml`. `render.yaml` and CI point to `docker/Dockerfile`. Uncommitted at last check.
+- **`docs/`**: `DESIGN.md`, `CHECKPOINT.md` moved here. `README.md` stays at root. Uncommitted at last check.
+- **Local run**: DB up (`docker compose -f docker/docker-compose.yml up -d db`), migrations applied, app running on `http://localhost:8000` (`uvicorn app.main:app --app-dir src/backend`). Store `/`, `/ar`, admin `/admin`, API docs `/api/docs`, health `/health`.
+- **Checks after restructure**: ruff, ruff format, mypy, 72 pytest pass, alembic check clean, runtime image builds and runs.
+- **Removed**: root `node_modules` (regenerable). `src/frontend/node_modules` is the new install location.
+
+Next session: commit the uncommitted `docker/` + `docs/` + README/CI/render changes, or confirm they are already committed.
 
 ---
 
@@ -52,8 +68,8 @@ src/backend/scripts/ seed.py, create_admin.py, browser_check.py (Playwright)
 src/frontend/scripts/vendor.mjs  copies htmx/preline/fonts into src/frontend/static
 tests/             unit/test_utils.py; integration/ test_orders, test_http, test_admin_catalog, test_integrations, test_storefront
 .github/workflows/ ci.yml, backup.yml (nightly encrypted pg_dump), cleanup.yml (every 30 min)
-Dockerfile         stages: assets (node) → base → dev (compose) / runtime (prod, runs alembic then uvicorn)
-docker-compose.yml db (postgres:16), app (dev target, reload), css (tailwind watcher)
+docker/Dockerfile  stages: assets (node) → base → dev (compose) / runtime (prod, runs alembic then uvicorn)
+docker/docker-compose.yml db (postgres:16), app (dev target, reload), css (tailwind watcher)
 render.yaml        Render blueprint (free plan, Frankfurt)
 ```
 
@@ -143,7 +159,7 @@ Rule: controllers → services → repositories/integrations. Routers never touc
 - Paymob redirect params can't be trusted → inquiry API reconciliation instead.
 
 **Environment quirks (Windows)**
-- Docker Desktop is not running after a reboot → start it (`"C:\Program Files\Docker\Docker\Docker Desktop.exe"`), then `docker compose up -d db`. Tests fail with `ConnectionRefusedError` otherwise.
+- Docker Desktop is not running after a reboot → start it (`"C:\Program Files\Docker\Docker\Docker Desktop.exe"`), then `docker compose -f docker/docker-compose.yml up -d db`. Tests fail with `ConnectionRefusedError` otherwise.
 - `uvicorn --reload` hung once after a change → restart, or run without `--reload`.
 - Git Bash heredocs sometimes mangle content/backslashes → write files with the Write tool or a Python script instead. Use `MSYS_NO_PATHCONV=1` when passing `/paths` as args to Python.
 - The Chrome extension window can't be resized (maximized) → use headless Playwright for viewport screenshots (`uv run --with playwright ...`; chromium already installed).
@@ -166,17 +182,17 @@ One brand; placeholders for brand; EN+AR ~75/25 with modern Arabic fonts; 30–4
 ## 10. Commands cheat-sheet (PowerShell, project root)
 
 ```powershell
-docker compose up -d db                 # database (Docker Desktop must be running)
-uv sync; npm install; npm run build     # deps + CSS/fonts/vendored JS
+docker compose -f docker/docker-compose.yml up -d db   # database (Docker Desktop must be running)
+uv sync; cd src/frontend; npm ci; npm run build; cd ../..   # deps + CSS/fonts/vendored JS
 uv run alembic upgrade head
 uv run python -m scripts.seed           # demo catalog (no-op if not empty; --reset to reload)
 uv run python -m scripts.create_admin owner "Name"
-uv run uvicorn app.main:app --reload    # http://localhost:8000  /ar  /admin  /api/docs
-npm run watch:css                       # while editing templates
+uv run uvicorn app.main:app --app-dir src/backend --reload   # http://localhost:8000  /ar  /admin  /api/docs
+cd src/frontend; npm run watch:css; cd ../..   # while editing templates
 uv run pytest                           # 72 tests
 uv run ruff check . ; uv run ruff format --check . ; uv run mypy src/backend/app
 uv run --with playwright python -m scripts.browser_check   # needs app running
-docker compose up                       # Docker-only path (db + app + css watcher)
+docker compose -f docker/docker-compose.yml up        # Docker-only path (db + app + css watcher)
 ```
 
 Local DB state at hand-off: 10 demo products, 0 orders, 1 admin (`owner`).
