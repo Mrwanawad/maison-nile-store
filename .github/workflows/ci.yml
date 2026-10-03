@@ -40,4 +40,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: docker build --target runtime -t brand-store .
+      - run: docker build -f docker/Dockerfile --target runtime -t brand-store .

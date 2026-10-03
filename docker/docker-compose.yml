@@ -1,6 +1,7 @@
 # Local development: Postgres + the app with auto-reload + Tailwind watcher.
-#   docker compose up -d db        # database only (run the app with uv on the host)
-#   docker compose up              # everything (db, app on :8000, CSS watcher)
+# Run from the repo root:
+#   docker compose -f docker/docker-compose.yml up -d db   # database only (run the app with uv on the host)
+#   docker compose -f docker/docker-compose.yml up         # everything (db, app on :8000, CSS watcher)
 services:
   db:
     image: postgres:16-alpine
@@ -20,9 +21,10 @@ services:
 
   app:
     build:
-      context: .
+      context: ..
+      dockerfile: docker/Dockerfile
       target: dev
-    env_file: .env
+    env_file: ../.env
     environment:
       DATABASE_URL: postgresql+asyncpg://store:store@db:5432/store
     command: >
@@ -31,7 +33,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./src/backend:/srv/src/backend
+      - ../src/backend:/srv/src/backend
       - ./media:/srv/media
     depends_on:
       db:
@@ -42,7 +44,7 @@ services:
     working_dir: /srv/src/frontend
     command: sh -c "npm ci && npm run vendor && npm run watch:css"
     volumes:
-      - ./src:/srv/src
+      - ../src:/srv/src
       - /srv/src/frontend/node_modules
 
 volumes:
