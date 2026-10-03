@@ -27,13 +27,11 @@ services:
       DATABASE_URL: postgresql+asyncpg://store:store@db:5432/store
     command: >
       sh -c "alembic upgrade head &&
-             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir app"
+             uvicorn app.main:app --app-dir src/backend --host 0.0.0.0 --port 8000 --reload --reload-dir src/backend/app"
     ports:
       - "8000:8000"
     volumes:
-      - ./app:/srv/app
-      - ./migrations:/srv/migrations
-      - ./scripts:/srv/scripts
+      - ./src/backend:/srv/src/backend
       - ./media:/srv/media
     depends_on:
       db:
@@ -41,11 +39,11 @@ services:
 
   css:
     image: node:22-slim
-    working_dir: /srv
+    working_dir: /srv/src/frontend
     command: sh -c "npm ci && npm run vendor && npm run watch:css"
     volumes:
-      - ./:/srv
-      - /srv/node_modules
+      - ./src:/srv/src
+      - /srv/src/frontend/node_modules
 
 volumes:
   pgdata:

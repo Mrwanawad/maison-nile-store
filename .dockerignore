@@ -9,6 +9,6 @@ media
 .mypy_cache
 .ruff_cache
 .pytest_cache
-app/static/css/app.css
-app/static/vendor
-app/static/fonts
+src/frontend/static/css/app.css
+src/frontend/static/vendor
+src/frontend/static/fonts

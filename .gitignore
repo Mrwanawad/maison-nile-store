@@ -10,9 +10,9 @@ htmlcov/
 
 # Node / build output
 node_modules/
-app/static/css/app.css
-app/static/vendor/
-app/static/fonts/
+src/frontend/static/css/app.css
+src/frontend/static/vendor/
+src/frontend/static/fonts/
 
 # Local data
 .env

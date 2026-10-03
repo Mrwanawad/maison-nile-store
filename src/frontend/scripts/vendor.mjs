@@ -1,8 +1,8 @@
 // Copies the browser JS we ship (HTMX, Preline overlay) from node_modules into
-// app/static/vendor, so the Python runtime never needs Node.
+// static/vendor, so the Python runtime never needs Node.
 import { copyFileSync, mkdirSync } from "node:fs";
 
-const out = "app/static/vendor";
+const out = "static/vendor";
 mkdirSync(out, { recursive: true });
 
 const files = [
@@ -25,8 +25,8 @@ for (const [from, to] of files) {
   console.log(`vendored ${to}`);
 }
 
-mkdirSync("app/static/fonts", { recursive: true });
+mkdirSync("static/fonts", { recursive: true });
 for (const [from, to] of fonts) {
-  copyFileSync(`node_modules/${from}`, `app/static/fonts/${to}`);
+  copyFileSync(`node_modules/${from}`, `static/fonts/${to}`);
   console.log(`vendored font ${to}`);
 }

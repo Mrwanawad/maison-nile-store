@@ -3,12 +3,10 @@
 # --- 1. Front-end assets (Tailwind CSS + vendored JS). Node exists only here. ---
 FROM node:22-slim AS assets
 WORKDIR /build
-COPY package.json package-lock.json ./
-RUN npm ci --no-audit --no-fund
-COPY scripts/vendor.mjs scripts/vendor.mjs
-COPY app/static app/static
-COPY app/views app/views
-RUN npm run build
+COPY src/frontend src/frontend
+COPY src/backend/app/views src/backend/app/views
+WORKDIR /build/src/frontend
+RUN npm ci --no-audit --no-fund && npm run build
 
 # --- 2. Python dependencies ---------------------------------------------------
 FROM python:3.12-slim AS base
@@ -17,6 +15,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
     UV_PROJECT_ENVIRONMENT=/opt/venv \
+    PYTHONPATH=/srv/src/backend \
     PATH="/opt/venv/bin:$PATH"
 COPY --from=ghcr.io/astral-sh/uv:0.10 /uv /usr/local/bin/uv
 WORKDIR /srv
@@ -26,16 +25,14 @@ COPY pyproject.toml uv.lock ./
 FROM base AS dev
 RUN uv sync --frozen --no-install-project
 COPY . .
-COPY --from=assets /build/app/static app/static
+COPY --from=assets /build/src/frontend/static src/frontend/static
 
 # --- 3. Production runtime ------------------------------------------------------
 FROM base AS runtime
 RUN uv sync --frozen --no-dev --no-install-project
 COPY alembic.ini ./
-COPY migrations migrations
-COPY scripts scripts
-COPY app app
-COPY --from=assets /build/app/static app/static
+COPY src/backend src/backend
+COPY --from=assets /build/src/frontend/static src/frontend/static
 RUN useradd --create-home --uid 10001 appuser && mkdir -p media && chown appuser media
 USER appuser
 EXPOSE 8000

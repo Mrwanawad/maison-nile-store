@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 /* Scan templates and our JS for class names. */
-@source "../../views";
+@source "../../../backend/app/views";
 @source "../js";
-@source "../../../node_modules/preline/dist/overlay.js";
-@import "../../../node_modules/preline/src/plugins/overlay/variants.css";
+@source "../../node_modules/preline/dist/overlay.js";
+@import "../../node_modules/preline/src/plugins/overlay/variants.css";
 
 /* Self-hosted fonts (copied by scripts/vendor.mjs). */
 @font-face { font-family: "Fraunces"; font-style: normal; font-weight: 100 900; font-display: swap;
