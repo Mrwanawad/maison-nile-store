@@ -1,7 +1,7 @@
 # CHECKPOINT — Brand Store (Egyptian e-commerce MVP)
 
 > Hand-off file for a fresh session. Read this first, then `docs/DESIGN.md` (section 15 overrides older sections; the last bullet, "Visual identity v3", overrides all earlier visual specs) and `README.md`.
-> Last updated: 2026-10-03. Branch `main`, all work committed (latest feature commit `3190a5b`), working tree clean. **No git remote yet** (`gh` is logged in as `Mrwanawad`; repo not created).
+> Last updated: 2026-10-03. Branch `main`, all work committed (latest feature commit `3190a5b`), working tree clean. Remote: private GitHub repo **https://github.com/Mrwanawad/maison-nile-store** (`origin`, `main` tracks `origin/main`).
 
 ---
 
@@ -140,7 +140,7 @@ Rule: controllers → services → repositories/integrations. Routers never touc
 
 ## 7. DUE / not done ⏳
 
-1. **Deploy (milestone 8).** Needs from the user: GitHub repo (remote), Supabase project (pooler URL + service key + public bucket `products`), Render account (Blueprint from `render.yaml`), UptimeRobot on `/health`, and GitHub secrets `SITE_URL`, `INTERNAL_CRON_TOKEN`, `BACKUP_DATABASE_URL`, `BACKUP_PASSPHRASE`. Then create both admins with `src/backend/scripts/create_admin.py` in the Render shell. Steps are in README → "Deploying".
+1. **Deploy (milestone 8).** GitHub repo exists (private, `Mrwanawad/maison-nile-store`). Still needs from the user: Supabase project (pooler URL + service key + public bucket `products`), Render account (Blueprint from `render.yaml`), UptimeRobot on `/health`, and GitHub secrets `SITE_URL`, `INTERNAL_CRON_TOKEN`, `BACKUP_DATABASE_URL`, `BACKUP_PASSPHRASE`. Then create both admins with `src/backend/scripts/create_admin.py` in the Render shell. Steps are in README → "Deploying".
 2. **Client inputs:** logo, accent color, Arabic brand name/tagline, WhatsApp/social/support contacts, Paymob (KYC + secret/public/HMAC/API keys + Apple Pay integration id; callback URL `https://<site>/webhooks/paymob`), Bosta API key (+ pickup location id), Telegram bot token + owner chat ids, Brevo verified sender, real photos, size chart, return/privacy/terms text, custom domain.
 3. **Verify against live accounts:** Paymob (Apple Pay can't be tested in Paymob test mode and likely needs a custom domain); Bosta payload (city names/fields may need adjusting; city = governorate English name).
 4. User's **manual local testing** (instructions were given; README has them). Await their feedback.
@@ -225,7 +225,7 @@ d090985 feat: bilingual storefront, checkout, admin and integrations MVP
 ## 12. Suggested next steps for the new session
 
 1. Ask the user for feedback on the v3 "Cairo pop" design and their manual test; fix what they report.
-2. Create the GitHub remote (user asked to "sync"; no remote existed) and push `main`.
+2. Check the first GitHub Actions CI run on `origin/main` and fix anything red; add the repo secrets listed in section 7.1.
 3. Get the deployment accounts (section 7.1) and deploy; verify `/health`, the storefront and admin on the live URL; set up UptimeRobot and the GitHub secrets.
 4. Once client keys arrive: test Paymob in test mode end to end (card first, then Apple Pay on a custom domain), test a Bosta staging shipment, test Telegram and Brevo.
 5. Replace placeholder content and photos; then hand over to the client.
