@@ -31,7 +31,7 @@ Hosting plan: Render free web service (Docker) + Supabase free + UptimeRobot + G
 ## 4. Architecture (modular monolith, MVC + services)
 
 ```
-app/
+src/backend/app/
   main.py          app factory: middleware order, static mounts (CachedStatic), routers, Sentry, config checks
   core/            config.py (Settings from .env), db.py, i18n.py (LocaleMiddleware, t(), url()),
                    security.py (CSRF, order tokens, bcrypt), errors.py (AppError + handlers),
@@ -46,9 +46,10 @@ app/
   views/           base.html, components/, pages/, partials/, admin/, emails/
   locales/         en.json, ar.json (admin.* keys English only)
   content/         en|ar/*.md: about, shipping-returns, size-guide, faq, contact, privacy, terms (PLACEHOLDER text)
-  static/          css/input.css (tokens + @font-face), js/app.js; build output: css/app.css, vendor/, fonts/ (gitignored)
-migrations/        Alembic, single initial migration a2cf68da34bd (+ enables RLS on all tables)
-scripts/           seed.py, create_admin.py, vendor.mjs (copies htmx/preline/fonts), browser_check.py (Playwright)
+  (src/frontend/static/)  css/input.css (tokens + @font-face), js/app.js; build output: css/app.css, vendor/, fonts/ (gitignored)
+src/backend/migrations/  Alembic, single initial migration a2cf68da34bd (+ enables RLS on all tables)
+src/backend/scripts/ seed.py, create_admin.py, browser_check.py (Playwright)
+src/frontend/scripts/vendor.mjs  copies htmx/preline/fonts into src/frontend/static
 tests/             unit/test_utils.py; integration/ test_orders, test_http, test_admin_catalog, test_integrations, test_storefront
 .github/workflows/ ci.yml, backup.yml (nightly encrypted pg_dump), cleanup.yml (every 30 min)
 Dockerfile         stages: assets (node) → base → dev (compose) / runtime (prod, runs alembic then uvicorn)
@@ -111,7 +112,7 @@ Rule: controllers → services → repositories/integrations. Routers never touc
 
 **Quality**
 - 72 pytest tests on real Postgres (database `store_test`, created automatically); fake HTTP transport for third parties.
-- `scripts/browser_check.py`: 16 Playwright checks (EN + AR, 390px).
+- `src/backend/scripts/browser_check.py`: 16 Playwright checks (EN + AR, 390px).
 - ruff + mypy --strict clean. Pre-commit config present (not installed yet: `uv run pre-commit install`).
 - Lighthouse mobile: Performance 90–97, Accessibility 100, Best practices 100. No horizontal scroll at 360/768/1280.
 
@@ -119,7 +120,7 @@ Rule: controllers → services → repositories/integrations. Routers never touc
 
 ## 7. DUE / not done ⏳
 
-1. **Deploy (milestone 8).** Needs from the user: GitHub repo (remote), Supabase project (pooler URL + service key + public bucket `products`), Render account (Blueprint from `render.yaml`), UptimeRobot on `/health`, and GitHub secrets `SITE_URL`, `INTERNAL_CRON_TOKEN`, `BACKUP_DATABASE_URL`, `BACKUP_PASSPHRASE`. Then create both admins with `scripts/create_admin.py` in the Render shell. Steps are in README → "Deploying".
+1. **Deploy (milestone 8).** Needs from the user: GitHub repo (remote), Supabase project (pooler URL + service key + public bucket `products`), Render account (Blueprint from `render.yaml`), UptimeRobot on `/health`, and GitHub secrets `SITE_URL`, `INTERNAL_CRON_TOKEN`, `BACKUP_DATABASE_URL`, `BACKUP_PASSPHRASE`. Then create both admins with `src/backend/scripts/create_admin.py` in the Render shell. Steps are in README → "Deploying".
 2. **Client inputs:** logo, accent color, Arabic brand name/tagline, WhatsApp/social/support contacts, Paymob (KYC + secret/public/HMAC/API keys + Apple Pay integration id; callback URL `https://<site>/webhooks/paymob`), Bosta API key (+ pickup location id), Telegram bot token + owner chat ids, Brevo verified sender, real photos, size chart, return/privacy/terms text, custom domain.
 3. **Verify against live accounts:** Paymob (Apple Pay can't be tested in Paymob test mode and likely needs a custom domain); Bosta payload (city names/fields may need adjusting; city = governorate English name).
 4. User's **manual local testing** (instructions were given; README has them). Await their feedback.
@@ -173,8 +174,8 @@ uv run python -m scripts.create_admin owner "Name"
 uv run uvicorn app.main:app --reload    # http://localhost:8000  /ar  /admin  /api/docs
 npm run watch:css                       # while editing templates
 uv run pytest                           # 72 tests
-uv run ruff check . ; uv run ruff format --check . ; uv run mypy app
-uv run --with playwright python scripts/browser_check.py   # needs app running
+uv run ruff check . ; uv run ruff format --check . ; uv run mypy src/backend/app
+uv run --with playwright python -m scripts.browser_check   # needs app running
 docker compose up                       # Docker-only path (db + app + css watcher)
 ```
 

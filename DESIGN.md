@@ -72,8 +72,10 @@ FastAPI on Render (Docker)
 
 ```
 .
-├── app/
-│   ├── main.py                 # app factory, middleware, static mount, Preline/HTMX wiring
+├── src/
+│   ├── backend/
+│   │   ├── app/
+│   │   │   ├── main.py                 # app factory, middleware, static mount, Preline/HTMX wiring
 │   ├── config.py               # pydantic-settings Settings
 │   ├── db.py                   # async engine + session dependency
 │   ├── models/                 # SQLAlchemy ORM models
@@ -91,12 +93,14 @@ FastAPI on Render (Docker)
 │       ├── css/app.css         # build output (gitignored)
 │       ├── js/app.js           # HTMX ↔ Preline re-init, tiny helpers
 │       └── img/
-├── migrations/                 # Alembic
+│   ├── migrations/             # Alembic
+│   │   └── scripts/seed.py
+│   └── frontend/
+│       ├── package.json        # tailwindcss, @tailwindcss/cli, preline (build-only)
+│       └── scripts/vendor.mjs
 ├── sql/place_order.sql         # Postgres function
-├── scripts/seed.py
 ├── tests/
 ├── Dockerfile                  # multi-stage: node (css build) → python (runtime)
-├── package.json                # tailwindcss, @tailwindcss/cli, preline (build-only)
 ├── pyproject.toml
 ├── .env.example
 └── DESIGN.md
@@ -366,8 +370,8 @@ Use Supabase's **connection pooler** URL (transaction mode) and disable asyncpg 
 
 ### MVP ($0)
 - **Render free Web Service** from `Dockerfile`:
-  - Stage 1 (node:lts-slim): `npm ci && npx @tailwindcss/cli -i app/static/css/input.css -o app/static/css/app.css --minify`; copy Preline JS from `node_modules`.
-  - Stage 2 (python:3.12-slim): install deps, copy app + built assets, run `uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --proxy-headers`.
+  - Stage 1 (node:lts-slim): `npm ci && npx @tailwindcss/cli -i src/frontend/static/css/input.css -o src/frontend/static/css/app.css --minify`; copy Preline JS from `node_modules`.
+  - Stage 2 (python:3.12-slim): install deps, copy src/backend + built assets, run `uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --proxy-headers`.
 - **UptimeRobot:** ping `/health` every 10 min. Keeps Render awake **and** keeps Supabase from pausing.
 - **GitHub Actions:**
   - `backup.yml`: nightly `pg_dump` → encrypted artifact (retain 14 days).
@@ -417,12 +421,12 @@ Use Supabase's **connection pooler** URL (transaction mode) and disable asyncpg 
 ## 15. v1 decisions (2026-10-02, override the sections above)
 
 ### Scope added to v1
-- **Bilingual EN/AR.** English at `/`, Arabic at `/ar/...` (RTL). UI text in `app/locales/{en,ar}.json`; product/category/color/size names stored in both languages. Arabic fonts: Alexandria (headings) + IBM Plex Sans Arabic (body). Admin is English only.
+- **Bilingual EN/AR.** English at `/`, Arabic at `/ar/...` (RTL). UI text in `src/backend/app/locales/{en,ar}.json`; product/category/color/size names stored in both languages. Arabic fonts: Alexandria (headings) + IBM Plex Sans Arabic (body). Admin is English only.
 - **Variants.** Global `sizes` table (grouped: apparel, waist, ...), per-product `product_colors`, and `product_variants` = product × color × size with its own SKU, stock and optional price override (`UNIQUE NULLS NOT DISTINCT`). `product_images.color_id` ties photos to a color. Products have no stock column.
 - **Categories, search, filters** (category, size, in stock, sort) and compare-at sale prices.
 - **Admin product management** (create/edit, colors, sizes, variant stock grid, photo upload → WebP), categories, sizes, COD phone blocklist, order notes, audit trail (`order_events`). Admins live in `admin_users` (bcrypt), created with `scripts/create_admin.py`.
 - **Orders keep a copy of the shipping details** (`ship_*` columns); `customers` holds the latest details per phone.
-- **Shipping** per governorate from `.env`: `SHIPPING_DEFAULT_FEE_EGP=100`, `SHIPPING_FEE_OVERRIDES=alexandria:50`. 27 governorates in `app/utils/governorates.py`.
+- **Shipping** per governorate from `.env`: `SHIPPING_DEFAULT_FEE_EGP=100`, `SHIPPING_FEE_OVERRIDES=alexandria:50`. 27 governorates in `src/backend/app/utils/governorates.py`.
 - **COD protection** (`.env`): max COD order total, max open COD orders per phone, phone blocklist, honeypot, rate limits. SMS OTP is an interface only (`OTP_PROVIDER=none`).
 - **Notifications** (background tasks, never block checkout): Telegram to the owners; customer confirmation email via Brevo (or Resend once a domain exists).
 - **Bosta**: "Create shipment" in admin; tracking number stored and shown to the customer.

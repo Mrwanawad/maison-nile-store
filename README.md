@@ -12,18 +12,18 @@ Requirements: Docker Desktop, [uv](https://docs.astral.sh/uv/), Node 20+.
 cp .env.example .env              # every setting lives here, with comments
 docker compose up -d db           # Postgres 16 on localhost:5432
 uv sync                           # Python dependencies
-npm install && npm run build      # CSS + vendored JS (once, or after template changes)
+cd src/frontend && npm install && npm run build && cd ../..   # CSS + vendored JS (once, or after template changes)
 uv run alembic upgrade head       # create tables
 uv run python -m scripts.seed     # demo catalog (10 products)
 uv run python -m scripts.create_admin owner "Shop Owner"   # prompts for a password
-uv run uvicorn app.main:app --reload
+uv run uvicorn app.main:app --app-dir src/backend --reload
 ```
 
 - Store: http://localhost:8000 (Arabic at http://localhost:8000/ar)
 - Admin: http://localhost:8000/admin
 - API docs (dev only): http://localhost:8000/api/docs
 
-While editing templates, keep `npm run watch:css` running in a second terminal.
+While editing templates, keep `npm run watch:css` (run in `src/frontend`) going in a second terminal.
 
 **Docker only** (no local Python/Node needed): `cp .env.example .env`, then `docker compose up`.
 That starts Postgres, the app on :8000 (migrations run automatically) and the CSS watcher.
@@ -39,7 +39,7 @@ docker compose exec app python -m scripts.create_admin owner "Shop Owner"
 ```bash
 uv run pytest            # needs the docker compose db (uses a separate store_test database)
 uv run ruff check . && uv run ruff format --check .
-uv run mypy app
+uv run mypy src/backend/app
 ```
 
 Install the git hooks once with `uv run pre-commit install`.
@@ -47,19 +47,24 @@ Install the git hooks once with `uv run pre-commit install`.
 ## Project layout
 
 ```
-app/
-  controllers/   web/ (storefront), admin/, api/v1/, system.py (health, cron)
-  services/      business rules: cart, orders, payments, shipping, fraud, notifications
-  repositories/  SQL only
-  integrations/  paymob, bosta, telegram, email (brevo/resend), storage (local/supabase), sms
-  models/        SQLAlchemy tables
-  schemas/       Pydantic input/output (shared by HTML and API)
-  views/         Jinja templates (pages, partials, components, admin, emails)
-  locales/       en.json, ar.json
-  content/       en/ar Markdown pages (about, FAQ, size guide, policies)
-  core/          config, db, i18n, security, errors, middleware, templates
-migrations/      Alembic
-scripts/         seed, create_admin, vendor.mjs
+src/
+  backend/       Python: FastAPI app, Alembic, CLI scripts
+    app/
+      controllers/  web/ (storefront), admin/, api/v1/, system.py (health, cron)
+      services/     business rules: cart, orders, payments, shipping, fraud, notifications
+      repositories/ SQL only
+      integrations/ paymob, bosta, telegram, email (brevo/resend), storage (local/supabase), sms
+      models/       SQLAlchemy tables
+      schemas/      Pydantic input/output (shared by HTML and API)
+      views/        Jinja templates (pages, partials, components, admin, emails)
+      locales/      en.json, ar.json
+      content/      en/ar Markdown pages (about, FAQ, size guide, policies)
+      core/         config, db, i18n, security, errors, middleware, templates
+    migrations/   Alembic
+    scripts/      seed, create_admin, browser_check
+  frontend/      CSS + JS assets: Tailwind source, htmx/Preline vendoring, npm config
+    static/       css/input.css (source), js/app.js, img, fonts, vendor (build output gitignored)
+    scripts/      vendor.mjs
 tests/           unit + integration (real Postgres)
 ```
 
@@ -87,5 +92,5 @@ Integrations switch on only when their keys are present: with no keys at all the
 | Bosta API key (and pickup location id) | `BOSTA_*` |
 | Telegram bot token + each owner's chat id | `TELEGRAM_*` |
 | Brevo account with a verified sender email | `EMAIL_*` |
-| Real product photos, size chart, return policy, about text | admin panel and `app/content/` |
+| Real product photos, size chart, return policy, about text | admin panel and `src/backend/app/content/` |
 | Custom domain (needed for production Apple Pay and a professional email sender) | Cloudflare → Render |
