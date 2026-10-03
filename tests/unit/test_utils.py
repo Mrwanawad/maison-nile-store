@@ -132,7 +132,7 @@ def test_text_helpers() -> None:
 
 
 def test_locale_catalogs_match() -> None:
-    root = Path(__file__).resolve().parents[2] / "app" / "locales"
+    root = Path(__file__).resolve().parents[2] / "src" / "backend" / "app" / "locales"
     en = json.loads((root / "en.json").read_text("utf-8"))
     ar = json.loads((root / "ar.json").read_text("utf-8"))
     storefront = {k for k in en if not k.startswith("admin.")}

@@ -1,10 +1,10 @@
 # ruff: noqa: B023  (each check runs inside its own loop iteration)
 """Real-browser checks of the storefront JavaScript at phone size, in English and Arabic.
 
-Needs the app running on localhost:8000 with the demo catalog (scripts/seed.py):
+Needs the app running on localhost:8000 with the demo catalog (python -m scripts.seed):
 
     uv run --with playwright python -m playwright install chromium   # once
-    uv run --with playwright python scripts/browser_check.py
+    uv run --with playwright python -m scripts.browser_check
 """
 
 import os

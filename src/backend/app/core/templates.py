@@ -29,7 +29,7 @@ templates = Jinja2Templates(directory=str(_VIEWS))
 settings = get_settings()
 
 
-_STATIC = Path(__file__).resolve().parent.parent / "static"
+_STATIC = Path(__file__).resolve().parents[3] / "frontend" / "static"
 
 
 def _static_url(path: str) -> str:

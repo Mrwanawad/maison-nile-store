@@ -1,7 +1,7 @@
 """Cash-on-delivery abuse protection. All limits come from `.env`.
 
 SMS one-time codes are not active yet (`OTP_PROVIDER=none`); see
-`app/integrations/sms` for the provider interface to plug in later.
+`src/backend/app/integrations/sms` for the provider interface to plug in later.
 """
 
 from __future__ import annotations

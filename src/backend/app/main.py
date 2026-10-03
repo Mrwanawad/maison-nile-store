@@ -32,7 +32,7 @@ from app.integrations.storage import MEDIA_ROOT
 from app.services import nav_cache, shipping_service
 
 log = logging.getLogger("app")
-STATIC_DIR = Path(__file__).resolve().parent / "static"
+STATIC_DIR = Path(__file__).resolve().parents[2] / "frontend" / "static"
 
 
 class CachedStatic(StaticFiles):
