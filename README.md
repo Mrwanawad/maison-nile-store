@@ -80,7 +80,7 @@ Integrations switch on only when their keys are present: with no keys at all the
 2. **Render**: *New → Blueprint* from this repo (uses `render.yaml`). Set `BASE_URL`, `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, plus any brand/contact values. Migrations run on every start.
 3. Create the admins: in the Render shell run `ADMIN_PASSWORD='…' python -m scripts.create_admin <username> "<Name>"` (once per owner).
 4. **UptimeRobot**: HTTP monitor on `https://<your-app>/health` every 5-10 minutes (keeps Render awake and Supabase from pausing).
-5. **GitHub secrets** for the scheduled jobs: `SITE_URL`, `INTERNAL_CRON_TOKEN` (same value as on Render), `BACKUP_DATABASE_URL` (Supabase *direct* connection string, `postgresql://…:5432/postgres`), `BACKUP_PASSPHRASE`.
+5. **GitHub secrets** for the scheduled jobs: `SITE_URL`, `INTERNAL_CRON_TOKEN` (same value as on Render), `BACKUP_DATABASE_URL` (Supabase *session pooler* connection string, `postgresql://postgres.<ref>:…@aws-0-<region>.pooler.supabase.com:5432/postgres`; the direct `db.<ref>.supabase.co` host is IPv6-only and GitHub runners can't reach it), `BACKUP_PASSPHRASE`.
 
 ### What the business needs to provide
 
