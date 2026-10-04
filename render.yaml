@@ -1,13 +1,14 @@
-# Render Blueprint: one free Docker web service. Secrets are set in the Render
-# dashboard (sync: false) and never committed.
+# Render Blueprint: one free web service on Render's native Python runtime
+# (Docker services require a card on file, even on the free instance).
+# Secrets are set in the Render dashboard (sync: false) and never committed.
 services:
   - type: web
     name: brand-store
-    runtime: docker
+    runtime: python
     plan: free
     region: frankfurt
-    dockerfilePath: ./docker/Dockerfile
-    dockerContext: .
+    buildCommand: ./deploy/render-build.sh
+    startCommand: ./deploy/render-start.sh
     healthCheckPath: /health
     autoDeploy: true
     envVars:

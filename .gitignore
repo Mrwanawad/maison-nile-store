@@ -27,3 +27,4 @@ media/
 Thumbs.db
 .idea/
 .vscode/
+.render/
