@@ -291,6 +291,16 @@ async def test_supabase_storage(fake_http: FakeHTTP, monkeypatch: pytest.MonkeyP
     assert fake_http.sent("/storage/v1/object/products")[-1] == {"prefixes": ["products/x/a.webp"]}
 
 
+def test_supabase_storage_auth_headers(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(get_settings(), "supabase_service_key", "sb_secret_abc")
+    assert SupabaseStorage().headers == {"apikey": "sb_secret_abc"}
+    monkeypatch.setattr(get_settings(), "supabase_service_key", "eyJlegacy")
+    assert SupabaseStorage().headers == {
+        "apikey": "eyJlegacy",
+        "Authorization": "Bearer eyJlegacy",
+    }
+
+
 async def test_cleanup_reconciles_before_cancelling(  # type: ignore[no-untyped-def]
     client, catalog: Catalog, db, fake_http: FakeHTTP, monkeypatch: pytest.MonkeyPatch
 ) -> None:

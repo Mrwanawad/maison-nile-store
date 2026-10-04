@@ -48,10 +48,12 @@ class SupabaseStorage:
         s = get_settings()
         self.base = s.supabase_url.rstrip("/")
         self.bucket = s.supabase_bucket
-        self.headers = {
-            "Authorization": f"Bearer {s.supabase_service_key}",
-            "apikey": s.supabase_service_key,
-        }
+        key = s.supabase_service_key
+        # New secret keys (sb_secret_...) aren't JWTs: the gateway rejects them on the
+        # Authorization header. Legacy service_role JWTs need both headers.
+        self.headers = {"apikey": key}
+        if not key.startswith("sb_"):
+            self.headers["Authorization"] = f"Bearer {key}"
 
     @property
     def public_prefix(self) -> str:
