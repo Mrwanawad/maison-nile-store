@@ -14,13 +14,19 @@
       kind === "error"
         ? "bg-danger text-paper"
         : kind === "info"
-          ? "bg-paper text-ink"
-          : "bg-mango text-ink";
+          ? "bg-paper text-ink ring-1 ring-line"
+          : "bg-ink text-paper";
     el.className =
-      "pointer-events-auto max-w-sm rounded-full border-2 border-ink px-5 py-3 text-sm font-semibold shadow-[4px_4px_0_0_var(--color-ink)] transition-opacity duration-200 " +
+      "pointer-events-auto flex max-w-sm items-center gap-2.5 rounded-full px-5 py-3 text-sm shadow-[0_18px_40px_-14px_rgb(0_0_0/0.45)] transition-opacity duration-300 " +
       tone;
     el.setAttribute("role", kind === "error" ? "alert" : "status");
-    el.textContent = message;
+    if (kind !== "error" && kind !== "info") {
+      const dot = document.createElement("span");
+      dot.className = "size-1.5 shrink-0 rounded-full bg-accent";
+      dot.setAttribute("aria-hidden", "true");
+      el.appendChild(dot);
+    }
+    el.appendChild(document.createTextNode(message));
     box.appendChild(el);
     setTimeout(() => {
       el.style.opacity = "0";
@@ -174,6 +180,31 @@
       }
     });
     update();
+
+    // Phone: a compact buy bar slides up once the real button has scrolled away.
+    const bar = root.querySelector("[data-sticky-buy]");
+    if (bar && button && "IntersectionObserver" in window) {
+      new IntersectionObserver(([entry]) => {
+        const show = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+        bar.toggleAttribute("data-show", show);
+        bar.inert = !show;
+        document.body.toggleAttribute("data-buy-bar", show);
+      }).observe(button);
+      const barPrice = bar.querySelector("[data-sticky-price]");
+      const barAdd = bar.querySelector("[data-sticky-add]");
+      form.addEventListener("change", () => {
+        if (barPrice && priceEl) barPrice.textContent = priceEl.textContent;
+        if (barAdd) barAdd.disabled = button.disabled;
+      });
+      if (barAdd) barAdd.addEventListener("click", () => {
+        if (form.checkValidity()) {
+          form.requestSubmit();
+        } else {
+          form.scrollIntoView({ behavior: "smooth", block: "center" });
+          setTimeout(() => form.reportValidity(), 450);
+        }
+      });
+    }
   }
   document.querySelectorAll("[data-picker]").forEach(initPicker);
 
@@ -217,6 +248,24 @@
       }
     });
   }
+
+  // ---------------------------------------------------------------- overlays
+  // Preline hides an overlay (and removes its backdrop) on the overlay's own
+  // transitionend. Closed before the opening transition got going, nothing ever
+  // transitions and it would stay mounted, invisible, over the page. If an overlay
+  // is still half-closed shortly after closing, send the event it is waiting for.
+  document.querySelectorAll(".hs-overlay").forEach((el) => {
+    let timer;
+    new MutationObserver(() => {
+      clearTimeout(timer);
+      if (el.classList.contains("open") || el.classList.contains("hidden")) return;
+      timer = setTimeout(() => {
+        if (!el.classList.contains("open") && !el.classList.contains("hidden")) {
+          el.dispatchEvent(new Event("transitionend"));
+        }
+      }, 900);
+    }).observe(el, { attributes: true, attributeFilter: ["class"] });
+  });
 
   // ---------------------------------------------------------------- misc
   document.querySelectorAll("[data-back]").forEach((a) =>

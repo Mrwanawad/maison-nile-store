@@ -4,46 +4,44 @@
 {% block title %}{{ heading }} · {{ brand_name() }}{% endblock %}
 {% block content %}
 {% set base_path = url('/c/' ~ category.slug) if category else url('/shop') %}
-<div class="border-b-2 border-ink bg-mango">
-  <div class="container-page pt-8 pb-8 md:pt-12 md:pb-12">
-    <nav aria-label="{{ t('nav.breadcrumb') }}" class="text-sm font-medium">
-      <a href="{{ url('/') }}" class="hover:underline">{{ t("nav.home") }}</a>
-      <span class="mx-1.5 opacity-50">/</span>
-      {% if category %}<a href="{{ url('/shop') }}" class="hover:underline">{{ t("nav.shop_all") }}</a><span class="mx-1.5 opacity-50">/</span>{% endif %}
-      <span aria-current="page">{{ heading }}</span>
-    </nav>
-    <h1 class="mt-4 text-6xl md:text-8xl" data-reveal>{{ heading }}</h1>
-    {% if nav_categories() %}
-    <div class="-mx-4 mt-6 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0">
-      <a href="{{ url('/shop') }}" class="chip shrink-0 border-ink {% if not category and not request.query_params.get('category') %}chip-active{% endif %}">{{ t("nav.shop_all") }}</a>
-      {% for c in nav_categories() %}<a href="{{ url('/c/' ~ c.slug) }}" class="chip shrink-0 border-ink {% if category and category.slug == c.slug %}chip-active{% endif %}">{{ c.name(locale()) }}</a>{% endfor %}
-    </div>
-    {% endif %}
+<div class="container-page pt-8 md:pt-14">
+  <nav aria-label="{{ t('nav.breadcrumb') }}" class="text-[13px] text-ink-soft">
+    <a href="{{ url('/') }}" class="hover:text-ink">{{ t("nav.home") }}</a>
+    <span class="mx-1.5">/</span>
+    {% if category %}<a href="{{ url('/shop') }}" class="hover:text-ink">{{ t("nav.shop_all") }}</a><span class="mx-1.5">/</span>{% endif %}
+    <span class="text-ink" aria-current="page">{{ heading }}</span>
+  </nav>
+  <h1 class="mt-6 text-[clamp(3.25rem,10vw,9.5rem)]" data-split>{{ heading }}</h1>
+  {% if nav_categories() %}
+  <div class="-mx-4 mt-8 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:px-0">
+    <a href="{{ url('/shop') }}" class="chip shrink-0 {% if not category and not request.query_params.get('category') %}chip-active{% endif %}">{{ t("nav.shop_all") }}</a>
+    {% for c in nav_categories() %}<a href="{{ url('/c/' ~ c.slug) }}" class="chip shrink-0 {% if category and category.slug == c.slug %}chip-active{% endif %}">{{ c.name(locale()) }}</a>{% endfor %}
   </div>
+  {% endif %}
 </div>
 
 <div class="container-page">
   <form id="filters" action="{{ base_path }}" method="get"
         hx-get="{{ base_path }}" hx-target="#results" hx-swap="outerHTML" hx-push-url="true" hx-trigger="change, submit, keyup changed delay:400ms from:#filter-q"
-        class="sticky top-0 z-20 -mx-4 border-b-2 border-ink bg-bone px-4 py-3 sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10">
+        class="sticky top-0 z-20 -mx-4 mt-8 border-y border-line bg-bone/85 px-4 py-3 backdrop-blur-xl backdrop-saturate-150 sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10">
     <div class="flex items-center gap-3 lg:hidden">
-      <button type="button" class="hs-collapse-toggle btn btn-secondary btn-sm" id="filters-toggle" aria-expanded="false" aria-controls="filters-panel" data-hs-collapse="#filters-panel">
+      <button type="button" class="hs-collapse-toggle btn btn-secondary btn-sm gap-2" id="filters-toggle" aria-expanded="false" aria-controls="filters-panel" data-hs-collapse="#filters-panel">
         {{ icon("sliders", "size-4") }} {{ t("filters.toggle") }}
       </button>
     </div>
     <noscript><style>#filters-panel{display:block!important}</style></noscript>
     <div id="filters-panel" class="hs-collapse hidden w-full overflow-hidden transition-[height] duration-300 lg:block" aria-labelledby="filters-toggle">
     <div class="flex flex-col gap-4 pt-4 lg:flex-row lg:items-center lg:pt-0">
-    <div class="relative lg:w-64">
+    <div class="relative lg:w-56 lg:shrink-0">
       <label for="filter-q" class="sr-only">{{ t("search.label") }}</label>
-      <input id="filter-q" name="q" type="search" value="{{ filters.q }}" placeholder="{{ t('search.placeholder') }}" class="field ps-9">
+      <input id="filter-q" name="q" type="search" value="{{ filters.q }}" placeholder="{{ t('search.placeholder') }}" class="field rounded-full py-2 ps-9">
       <span class="pointer-events-none absolute inset-y-0 start-3 flex items-center text-ink-soft">{{ icon("search", "size-4") }}</span>
     </div>
 
     {% if not category and nav_categories() %}
     <div>
       <label for="filter-category" class="sr-only">{{ t("filters.category") }}</label>
-      <select id="filter-category" name="category" class="field lg:w-48">
+      <select id="filter-category" name="category" class="field rounded-full py-2 lg:w-44 lg:shrink-0">
         <option value="">{{ t("filters.all_categories") }}</option>
         {% for c in categories %}<option value="{{ c.slug }}" {% if request.query_params.get('category') == c.slug %}selected{% endif %}>{{ localized(c, "name") }}</option>{% endfor %}
       </select>
@@ -51,28 +49,28 @@
     {% endif %}
 
     {% if sizes %}
-    <fieldset class="flex flex-wrap items-center gap-1.5">
+    <fieldset class="-mx-4 flex min-w-0 items-center gap-1.5 overflow-x-auto px-4 [scrollbar-width:none] lg:mx-0 lg:flex-1 lg:px-0 [&>label]:shrink-0">
       <legend class="sr-only">{{ t("filters.size") }}</legend>
       <label class="cursor-pointer">
         <input type="radio" name="size" value="" class="peer sr-only" {% if not filters.size %}checked{% endif %}>
-        <span class="chip peer-checked:border-ink peer-checked:bg-ink peer-checked:text-bone peer-focus-visible:outline-2 peer-focus-visible:outline-accent">{{ t("filters.any_size") }}</span>
+        <span class="chip h-9 peer-checked:border-ink peer-checked:bg-ink peer-checked:text-paper peer-focus-visible:outline-2 peer-focus-visible:outline-accent">{{ t("filters.any_size") }}</span>
       </label>
       {% for s in sizes %}
       <label class="cursor-pointer">
         <input type="radio" name="size" value="{{ s.code }}" class="peer sr-only" {% if filters.size == s.code %}checked{% endif %}>
-        <span class="chip peer-checked:border-ink peer-checked:bg-ink peer-checked:text-bone peer-focus-visible:outline-2 peer-focus-visible:outline-accent">{{ localized(s, "label") }}</span>
+        <span class="chip h-9 peer-checked:border-ink peer-checked:bg-ink peer-checked:text-paper peer-focus-visible:outline-2 peer-focus-visible:outline-accent">{{ localized(s, "label") }}</span>
       </label>
       {% endfor %}
     </fieldset>
     {% endif %}
 
-    <div class="flex items-center gap-4 lg:ms-auto">
-      <label class="inline-flex cursor-pointer items-center gap-2 text-sm">
-        <input type="checkbox" name="in_stock" value="true" class="size-5 rounded accent-[var(--color-accent)]" {% if filters.in_stock %}checked{% endif %}>
+    <div class="flex items-center gap-4 lg:ms-auto lg:shrink-0">
+      <label class="inline-flex cursor-pointer items-center gap-2 text-sm whitespace-nowrap">
+        <input type="checkbox" name="in_stock" value="true" class="size-4.5 rounded accent-[var(--color-ink)]" {% if filters.in_stock %}checked{% endif %}>
         {{ t("filters.in_stock") }}
       </label>
       <label for="filter-sort" class="sr-only">{{ t("filters.sort") }}</label>
-      <select id="filter-sort" name="sort" class="field w-auto py-2">
+      <select id="filter-sort" name="sort" class="field w-auto rounded-full py-2">
         {% for key in ["featured", "newest", "price_asc", "price_desc"] %}
         <option value="{{ key }}" {% if filters.sort == key %}selected{% endif %}>{{ t("filters.sort." ~ key) }}</option>
         {% endfor %}

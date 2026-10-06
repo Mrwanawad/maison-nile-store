@@ -33,6 +33,7 @@ async def home(request: Request, db: DB) -> Response:
         {
             "cards": await catalog_service.featured_cards(db, limit=8),
             "categories": await catalog_repo.list_categories(db),
+            "tiles": await catalog_service.category_tiles(db),
         },
     )
 

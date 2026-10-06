@@ -13,11 +13,11 @@ const files = [
   ["node_modules/motion/dist/motion.js", "motion.js"],
 ];
 
-// Self-hosted fonts (no third-party requests). Lalezar = poster display, Readex Pro = body;
-// both cover Latin + Arabic so EN and AR share one type system.
+// Self-hosted fonts (no third-party requests). Readex Pro (variable, Latin + Arabic) carries
+// display and body; Instrument Serif italic (Latin) and Amiri (Arabic) are the serif accent.
 const fonts = [
-  ["@fontsource/lalezar/files/lalezar-latin-400-normal.woff2", "lalezar-latin.woff2"],
-  ["@fontsource/lalezar/files/lalezar-arabic-400-normal.woff2", "lalezar-arabic.woff2"],
+  ["@fontsource/instrument-serif/files/instrument-serif-latin-400-italic.woff2", "instrument-serif-italic.woff2"],
+  ["@fontsource/amiri/files/amiri-arabic-400-normal.woff2", "amiri-arabic.woff2"],
   ["@fontsource-variable/readex-pro/files/readex-pro-latin-wght-normal.woff2", "readex-latin.woff2"],
   ["@fontsource-variable/readex-pro/files/readex-pro-arabic-wght-normal.woff2", "readex-arabic.woff2"],
 ];

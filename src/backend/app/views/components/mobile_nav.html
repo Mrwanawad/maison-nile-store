@@ -1,28 +1,35 @@
 {% from "components/icons.html" import icon %}
+{# Full-screen ink menu. Links rise in one after another when it opens (CSS delays
+   per item, keyed off Preline's open state), so it animates even without fx.js. #}
 <div id="mobile-nav"
-     class="hs-overlay hs-overlay-open:translate-x-0 hidden -translate-x-full rtl:translate-x-full fixed top-0 start-0 z-[80] flex h-full w-full max-w-[380px] transform flex-col bg-accent text-bone transition-all duration-300 ease-out lg:hidden"
+     class="hs-overlay group/nav hidden fixed inset-0 z-[80] flex flex-col bg-ink text-paper opacity-0 transition-opacity duration-500 hs-overlay-open:opacity-100 lg:hidden"
      role="dialog" tabindex="-1" aria-label="{{ t('nav.menu') }}">
-  <div class="flex items-center justify-between px-5 py-4">
-    <span class="font-display text-3xl leading-none">{{ brand_name() }}</span>
-    <button type="button" class="-me-2 rounded-full border-2 border-bone p-2 transition-colors hover:bg-bone hover:text-accent" aria-label="{{ t('common.close') }}" data-hs-overlay="#mobile-nav">{{ icon("x", "size-5") }}</button>
+  <div class="container-page flex h-16 shrink-0 items-center justify-between">
+    <span class="font-display text-[22px] leading-none font-normal tracking-[-0.05em]">{{ brand_name() }}</span>
+    <button type="button" class="-me-2 flex size-11 items-center justify-center rounded-full ring-1 ring-paper/25 transition-colors hover:bg-paper hover:text-ink" aria-label="{{ t('common.close') }}" data-hs-overlay="#mobile-nav">{{ icon("x", "size-5") }}</button>
   </div>
-  <nav class="flex flex-1 flex-col overflow-y-auto px-5 pt-4" aria-label="{{ t('nav.main') }}">
+  <nav class="container-page flex flex-1 flex-col justify-center overflow-y-auto py-6" aria-label="{{ t('nav.main') }}">
     {% set links = [(url('/shop'), t("nav.shop_all"))] %}
     {% for c in nav_categories() %}{% set _ = links.append((url('/c/' ~ c.slug), c.name(locale()))) %}{% endfor %}
     {% set _ = links.append((url('/shop?sort=newest'), t("nav.new"))) %}
-    {% for href, label in links %}
-    <a href="{{ href }}" class="group flex items-center justify-between border-b-2 border-bone/20 py-3 font-display text-4xl leading-tight transition-colors hover:text-mango">
-      <span>{{ label }}</span>
-      {{ icon("chevron-right", "size-6 opacity-0 transition-opacity group-hover:opacity-100", flip=true) }}
-    </a>
-    {% endfor %}
-    <div class="mt-6 flex flex-col gap-3 pb-6 text-base font-semibold">
-      <a href="{{ url('/track') }}" class="hover:text-mango">{{ t("nav.track") }}</a>
-      <a href="{{ url('/pages/about') }}" class="hover:text-mango">{{ t("nav.about") }}</a>
-    </div>
+    <ul role="list">
+      {% for href, label in links %}
+      <li class="overflow-hidden">
+        <a href="{{ href }}" class="flex translate-y-full items-baseline gap-4 py-1.5 font-display text-[clamp(2.6rem,12vw,4.5rem)] leading-[1.05] font-light tracking-[-0.045em] transition-[transform,color] duration-700 ease-[var(--ease-expo)] group-[.open]/nav:translate-y-0 hover:text-accent"
+           style="transition-delay: {{ 80 + loop.index0 * 55 }}ms">
+          <span class="price text-[12px] text-paper/40">0{{ loop.index }}</span>
+          <span>{{ label }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
   </nav>
-  <div class="border-t-2 border-bone/20 px-5 py-4">
-    <a href="{{ switch_locale_url(request) }}" class="inline-flex items-center gap-2 rounded-full bg-mango px-4 py-2 font-semibold text-ink" lang="{{ 'en' if locale() == 'ar' else 'ar' }}">
+  <div class="container-page flex shrink-0 flex-wrap items-center justify-between gap-4 border-t border-paper/10 py-5 text-[14px] text-paper/70">
+    <div class="flex gap-5">
+      <a href="{{ url('/track') }}" class="link-draw hover:text-paper">{{ t("nav.track") }}</a>
+      <a href="{{ url('/pages/about') }}" class="link-draw hover:text-paper">{{ t("nav.about") }}</a>
+    </div>
+    <a href="{{ switch_locale_url(request) }}" class="inline-flex items-center gap-2 rounded-full bg-paper px-4 py-2 font-medium text-ink" lang="{{ 'en' if locale() == 'ar' else 'ar' }}">
       {{ icon("globe", "size-4") }} {{ "English" if locale() == "ar" else "العربية" }}
     </a>
   </div>

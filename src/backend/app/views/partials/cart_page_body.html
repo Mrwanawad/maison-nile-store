@@ -1,20 +1,20 @@
 {% if request.headers.get("hx-request") == "true" %}{% set oob = true %}{% include "partials/cart_badge.html" %}{% endif %}
 {% if cart.is_empty %}
-  <div class="panel-pop max-w-lg -rotate-1 bg-mango px-6 py-14">
-    <p class="font-display text-4xl">{{ t("cart.empty_title") }}</p>
+  <div class="max-w-xl py-10">
+    <p class="font-display text-[clamp(2.5rem,6vw,4.5rem)]">{{ t("cart.empty_title") }}</p>
     <p class="mt-2 text-ink-soft">{{ t("cart.empty_body") }}</p>
     <a href="{{ url('/shop') }}" class="btn btn-primary mt-6">{{ t("cart.start_shopping") }}</a>
   </div>
 {% else %}
   {% for notice in cart.notices|unique %}
-  <p class="mb-4 rounded-sm border-2 border-ink bg-mango/50 px-3 py-2 text-sm font-medium">{{ t(notice) }}</p>
+  <p class="mb-4 rounded-sm bg-mango/40 px-3.5 py-2.5 text-sm">{{ t(notice) }}</p>
   {% endfor %}
   <div class="grid gap-10 lg:grid-cols-12">
     <ul class="divide-y-2 divide-ink/10 border-y-2 border-ink lg:col-span-8" role="list">
       {% for line in cart.lines %}
       <li class="flex gap-4 py-6 sm:gap-6">
         <a href="{{ url('/p/' ~ line.slug) }}" class="shrink-0">
-          <img src="{{ line.image_url }}" alt="" width="112" height="140" loading="lazy" class="h-[140px] w-28 rounded-sm border-2 border-ink bg-sand object-cover">
+          <img src="{{ line.image_url }}" alt="" width="112" height="140" loading="lazy" class="h-[140px] w-28 rounded-xs bg-sand object-cover">
         </a>
         <div class="flex min-w-0 flex-1 flex-col">
           <div class="flex items-start justify-between gap-4">
@@ -38,13 +38,13 @@
       {% endfor %}
     </ul>
     <aside class="lg:col-span-4">
-      <div class="panel-pop p-6">
-        <h2 class="text-3xl">{{ t("cart.summary") }}</h2>
+      <div class="panel p-6">
+        <h2 class="text-[32px] tracking-[-0.04em]">{{ t("cart.summary") }}</h2>
         <dl class="mt-5 space-y-3 text-[15px]">
           <div class="flex justify-between"><dt class="text-ink-soft">{{ t("cart.subtotal") }}</dt><dd class="price">{{ price(cart.subtotal) }}</dd></div>
           <div class="flex justify-between"><dt class="text-ink-soft">{{ t("cart.shipping") }}</dt><dd class="text-ink-soft">{{ t("cart.shipping_at_checkout") }}</dd></div>
         </dl>
-        <a href="{{ url('/checkout') }}" class="btn btn-pop btn-lg mt-6 w-full">{{ t("cart.checkout") }}</a>
+        <a href="{{ url('/checkout') }}" class="btn btn-primary btn-lg mt-6 w-full">{{ t("cart.checkout") }}</a>
         <a href="{{ url('/shop') }}" class="mt-3 block text-center text-sm text-ink-soft hover:text-ink hover:underline">{{ t("cart.continue") }}</a>
       </div>
     </aside>

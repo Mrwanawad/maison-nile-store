@@ -56,8 +56,8 @@ class Settings(BaseSettings):
     brand_tagline_ar: str = "قطع يومية، صُنعت في مصر."
     brand_logo_url: str = ""
     brand_favicon_url: str = "/static/img/favicon.svg"
-    brand_accent_color: str = "#1E3FE0"
-    brand_accent_hover_color: str = "#1530B8"
+    brand_accent_color: str = "#D93A12"
+    brand_accent_hover_color: str = "#B02E0B"
     hero_image_url: str = ""
 
     # Contact

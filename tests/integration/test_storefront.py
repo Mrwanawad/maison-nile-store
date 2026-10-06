@@ -9,7 +9,7 @@ from sqlalchemy import update
 
 from app.core.db import SessionLocal
 from app.core.rate_limit import limiter
-from app.models import Product, ProductVariant
+from app.models import Category, Product, ProductVariant
 from tests.conftest import Catalog, csrf
 
 
@@ -176,3 +176,14 @@ async def test_unexpected_errors_render_friendly_500(
         assert api.status_code == 500 and api.json()["error"]["code"] == "server_error"
         hx = await c.get("/", headers={"HX-Request": "true"})
         assert hx.status_code == 500 and "toast" in hx.headers["HX-Trigger"]
+
+
+async def test_home_shows_category_tiles(client, catalog: Catalog, db) -> None:  # type: ignore[no-untyped-def]
+    db.add(Category(slug="empty", name_en="Empty", name_ar="فارغ"))
+    await db.commit()
+    html = (await client.get("/")).text
+    assert "data-hscroll" in html
+    # One tile: "tops" with its one product. The empty category gets none.
+    assert html.count("1 piece<") == 1 and not re.search(r"\d+ pieces", html)
+    ar = (await client.get("/ar")).text
+    assert "قطعة واحدة" in ar

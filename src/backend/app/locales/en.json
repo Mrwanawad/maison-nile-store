@@ -235,5 +235,11 @@
   "admin.error.image_url": "Image links must start with https://",
   "admin.error.size_code": "Enter a size code.",
   "admin.error.size_exists": "That size already exists in this group.",
-  "admin.error.size_in_use": "That size is used by products. Remove it from them first."
+  "admin.error.size_in_use": "That size is used by products. Remove it from them first.",
+  "home.hero.l1": "Made slowly.",
+  "home.hero.l2": "Worn",
+  "home.hero.l2_accent": "often.",
+  "home.pieces": "{count} pieces",
+  "product.view": "View",
+  "home.piece": "1 piece"
 }

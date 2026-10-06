@@ -2,7 +2,7 @@
 {% block title %}{{ t("error.title") }} · {{ brand_name() }}{% endblock %}
 {% block content %}
 <div class="container-page max-w-2xl py-20 md:py-32">
-  <h1 class="text-6xl text-accent md:text-7xl">{{ t("error.title") }}</h1>
+  <h1 class="text-[clamp(3rem,8vw,7rem)]">{{ t("error.title") }}</h1>
   <p class="mt-4 text-lg">{{ message }}</p>
   <div class="mt-8 flex flex-wrap gap-4">
     <a href="{{ url('/shop') }}" class="btn btn-secondary" data-back>{{ t("common.go_back") }}</a>

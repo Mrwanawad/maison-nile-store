@@ -1,20 +1,19 @@
-{# Mango ticker strip. The list is rendered twice so the track can loop seamlessly;
-   the copy is hidden from assistive tech. Pauses on hover/focus, static under reduced motion. #}
+{# Slim ink bar. One message at a time; fx.js rolls to the next every few seconds
+   (without JS the first message stays). Hidden from the a11y tree except the active one. #}
 {% set items = [
   t("bar.delivery_short", min=settings.delivery_days_min, max=settings.delivery_days_max),
   t("bar.cod"),
   t("bar.exchange", days=settings.exchange_days),
   t("bar.made"),
 ] %}
-<div dir="ltr" class="marquee border-b-2 border-ink bg-mango py-2 text-[13px] font-semibold text-ink" style="--marquee-speed: 40s">
-  {% for copy in [0, 1] %}
-  <ul class="marquee-track" role="list" {% if copy %}aria-hidden="true"{% endif %}>
-    {% for _ in range(2) %}{% for item in items %}
-    <li class="flex items-center gap-6 pe-6 whitespace-nowrap">
-      <span dir="auto">{{ item }}</span>
-      <svg viewBox="0 0 24 24" class="size-3.5 text-hibiscus" fill="currentColor" aria-hidden="true"><path d="M12 0l2.6 8.4L24 12l-9.4 3.6L12 24l-2.6-8.4L0 12l9.4-3.6z"/></svg>
+<div class="relative z-40 bg-ink text-paper">
+  <ul class="relative mx-auto flex h-9 max-w-[1480px] items-center justify-center overflow-hidden px-4 text-center text-[12px] font-normal" role="list" data-ticker>
+    {% for item in items %}
+    <li class="absolute inset-x-4 flex items-center justify-center gap-2.5 transition-[transform,opacity] duration-700 ease-[var(--ease-expo)] {% if not loop.first %}translate-y-full opacity-0{% endif %}"
+        {% if not loop.first %}aria-hidden="true"{% endif %} data-ticker-item>
+      <span class="size-1 shrink-0 rounded-full bg-accent" aria-hidden="true"></span>
+      <span class="truncate">{{ item }}</span>
     </li>
-    {% endfor %}{% endfor %}
+    {% endfor %}
   </ul>
-  {% endfor %}
 </div>

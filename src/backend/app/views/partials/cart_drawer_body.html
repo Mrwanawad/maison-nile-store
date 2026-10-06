@@ -2,27 +2,27 @@
 {% set oob = true %}{% include "partials/cart_badge.html" %}
 {% if cart.is_empty %}
   <div class="flex flex-1 flex-col items-start justify-center gap-4 px-6">
-    <p class="font-display text-4xl">{{ t("cart.empty_title") }}</p>
+    <p class="font-display text-[40px] tracking-[-0.04em]">{{ t("cart.empty_title") }}</p>
     <p class="text-ink-soft">{{ t("cart.empty_body") }}</p>
     <a href="{{ url('/shop') }}" class="btn btn-primary mt-2">{{ t("cart.start_shopping") }}</a>
   </div>
 {% else %}
   {% for notice in cart.notices|unique %}
-  <p class="mx-5 mt-4 rounded-sm border-2 border-ink bg-mango/50 px-3 py-2 text-sm font-medium">{{ t(notice) }}</p>
+  <p class="mx-6 mt-4 rounded-sm bg-mango/40 px-3.5 py-2.5 text-sm">{{ t(notice) }}</p>
   {% endfor %}
-  <ul class="flex-1 divide-y divide-line overflow-y-auto px-5" role="list">
+  <ul class="flex-1 divide-y divide-line overflow-y-auto px-6" role="list">
     {% for line in cart.lines %}
     <li class="flex gap-4 py-5">
       <a href="{{ url('/p/' ~ line.slug) }}" class="shrink-0">
-        <img src="{{ line.image_url }}" alt="" width="80" height="100" loading="lazy" class="h-[100px] w-20 rounded-sm border-2 border-ink bg-sand object-cover">
+        <img src="{{ line.image_url }}" alt="" width="80" height="100" loading="lazy" class="h-[120px] w-24 rounded-xs bg-sand object-cover transition-transform duration-500 hover:scale-[1.03]">
       </a>
       <div class="flex min-w-0 flex-1 flex-col">
         <div class="flex items-start justify-between gap-3">
           <div class="min-w-0">
-            <a href="{{ url('/p/' ~ line.slug) }}" class="block truncate font-medium hover:underline">{{ line.product_name }}</a>
+            <a href="{{ url('/p/' ~ line.slug) }}" class="block truncate hover:underline">{{ line.product_name }}</a>
             {% if line.label %}<p class="mt-0.5 text-sm text-ink-soft">{{ line.label }}</p>{% endif %}
           </div>
-          <p class="price shrink-0 text-sm font-medium">{{ price(line.line_total) }}</p>
+          <p class="price shrink-0 text-sm">{{ price(line.line_total) }}</p>
         </div>
         <div class="mt-auto flex items-center justify-between pt-3">
           {% with target="#cart-drawer-body", line=line %}{% include "components/qty_stepper.html" %}{% endwith %}
@@ -36,13 +36,16 @@
     </li>
     {% endfor %}
   </ul>
-  <div class="border-t-2 border-ink bg-paper px-5 pb-5 pt-4">
+  <div class="border-t border-line bg-paper px-6 pb-6 pt-5">
     <div class="flex items-baseline justify-between">
       <span class="text-ink-soft">{{ t("cart.subtotal") }}</span>
-      <span class="price font-display text-3xl">{{ price(cart.subtotal) }}</span>
+      <span class="price font-display text-[32px] tracking-[-0.03em]">{{ price(cart.subtotal) }}</span>
     </div>
     <p class="mt-1 text-sm text-ink-soft">{{ t("cart.shipping_note") }}</p>
-    <a href="{{ url('/checkout') }}" class="btn btn-pop btn-lg mt-4 w-full">{{ t("cart.checkout") }}</a>
+    <a href="{{ url('/checkout') }}" class="btn btn-primary btn-lg mt-5 w-full">
+      <span class="roll" data-text="{{ t('cart.checkout') }}"><span>{{ t("cart.checkout") }}</span></span>
+      {{ icon("arrow-right", "arrow size-4") }}
+    </a>
     <a href="{{ url('/cart') }}" class="mt-3 block text-center text-sm text-ink-soft hover:text-ink hover:underline">{{ t("cart.view_full") }}</a>
   </div>
 {% endif %}

@@ -10,50 +10,49 @@
 @import "../../node_modules/preline/src/plugins/accordion/variants.css";
 @import "../../node_modules/preline/src/plugins/collapse/variants.css";
 
-/* Self-hosted fonts (copied by scripts/vendor.mjs). Both families cover Latin + Arabic,
-   so EN and AR pages share one type system. Lalezar is a Cairo cinema-poster face. */
-@font-face { font-family: "Lalezar"; font-style: normal; font-weight: 400; font-display: swap;
-  src: url("../fonts/lalezar-latin.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-@font-face { font-family: "Lalezar"; font-style: normal; font-weight: 400; font-display: swap;
-  src: url("../fonts/lalezar-arabic.woff2") format("woff2"); unicode-range: U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC; }
+/* Self-hosted fonts (copied by scripts/vendor.mjs).
+   Readex Pro (variable 160–700, Latin + Arabic) carries display and body text.
+   "Accent" is one family made of two files: Instrument Serif italic for Latin and
+   Amiri for Arabic (Arabic has no italic), picked per glyph by unicode-range. */
 @font-face { font-family: "Readex Pro"; font-style: normal; font-weight: 160 700; font-display: swap;
   src: url("../fonts/readex-latin.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
 @font-face { font-family: "Readex Pro"; font-style: normal; font-weight: 160 700; font-display: swap;
   src: url("../fonts/readex-arabic.woff2") format("woff2"); unicode-range: U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC; }
+@font-face { font-family: "Accent"; font-style: italic; font-weight: 400; font-display: swap;
+  src: url("../fonts/instrument-serif-italic.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: "Accent"; font-style: italic; font-weight: 400; font-display: swap;
+  src: url("../fonts/amiri-arabic.woff2") format("woff2"); unicode-range: U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC; }
 
 /* ---------------------------------------------------------------------------
-   Design tokens — "Cairo pop": street-sign cobalt, taxi mango, karkadeh pink,
-   printed on chalk. Token names stay stable for templates (admin shares them):
-   bone = page, sand = image well, ink = text, accent = cobalt (overridable
-   from .env), mango = highlight, hibiscus = sale.
+   Design tokens — v4 "Nile Noir": warm paper, near-black ink, one vermilion
+   signal (overridable from .env). Token names stay stable for templates and admin:
+   bone = page, paper = raised surface, sand = image well, ink = text,
+   accent = signal, hibiscus = sale (fixed), mango = soft highlight.
    --------------------------------------------------------------------------- */
 @theme {
-  --color-bone: #f6f6f1;
-  --color-paper: #ffffff;
-  --color-sand: #e8e8e0;
-  --color-ink: #10133a;
-  --color-ink-soft: #565a78;
-  --color-line: #d9d9d0;
-  --color-accent: #1e3fe0;
-  --color-accent-ink: #1530b8;
-  --color-mango: #ffc21a;
-  --color-hibiscus: #e5306b;
-  --color-olive: #1f8a5b;
-  --color-danger: #c8102e;
+  --color-bone: #f3f0ea;
+  --color-paper: #fbfaf7;
+  --color-sand: #e6e1d8;
+  --color-ink: #121110;
+  --color-ink-soft: #6a645b;
+  --color-line: #dcd6cc;
+  --color-accent: #d93a12;
+  --color-accent-ink: #b02e0b;
+  --color-mango: #f1cf6e;
+  --color-hibiscus: #d93a12;
+  --color-olive: #3e7b4f;
+  --color-danger: #c21f1f;
 
-  --font-display: "Lalezar", "Readex Pro", ui-sans-serif, sans-serif;
-  --font-sans: "Readex Pro", ui-sans-serif, sans-serif;
+  --font-display: "Readex Pro", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Readex Pro", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Accent", ui-serif, Georgia, serif;
 
-  /* Shape follows role: photos square-ish (xs), fields (sm), panels (md),
-     buttons/chips pills. Pop surfaces get a hard printed offset, never a blur. */
   --radius-xs: 4px;
-  --radius-sm: 12px;
-  --radius-md: 20px;
-
-  --shadow-pop: 4px 4px 0 0 var(--color-ink);
-  --shadow-pop-lg: 7px 7px 0 0 var(--color-ink);
+  --radius-sm: 10px;
+  --radius-md: 18px;
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   --animate-marquee: marquee var(--marquee-speed, 32s) linear infinite;
@@ -74,12 +73,12 @@
 /* Cross-document page transitions (Chrome/Edge/Safari 18+); plain navigation elsewhere. */
 @media (prefers-reduced-motion: no-preference) {
   @view-transition { navigation: auto; }
-  ::view-transition-old(root) { animation: 160ms var(--ease-out) both vt-out; }
-  ::view-transition-new(root) { animation: 260ms var(--ease-out) both vt-in; }
-  ::view-transition-group(*) { animation-duration: 380ms; animation-timing-function: var(--ease-out); }
+  ::view-transition-old(root) { animation: 220ms var(--ease-out) both vt-out; }
+  ::view-transition-new(root) { animation: 520ms var(--ease-expo) both vt-in; }
+  ::view-transition-group(*) { animation-duration: 560ms; animation-timing-function: var(--ease-expo); }
 }
-@keyframes vt-out { to { opacity: 0; } }
-@keyframes vt-in { from { opacity: 0; transform: translateY(10px); } }
+@keyframes vt-out { to { opacity: 0; transform: scale(0.985); } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(24px); } }
 
 @layer base {
   html {
@@ -90,30 +89,35 @@
   }
   body {
     @apply bg-bone text-ink font-sans text-base leading-relaxed;
+    font-weight: 350;
   }
   [dir="rtl"] body {
     line-height: 1.8;
   }
   h1, h2, h3, .font-display {
     font-family: var(--font-display);
-    font-weight: 400;
-    line-height: 0.98;
-    letter-spacing: 0;
+    font-weight: 300;
+    line-height: 0.95;
+    letter-spacing: -0.035em;
   }
-  /* Arabic glyphs need room for dots and descenders. */
-  [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] .font-display, :lang(ar).font-display, [lang="ar"] .font-display {
+  /* Arabic must never be tracked (it breaks joining) and needs room for dots. */
+  [dir="rtl"] body *, [lang="ar"], [lang="ar"] * {
+    letter-spacing: 0 !important;
+  }
+  [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] .font-display, [lang="ar"].font-display, [lang="ar"] .font-display {
     line-height: 1.3;
   }
+  b, strong { font-weight: 600; }
   a {
     text-underline-offset: 3px;
   }
   :focus-visible {
-    outline: 3px solid var(--color-accent);
-    outline-offset: 2px;
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
   }
   ::selection {
-    background: var(--color-mango);
-    color: var(--color-ink);
+    background: var(--color-ink);
+    color: var(--color-bone);
   }
   input, select, textarea, button {
     font: inherit;
@@ -133,9 +137,20 @@
 
 @layer components {
   .container-page {
-    @apply mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-10;
+    @apply mx-auto w-full max-w-[1480px] px-4 sm:px-6 lg:px-10;
   }
-  /* Small label: sentence case, no tracking. */
+  /* Serif accent word inside a light display headline. */
+  .serif {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  /* Small editorial label: "(01) — Featured". Tracked caps in LTR only. */
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-[11px] font-medium uppercase text-ink-soft;
+    letter-spacing: 0.14em;
+  }
   .label-caps {
     @apply text-xs font-medium;
   }
@@ -143,52 +158,72 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Buttons: class="btn btn-primary". Every button presses down on click. */
+  /* Buttons: class="btn btn-primary". Labels can roll on hover with
+     <span class="roll" data-text="Label"><span>Label</span></span>. */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border-2 border-ink px-6 py-3 text-sm font-semibold
-      transition-[background-color,color,transform,box-shadow] duration-150 ease-out
-      active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50;
+    @apply relative inline-flex h-12 items-center justify-center gap-2.5 overflow-hidden rounded-full px-7 text-[15px] font-medium whitespace-nowrap
+      transition-[background-color,color,box-shadow,transform] duration-300 ease-out
+      active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40;
   }
   .btn-primary {
-    @apply bg-ink text-bone hover:border-accent hover:bg-accent;
+    @apply bg-ink text-paper hover:bg-accent;
+  }
+  .btn-accent, .btn-pop {
+    @apply bg-accent text-paper hover:bg-ink;
+  }
+  .btn-light {
+    @apply bg-paper text-ink hover:bg-accent hover:text-paper;
   }
   .btn-secondary {
-    @apply bg-transparent text-ink hover:bg-ink hover:text-bone;
+    @apply bg-transparent text-ink ring-1 ring-ink/25 ring-inset hover:bg-ink hover:text-paper hover:ring-ink;
   }
   .btn-ghost {
-    @apply border-transparent px-3 text-ink-soft hover:text-ink;
-  }
-  /* The loud one: mango sticker with a printed offset. One per screen. */
-  .btn-pop {
-    @apply bg-mango text-ink;
-    box-shadow: var(--shadow-pop);
-  }
-  .btn-pop:hover:not(:disabled) {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 0 var(--color-ink);
-  }
-  .btn-pop:active:not(:disabled) {
-    transform: translate(4px, 4px);
-    box-shadow: 0 0 0 0 var(--color-ink);
+    @apply h-auto px-3 py-2 text-ink-soft hover:text-ink;
   }
   .btn-sm {
-    @apply px-4 py-2 text-xs;
+    @apply h-9 px-4 text-[13px];
   }
   .btn-lg {
-    @apply px-8 py-4 text-base;
+    @apply h-14 px-8 text-base;
   }
+  .roll {
+    @apply relative inline-grid overflow-hidden;
+  }
+  .roll > span, .roll::after {
+    grid-area: 1 / 1;
+    transition: transform 0.55s var(--ease-expo);
+  }
+  .roll::after {
+    content: attr(data-text);
+    transform: translateY(110%);
+  }
+  :is(a, button):hover > .roll > span, :is(a, button):hover > .roll::after {
+    transform: translateY(-110%);
+  }
+  :is(a, button):hover > .roll::after {
+    transform: translateY(0);
+  }
+  .btn .arrow {
+    @apply transition-transform duration-500;
+    transition-timing-function: var(--ease-expo);
+  }
+  .btn:hover .arrow {
+    transform: translateX(4px);
+  }
+  [dir="rtl"] .btn .arrow { transform: scaleX(-1); }
+  [dir="rtl"] .btn:hover .arrow { transform: scaleX(-1) translateX(4px); }
 
   /* Forms */
   .field-label {
-    @apply mb-1.5 block text-sm font-semibold text-ink;
+    @apply mb-1.5 block text-sm font-medium text-ink;
   }
   .field {
-    @apply block w-full rounded-sm border-2 border-ink/15 bg-paper px-3.5 py-2.5 text-[15px] text-ink
-      placeholder:text-ink-soft/60 transition-[border-color,box-shadow] duration-150
-      focus:border-ink focus:outline-none focus:ring-4 focus:ring-mango/60;
+    @apply block w-full rounded-sm border border-line bg-paper px-3.5 py-3 text-[15px] text-ink
+      placeholder:text-ink-soft/70 transition-[border-color,box-shadow] duration-200
+      hover:border-ink/40 focus:border-ink focus:outline-none focus:ring-4 focus:ring-ink/8;
   }
   .field[aria-invalid="true"] {
-    @apply border-danger focus:ring-danger/20;
+    @apply border-danger focus:ring-danger/15;
   }
   .field-error {
     @apply mt-1.5 text-sm font-medium text-danger;
@@ -199,51 +234,56 @@
 
   /* Chips (filters, sizes) */
   .chip {
-    @apply inline-flex min-w-11 items-center justify-center rounded-full border-2 border-ink/15 bg-paper px-4 py-2
-      text-sm font-semibold text-ink transition-[border-color,background-color,color,transform] duration-150 hover:border-ink active:scale-95;
+    @apply inline-flex h-10 min-w-11 items-center justify-center rounded-full border border-line bg-paper px-4
+      text-sm font-normal text-ink transition-[border-color,background-color,color,transform] duration-200 hover:border-ink active:scale-95;
   }
   .chip-active {
-    @apply border-ink bg-ink text-bone;
+    @apply border-ink bg-ink text-paper;
   }
 
   .link {
-    @apply font-semibold text-accent underline decoration-accent/30 decoration-2 underline-offset-4 transition-colors hover:decoration-accent;
+    @apply font-medium text-ink underline decoration-ink/25 decoration-1 underline-offset-4 transition-colors hover:decoration-accent hover:text-accent;
+  }
+  /* Underline that draws in from the start edge. */
+  .link-draw {
+    background: linear-gradient(currentColor, currentColor) no-repeat;
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    transition: background-size 0.5s var(--ease-expo);
+    padding-bottom: 2px;
+  }
+  [dir="rtl"] .link-draw { background-position: 100% 100%; }
+  .link-draw:hover, .link-draw[aria-current] {
+    background-size: 100% 1px;
   }
 
   .divider {
     @apply border-t border-line;
   }
 
-  /* Stickers: slapped-on badges, slightly crooked. */
-  .sticker {
-    @apply inline-flex items-center rounded-full border-2 border-ink px-2.5 py-0.5 text-xs font-bold text-ink;
-    transform: rotate(-4deg);
-  }
-  .badge-sale, .badge-new, .badge-soldout {
-    @apply inline-flex items-center rounded-full border-2 border-ink px-2.5 py-0.5 text-xs font-bold;
-    transform: rotate(-4deg);
+  /* Badges: quiet labels on photos. */
+  .sticker, .badge-sale, .badge-new, .badge-soldout {
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-[11px] leading-none font-medium backdrop-blur-md;
   }
   .badge-sale {
-    @apply bg-hibiscus text-paper;
+    @apply bg-accent text-paper;
   }
-  .badge-new {
-    @apply bg-mango text-ink;
+  .badge-new, .sticker {
+    @apply bg-paper/85 text-ink;
   }
   .badge-soldout {
-    @apply bg-ink text-bone;
-    transform: rotate(3deg);
+    @apply bg-ink/80 text-paper;
   }
 
-  /* Pop panel: paper card with a printed offset. */
-  .panel-pop {
-    @apply rounded-md border-2 border-ink bg-paper;
-    box-shadow: var(--shadow-pop-lg);
+  /* Raised surface. panel-pop kept as an alias for older templates. */
+  .panel, .panel-pop {
+    @apply rounded-md bg-paper ring-1 ring-line;
   }
 
   /* Marquee: content is duplicated once in markup; track slides half its width. */
   .marquee {
     @apply flex overflow-hidden;
-    mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
   }
   .marquee-track {
     @apply flex w-max shrink-0 animate-marquee items-center;
@@ -255,33 +295,52 @@
     animation-play-state: paused;
   }
 
-  /* Product card: lifts and gets its printed shadow on hover. */
+  /* Product card: slow zoom, second photo fades in. */
   .card-media {
-    @apply relative aspect-[4/5] overflow-hidden rounded-sm border-2 border-transparent bg-sand
-      transition-[transform,box-shadow,border-color] duration-200 ease-out;
+    @apply relative aspect-[4/5] overflow-hidden rounded-xs bg-sand;
   }
-  .card:hover .card-media, .card:focus-within .card-media {
-    @apply border-ink;
-    transform: translate(-3px, -3px);
-    box-shadow: var(--shadow-pop-lg);
+  .card-media img {
+    transition: transform 1.2s var(--ease-expo), opacity 0.6s var(--ease-out);
+  }
+  .card:hover .card-media img, .card:focus-within .card-media img {
+    transform: scale(1.045);
+  }
+  .card-quick {
+    @apply pointer-events-none absolute inset-x-3 bottom-3 flex translate-y-3 items-center justify-between rounded-full bg-paper/90 px-4 py-2.5 text-[13px] font-medium opacity-0 backdrop-blur-md;
+    transition: transform 0.5s var(--ease-expo), opacity 0.3s var(--ease-out);
+  }
+  .card:hover .card-quick, .card:focus-within .card-quick {
+    @apply translate-y-0 opacity-100;
   }
 
-  /* Bilingual hero lockup */
+  /* Hero headline */
   .hero-lockup {
-    @apply font-display text-bone;
-    font-size: clamp(3.2rem, 8.2vw, 8.75rem);
-    line-height: 0.9;
+    @apply font-display;
+    font-size: clamp(3.6rem, 12.5vw, 13.5rem);
+    line-height: 0.86;
+    letter-spacing: -0.055em;
+    font-weight: 250;
   }
-  .hero-lockup [lang="ar"] {
-    font-size: 0.86em;
-    line-height: 1.25;
+  @media (max-width: 639px) {
+    .hero-lockup { font-size: 18.5vw; }
   }
-  /* Headline lines rise out of a mask on load (JS adds data-ready). */
-  .reveal-line {
-    @apply block overflow-hidden pb-[0.08em];
+  .hero-lockup .serif {
+    letter-spacing: -0.02em;
   }
-  .reveal-line > span {
+  .hero-lockup[lang="ar"], [dir="rtl"] .hero-lockup {
+    line-height: 1.15;
+    font-size: clamp(3rem, 10vw, 10.5rem);
+  }
+  /* Split text (fx.js wraps words): each word rises out of its own mask. */
+  .reveal-line, .sw {
+    @apply inline-block overflow-hidden align-top;
+    padding-bottom: 0.12em;
+    margin-bottom: -0.12em;
+  }
+  .reveal-line { @apply block; }
+  .reveal-line > span, .sw > span {
     @apply inline-block;
+    will-change: transform;
   }
 
   /* Rich text from markdown pages / descriptions */
@@ -289,10 +348,10 @@
     @apply max-w-prose text-[15px] leading-7 text-ink;
   }
   .prose-store h2 {
-    @apply mt-10 mb-3 text-3xl;
+    @apply mt-12 mb-3 text-3xl md:text-4xl;
   }
   .prose-store h3 {
-    @apply mt-8 mb-2 text-xl;
+    @apply mt-8 mb-2 text-xl font-normal;
   }
   .prose-store p, .prose-store ul, .prose-store ol {
     @apply mb-4;
@@ -301,19 +360,19 @@
     @apply list-disc ps-5 marker:text-accent;
   }
   .prose-store ol {
-    @apply list-decimal ps-5 marker:font-semibold marker:text-accent;
+    @apply list-decimal ps-5 marker:font-medium marker:text-accent;
   }
   .prose-store a {
-    @apply font-semibold text-accent underline decoration-accent/30 decoration-2 underline-offset-4 hover:decoration-accent;
+    @apply font-medium text-ink underline decoration-ink/25 underline-offset-4 hover:text-accent hover:decoration-accent;
   }
   .prose-store table {
     @apply mb-6 w-full border-collapse text-sm;
   }
   .prose-store th, .prose-store td {
-    @apply border-b border-line px-3 py-2 text-start;
+    @apply border-b border-line px-3 py-2.5 text-start;
   }
   .prose-store th {
-    @apply bg-sand font-semibold;
+    @apply font-medium text-ink-soft;
   }
 
   /* HTMX request indicator */
@@ -326,10 +385,95 @@
   .htmx-request.btn, .htmx-request .btn-busy {
     @apply pointer-events-none opacity-70;
   }
+
+  /* Film grain for dark photo sections (static SVG noise, no JS). */
+  .grain::after {
+    content: "";
+    @apply pointer-events-none absolute inset-0 z-[1] opacity-[0.09] mix-blend-overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
 }
+
+/* ---------------------------------------------------------------- header states
+   On pages with a full-bleed hero the header starts transparent over the photo
+   (data-over) and turns into frosted paper once scrolled (fx.js sets data-scrolled). */
+[data-header] {
+  transition: transform 0.5s var(--ease-expo), background-color 0.4s var(--ease-out), color 0.4s var(--ease-out), border-color 0.4s;
+}
+[data-header][data-scrolled] {
+  background-color: color-mix(in oklab, var(--color-bone) 82%, transparent);
+  backdrop-filter: saturate(1.6) blur(18px);
+  -webkit-backdrop-filter: saturate(1.6) blur(18px);
+}
+[data-header][data-over]:not([data-scrolled]) {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--color-paper);
+}
+[data-header][data-over]:not([data-scrolled]) .on-dark-invert {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+}
+[data-header][data-over]:not([data-scrolled]) .on-dark-ring {
+  --tw-ring-color: color-mix(in oklab, var(--color-paper) 45%, transparent);
+}
+
+/* ---------------------------------------------------------------- page chrome
+   Scroll progress hairline, cursor follower, first-visit intro curtain. */
+.scroll-progress {
+  @apply pointer-events-none fixed inset-x-0 top-0 z-[95] h-[2px] origin-left bg-accent;
+  transform: scaleX(0);
+}
+[dir="rtl"] .scroll-progress { transform-origin: right; }
+
+.cursor {
+  @apply pointer-events-none fixed top-0 left-0 z-[96] flex size-24 items-center justify-center rounded-full bg-ink text-[13px] font-medium text-paper opacity-0;
+  transform: translate(-50%, -50%) scale(0.2);
+  transition: opacity 0.25s var(--ease-out);
+}
+.cursor[data-on] { opacity: 1; }
+
+.intro {
+  @apply pointer-events-none fixed inset-0 z-[100] hidden items-center justify-center bg-ink text-paper;
+}
+.intro-on .intro { display: flex; }
+.intro-word {
+  @apply font-display;
+  font-size: clamp(3rem, 11vw, 10rem);
+  font-weight: 250;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+
+/* Pinned horizontal row (fx.js sets data-hscroll-on on desktop when motion is available). */
+@media (min-width: 1024px) {
+  [data-hscroll-on] [data-hscroll-pin] {
+    position: sticky;
+    top: 0;
+    display: flex;
+    height: 100vh;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+  }
+  [data-hscroll-on] [data-hscroll-track] {
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+}
+/* The WhatsApp button steps aside for the phone buy bar. */
+.wa-float { transition: translate 0.5s var(--ease-expo), scale 0.5s var(--ease-expo), background-color 0.3s; }
+@media (max-width: 767px) {
+  [data-buy-bar] .wa-float { translate: 0 -76px; }
+}
+
+/* With the "View" cursor active the in-card label is redundant. */
+.has-cursor .card-quick { display: none; }
 
 /* Scroll reveal targets start hidden only when JS + motion are available. */
 @media (prefers-reduced-motion: no-preference) {
   .js:not(.fx-off) [data-reveal] { opacity: 0; }
+  .js:not(.fx-off) [data-reveal="clip"] { opacity: 1; clip-path: inset(100% 0 0 0); }
   .js:not(.fx-off) [data-hero-part] { opacity: 0; }
+  .js:not(.fx-off) [data-split]:not([data-split-done]) { opacity: 0; }
 }

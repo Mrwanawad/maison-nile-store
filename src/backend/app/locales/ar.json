@@ -213,5 +213,11 @@
   "error.rate_limited": "محاولات كثيرة. من فضلك انتظر دقيقة وحاول مرة أخرى.",
   "error.csrf": "انتهت الجلسة. من فضلك حدّث الصفحة وحاول مرة أخرى.",
   "error.contact": "إذا تكررت المشكلة، راسلنا على",
-  "error.reference": "رقم مرجع الخطأ:"
+  "error.reference": "رقم مرجع الخطأ:",
+  "home.hero.l1": "مصنوعة بتأنٍّ.",
+  "home.hero.l2": "تُلبس",
+  "home.hero.l2_accent": "كل يوم.",
+  "home.pieces": "{count} قطعة",
+  "product.view": "عرض",
+  "home.piece": "قطعة واحدة"
 }

@@ -46,6 +46,14 @@ class ProductCard:
 
 
 @dataclass(slots=True)
+class CategoryTile:
+    slug: str
+    name: str
+    image_url: str
+    count: int
+
+
+@dataclass(slots=True)
 class Listing:
     cards: list[ProductCard]
     total: int
@@ -136,6 +144,20 @@ async def featured_cards(session: AsyncSession, limit: int = 8) -> list[ProductC
     newest = await catalog_repo.list_products(session, sort="newest", limit=4)
     new_ids = {p.id for p in newest}
     return [to_card(p, new_ids=new_ids) for p in products]
+
+
+async def category_tiles(session: AsyncSession) -> list[CategoryTile]:
+    """One tile per category that has products: cover = its first featured product photo."""
+    tiles = []
+    for category in await catalog_repo.list_categories(session):
+        products = await catalog_repo.list_products(session, category_id=category.id, limit=1)
+        if not products:
+            continue
+        card = to_card(products[0])
+        count = await catalog_repo.count_products(session, category_id=category.id)
+        name = localized(category, "name")
+        tiles.append(CategoryTile(category.slug, name, card.image_url, count))
+    return tiles
 
 
 async def get_product_or_404(session: AsyncSession, slug: str) -> Product:

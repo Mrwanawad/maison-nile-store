@@ -1,43 +1,48 @@
 {% from "components/icons.html" import icon %}
-<footer class="mt-28 overflow-hidden bg-ink text-bone">
-  <div class="container-page grid gap-12 pt-16 pb-10 md:grid-cols-12">
-    <div class="md:col-span-5">
-      <p class="max-w-sm font-display text-4xl leading-tight text-mango">{{ tagline() }}</p>
-      <div class="mt-6 flex items-center gap-2">
-        {% if settings.instagram_url %}<a href="{{ settings.instagram_url }}" class="rounded-full border-2 border-bone/30 p-2.5 transition-colors hover:border-mango hover:bg-mango hover:text-ink" target="_blank" rel="noopener" aria-label="Instagram">{{ icon("instagram") }}</a>{% endif %}
-        {% if settings.facebook_url %}<a href="{{ settings.facebook_url }}" class="rounded-full border-2 border-bone/30 p-2.5 transition-colors hover:border-mango hover:bg-mango hover:text-ink" target="_blank" rel="noopener" aria-label="Facebook">{{ icon("facebook") }}</a>{% endif %}
-        {% if settings.tiktok_url %}<a href="{{ settings.tiktok_url }}" class="rounded-full border-2 border-bone/30 p-2.5 transition-colors hover:border-mango hover:bg-mango hover:text-ink" target="_blank" rel="noopener" aria-label="TikTok">{{ icon("music") }}</a>{% endif %}
+{# Ink footer. The giant wordmark at the bottom rises letter by letter when it
+   scrolls into view (fx.js, [data-footer-mark]); static without JS. #}
+<footer class="relative mt-28 overflow-hidden bg-ink text-paper md:mt-40">
+  <div class="container-page grid gap-14 pt-16 pb-12 md:grid-cols-12 md:pt-24">
+    <div class="md:col-span-6">
+      <p class="max-w-md font-display text-[clamp(2rem,4vw,3.5rem)] leading-[1.02] font-light tracking-[-0.04em]">{{ tagline() }}</p>
+      <div class="mt-8 flex items-center gap-2">
+        {% for href, ic, label in [(settings.instagram_url, "instagram", "Instagram"), (settings.facebook_url, "facebook", "Facebook"), (settings.tiktok_url, "music", "TikTok")] %}
+        {% if href %}<a href="{{ href }}" class="flex size-11 items-center justify-center rounded-full ring-1 ring-paper/20 transition-[background-color,color,box-shadow] duration-300 hover:bg-paper hover:text-ink hover:ring-paper" target="_blank" rel="noopener" aria-label="{{ label }}" data-magnetic>{{ icon(ic, "size-[18px]") }}</a>{% endif %}
+        {% endfor %}
       </div>
     </div>
-    <div class="md:col-span-3">
-      <p class="font-display text-2xl text-bone/60">{{ t("footer.shop") }}</p>
-      <ul class="mt-4 space-y-2.5 font-semibold" role="list">
-        <li><a href="{{ url('/shop') }}" class="hover:text-mango">{{ t("nav.shop_all") }}</a></li>
-        {% for c in nav_categories() %}<li><a href="{{ url('/c/' ~ c.slug) }}" class="hover:text-mango">{{ c.name(locale()) }}</a></li>{% endfor %}
-      </ul>
-    </div>
-    <div class="md:col-span-4">
-      <p class="font-display text-2xl text-bone/60">{{ t("footer.help") }}</p>
-      <ul class="mt-4 space-y-2.5 font-semibold" role="list">
-        <li><a href="{{ url('/track') }}" class="hover:text-mango">{{ t("nav.track") }}</a></li>
-        <li><a href="{{ url('/pages/shipping-returns') }}" class="hover:text-mango">{{ t("footer.shipping_returns") }}</a></li>
-        <li><a href="{{ url('/pages/size-guide') }}" class="hover:text-mango">{{ t("footer.size_guide") }}</a></li>
-        <li><a href="{{ url('/pages/faq') }}" class="hover:text-mango">{{ t("footer.faq") }}</a></li>
-        <li><a href="{{ url('/pages/contact') }}" class="hover:text-mango">{{ t("footer.contact") }}</a></li>
-      </ul>
+    <div class="grid grid-cols-2 gap-8 md:col-span-6">
+      <div>
+        <p class="eyebrow text-paper/50">{{ t("footer.shop") }}</p>
+        <ul class="mt-5 space-y-3 text-[15px]" role="list">
+          <li><a href="{{ url('/shop') }}" class="link-draw">{{ t("nav.shop_all") }}</a></li>
+          {% for c in nav_categories() %}<li><a href="{{ url('/c/' ~ c.slug) }}" class="link-draw">{{ c.name(locale()) }}</a></li>{% endfor %}
+        </ul>
+      </div>
+      <div>
+        <p class="eyebrow text-paper/50">{{ t("footer.help") }}</p>
+        <ul class="mt-5 space-y-3 text-[15px]" role="list">
+          <li><a href="{{ url('/track') }}" class="link-draw">{{ t("nav.track") }}</a></li>
+          <li><a href="{{ url('/pages/shipping-returns') }}" class="link-draw">{{ t("footer.shipping_returns") }}</a></li>
+          <li><a href="{{ url('/pages/size-guide') }}" class="link-draw">{{ t("footer.size_guide") }}</a></li>
+          <li><a href="{{ url('/pages/faq') }}" class="link-draw">{{ t("footer.faq") }}</a></li>
+          <li><a href="{{ url('/pages/contact') }}" class="link-draw">{{ t("footer.contact") }}</a></li>
+        </ul>
+      </div>
     </div>
   </div>
-  {# Wordmark sits on the bottom edge like a shop sign. #}
+
   <div class="container-page" aria-hidden="true">
-    <p class="font-display leading-[0.8] whitespace-nowrap text-accent" style="font-size: clamp(4rem, 15vw, 14rem)">{{ brand_name() }}</p>
+    <p dir="auto" class="font-display leading-[0.78] font-light whitespace-nowrap tracking-[-0.065em] text-paper" style="font-size: clamp(4.5rem, 17.5vw, 18rem)" data-footer-mark>{{ brand_name() }}</p>
   </div>
-  <div class="border-t-2 border-bone/15">
-    <div class="container-page flex flex-col gap-3 py-5 text-sm text-bone/70 sm:flex-row sm:items-center sm:justify-between">
+
+  <div class="border-t border-paper/10">
+    <div class="container-page flex flex-col gap-3 py-6 text-[13px] text-paper/55 sm:flex-row sm:items-center sm:justify-between">
       <p>© {{ brand_name() }}. {{ t("footer.made_in") }}</p>
-      <div class="flex gap-5">
-        <a href="{{ url('/pages/privacy') }}" class="hover:text-bone">{{ t("footer.privacy") }}</a>
-        <a href="{{ url('/pages/terms') }}" class="hover:text-bone">{{ t("footer.terms") }}</a>
-        <a href="{{ switch_locale_url(request) }}" class="hover:text-bone" lang="{{ 'en' if locale() == 'ar' else 'ar' }}">{{ "English" if locale() == "ar" else "العربية" }}</a>
+      <div class="flex gap-6 sm:pe-16">
+        <a href="{{ url('/pages/privacy') }}" class="link-draw hover:text-paper">{{ t("footer.privacy") }}</a>
+        <a href="{{ url('/pages/terms') }}" class="link-draw hover:text-paper">{{ t("footer.terms") }}</a>
+        <a href="{{ switch_locale_url(request) }}" class="link-draw hover:text-paper" lang="{{ 'en' if locale() == 'ar' else 'ar' }}">{{ "English" if locale() == "ar" else "العربية" }}</a>
       </div>
     </div>
   </div>
