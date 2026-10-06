@@ -142,10 +142,10 @@
   // ------------------------------------------------------------ manifesto word scrub
   document.querySelectorAll("[data-scrub-words]").forEach((el) => {
     const words = split(el, false);
-    words.forEach((w) => (w.style.opacity = "0.14"));
+    words.forEach((w) => (w.style.opacity = "0.18"));
     scroll((p) => {
       const lit = p * (words.length + 4) - 2;
-      words.forEach((w, i) => (w.style.opacity = String(Math.min(1, Math.max(0.14, lit - i + 0.14)))));
+      words.forEach((w, i) => (w.style.opacity = String(Math.min(1, Math.max(0.18, lit - i + 0.18)))));
     }, { target: el, offset: ["start 85%", "end 50%"] });
   });
 
@@ -186,9 +186,11 @@
   // ------------------------------------------------------------ velocity marquee
   const marquees = [...document.querySelectorAll("[data-velocity-marquee] .marquee-track")];
   if (marquees.length && marquees[0].getAnimations) {
+    // Runs only while the marquee is on screen.
     let lastY = window.scrollY;
     let v = 0;
     let dir = 1;
+    let raf = 0;
     const tick = () => {
       const y = window.scrollY;
       const dy = y - lastY;
@@ -197,9 +199,13 @@
       v += (Math.min(Math.abs(dy), 120) / 12 - v) * 0.08;
       const rate = dir * (1 + v);
       marquees.forEach((m) => m.getAnimations().forEach((a) => (a.playbackRate = rate)));
-      requestAnimationFrame(tick);
+      raf = requestAnimationFrame(tick);
     };
-    requestAnimationFrame(tick);
+    inView(marquees[0].parentElement, () => {
+      lastY = window.scrollY;
+      raf = requestAnimationFrame(tick);
+      return () => cancelAnimationFrame(raf);
+    });
   }
 
   // ------------------------------------------------------------ footer wordmark
@@ -209,8 +215,25 @@
     const letters = split(mark, true);
     letters.forEach((l) => (l.style.transform = "translateY(100%)"));
     inView(mark, () => {
-      animate(letters, { y: ["100%", "0%"] }, { duration: 1.2, delay: stagger(0.045), ease: expo });
+      animate(letters, { y: ["100%", "0%"] }, { duration: 1.2, delay: stagger(0.045), ease: expo }).then(() => {
+        // Masks off once risen, so the hover lift is not clipped.
+        mark.style.overflow = "visible";
+        letters.forEach((l) => (l.parentElement.style.overflow = "visible"));
+      });
     }, { amount: 0.5 });
+    // Desktop: letters near the pointer lift a little, like keys under a hand.
+    if (fine) {
+      const box = mark.parentElement;
+      box.addEventListener("pointermove", (e) => {
+        letters.forEach((l) => {
+          const r = l.getBoundingClientRect();
+          const d = Math.abs(e.clientX - (r.left + r.width / 2));
+          const lift = Math.max(0, 1 - d / 260);
+          animate(l, { y: `${-lift * 14}%` }, { duration: 0.5, ease: expo });
+        });
+      });
+      box.addEventListener("pointerleave", () => animate(letters, { y: "0%" }, { duration: 0.8, ease: expo }));
+    }
   }
 
   // ------------------------------------------------------------ pointer niceties

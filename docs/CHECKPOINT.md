@@ -1,9 +1,19 @@
 # CHECKPOINT — Brand Store (Egyptian e-commerce MVP)
 
 > Hand-off file for a fresh session. Read this first, then `docs/DESIGN.md` (section 15 overrides older sections; the last bullet, "Visual identity v3", overrides all earlier visual specs) and `README.md`.
-> Last updated: 2026-10-03. Branch `main`, all work committed (latest feature commit `3190a5b`), working tree clean. Remote: private GitHub repo **https://github.com/Mrwanawad/maison-nile-store** (`origin`, `main` tracks `origin/main`).
+> Last updated: 2026-10-06 (v4 "Nile Noir" redesign on branch `claude/modest-faraday-w48twm`; see section 0b). Previously: 2026-10-03. Branch `main`, all work committed (latest feature commit `3190a5b`), working tree clean. Remote: private GitHub repo **https://github.com/Mrwanawad/maison-nile-store** (`origin`, `main` tracks `origin/main`).
 
 ---
+
+## 0b. v4 "Nile Noir" redesign (2026-10-06, branch `claude/modest-faraday-w48twm`)
+
+- The user asked for a full UI overhaul: modern, minimal, eye-catching, heavy animation. Direction changed from "Cairo pop" to editorial minimal + cinematic motion. Spec: `docs/DESIGN.md` last bullet ("Visual identity v4").
+- Fonts: Lalezar removed; Instrument Serif italic + Amiri added (`@fontsource/*`, vendored by `scripts/vendor.mjs`). Default accent is now vermilion `#D93A12` / `#B02E0B` (`config.py`, `.env.example`; **update your local `.env`**).
+- New: `catalog_service.category_tiles` (home category row), locale keys `home.hero.*`, `home.pieces`, `home.piece`, `product.view`; test `test_home_shows_category_tiles`.
+- Fix: Preline overlays closed before their opening transition started stayed mounted (invisible full-screen layer + backdrop). `app.js` now dispatches the missing `transitionend` after 900 ms.
+- PRs #1 and #2 (deploy hardening, Supabase `sb_secret_` key header fix) were merged into `main` before this work.
+- Checks: 81 pytest pass; ruff, ruff format, mypy clean; 16/16 browser checks pass with Unsplash stubbed (the cloud proxy blocks images.unsplash.com, which is the only cause of "no JS errors" failing when not stubbed). Lighthouse mobile (local, photos blocked): home 94 perf / 96 a11y (the only a11y finding is the manifesto's deliberately dim not-yet-scrolled words), product 100 / 100.
+- Visual review was done with generated stand-in photos (Unsplash blocked in the cloud session); re-check with real photos on a normal network.
 
 ## 0a. Deploy hand-off (2026-10-03, branch `claude/nifty-davinci-f88xxv`)
 
@@ -107,7 +117,7 @@ Rule: controllers → services → repositories/integrations. Routers never touc
 ## 6. Features — DONE ✅
 
 **Storefront**
-- EN at `/`, AR at `/ar/...` (RTL, logical CSS). Visual identity "Cairo pop" (DESIGN.md last bullet): Lalezar + Readex Pro, cobalt / mango / hibiscus on chalk, Preline overlay+accordion+collapse, Motion One animations (fx.js), View Transitions.
+- EN at `/`, AR at `/ar/...` (RTL, logical CSS). Visual identity v4 "Nile Noir" (DESIGN.md last bullet): Readex Pro light display + Instrument Serif / Amiri italic accent, ink / paper / one vermilion signal, Preline overlay+accordion+collapse, Motion One animations (fx.js: intro curtain, parallax hero, split reveals, pinned category row, scroll-scrubbed manifesto, View cursor, fly-to-bag), View Transitions.
 - Home (bilingual poster hero + sticker, category marquee, featured grid, sticker promise cards, story), shop listing with search / category / size / in-stock filters and sort (HTMX, URL updates), category pages, product page (swatches, size buttons, sold-out marked, "Only N left", sale %, gallery per color, size-guide modal, info accordion, WhatsApp prefilled), related products.
 - Cart in signed session cookie (`{variant_id: qty}` only). HTMX slide-out drawer + full cart page, toasts, badge. Quantity capped by stock and `MAX_QTY_PER_LINE`. Cart fixes itself when stock drops or a product is hidden.
 - Checkout: inline bilingual validation, Egyptian phone normalization (Arabic digits, +20), governorate select with live fee, details remembered in localStorage, honeypot, double-submit guard.

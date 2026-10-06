@@ -98,7 +98,7 @@
         <p class="eyebrow"><span class="price">(02)</span> {{ t("home.categories") }}</p>
         <h2 id="tiles-heading" class="mt-4 text-[clamp(2.75rem,7vw,6.5rem)]" data-split>{{ t("home.shop_by") }}</h2>
       </div>
-      <p class="hidden pb-2 text-[13px] text-ink-soft lg:block price" aria-hidden="true"><span data-hscroll-count>01</span> / {{ "%02d" % tiles|length }}</p>
+      <p class="hidden pb-2 text-[13px] text-ink-soft lg:block price" dir="ltr" aria-hidden="true"><span data-hscroll-count>01</span> / {{ "%02d" % (tiles|length + 1) }}</p>
     </div>
     <div class="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:px-6 lg:gap-6 lg:px-10" data-hscroll-track>
       {% for tile in tiles %}
@@ -116,6 +116,14 @@
         </span>
       </a>
       {% endfor %}
+      <a href="{{ url('/shop') }}" class="group relative flex aspect-[3/4] w-[78vw] shrink-0 snap-start flex-col justify-between overflow-hidden rounded-xs bg-ink p-5 text-paper sm:w-[46vw] md:p-7 lg:aspect-[4/5] lg:h-[62vh] lg:w-auto">
+        <span class="price text-[12px] text-paper/50">{{ "%02d" % (tiles|length + 1) }}</span>
+        <span class="absolute -end-16 -top-16 size-64 rounded-full bg-accent opacity-90 blur-3xl transition-transform duration-[1.4s] ease-[var(--ease-expo)] group-hover:scale-150" aria-hidden="true"></span>
+        <span class="relative">
+          <span class="block font-display text-[clamp(2.75rem,5.5vw,5.5rem)] leading-[0.95] font-light tracking-[-0.05em]">{{ t("nav.shop_all") }}</span>
+          <span class="mt-6 flex size-14 items-center justify-center rounded-full bg-paper text-ink transition-transform duration-500 ease-[var(--ease-expo)] group-hover:translate-x-2 rtl:group-hover:-translate-x-2">{{ icon("arrow-right", "size-5", flip=true) }}</span>
+        </span>
+      </a>
     </div>
   </div>
 </section>
