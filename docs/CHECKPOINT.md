@@ -1,7 +1,30 @@
 # CHECKPOINT — Brand Store (Egyptian e-commerce MVP)
 
-> Hand-off file for a fresh session. Read this first, then `docs/DESIGN.md` (section 15 overrides older sections; the last bullet, "Visual identity v3", overrides all earlier visual specs) and `README.md`.
-> Last updated: 2026-10-06 (v4 "Nile Noir" redesign on branch `claude/modest-faraday-w48twm`; see section 0b). Previously: 2026-10-03. Branch `main`, all work committed (latest feature commit `3190a5b`), working tree clean. Remote: private GitHub repo **https://github.com/Mrwanawad/maison-nile-store** (`origin`, `main` tracks `origin/main`).
+> Hand-off file for a fresh session. Read this first (start with **section 00, current stop point**), then `docs/DESIGN.md` (section 15 overrides older sections; the last bullet, "Visual identity v4 Nile Noir", overrides all earlier visual specs) and `README.md`.
+> Last updated: **2026-10-07**. Active branch: `claude/modest-faraday-w48twm` (v4 redesign, pushed, **not merged into `main`, no PR yet**). `main` = deploy hardening (PRs #1, #2 merged). Remote: private GitHub repo **https://github.com/Mrwanawad/maison-nile-store** (`origin`).
+
+---
+
+## 00. CURRENT STOP POINT (2026-10-07) — read first
+
+**State of the code**
+- `main` @ `f5b275b`: MVP + deploy hardening (PR #1) + Supabase `sb_secret_` storage header fix (PR #2). Scheduled-workflow skip fix is on `main` now.
+- `claude/modest-faraday-w48twm` @ `bda063f` (pushed, clean, contains all of `main`): `6b158bf` design-md skill (`.claude/skills/design-md`), `e6d216f` v4 "Nile Noir" redesign, `bda063f` v4 polish + docs. Details in section 0b. **Decision pending from the user: open a PR and merge into `main`** (asked, not answered yet).
+- Not deployed. Deploy plan unchanged (section 0a); blocked on `RENDER_API_KEY` / `SUPABASE_ACCESS_TOKEN` env vars + network allowlist in the cloud environment. The Supabase MCP server fails to connect in cloud sessions (proxy).
+
+**Last task done:** full UI redesign ("ULTRADESIGN": modern, minimal, eye-catching, heavy animation) → v4 Nile Noir. Verified: 81 pytest, ruff/format/mypy clean, 16/16 browser checks (Unsplash stubbed), Lighthouse mobile home 94/96, product 100/100. User got a before/after image + a 33 s motion tour video.
+
+**Where the user is now**
+- Running v4 on their Windows laptop (`C:\Users\KimoStore\Desktop\E-Commerce`, venv prompt `(brand-store)`), branch `claude/modest-faraday-w48twm` checked out. Steps given: `uv sync` → `npm ci; npm run build` in `src/frontend` → DB up → `alembic upgrade head` → `scripts.seed` → `scripts.create_admin owner "Owner"` → uvicorn.
+- Hit `Bind for 0.0.0.0:5432 failed: port is already allocated`: another project's **`temporal-postgresql`** container (a Temporal stack) owns 5432 and auto-starts with Docker Desktop. The user stopped it from Docker Desktop. The store DB container is `docker-db-1` (compose project `docker`, fresh empty volume → needs migrate + seed + admin). If it recurs: stop Temporal again, or (offered, not done) make the port configurable via `DB_PORT` in compose + `.env` + `TEST_DATABASE_URL`.
+- Their local `.env` must have `BRAND_ACCENT_COLOR=#D93A12`, `BRAND_ACCENT_HOVER_COLOR=#B02E0B` (old value was cobalt). No feedback on v4 from real-photo testing yet.
+
+**Next: client hand-off** (the user will continue in a new chat, on the client side)
+- Client gets repo access via GitHub → Settings → Collaborators. They clone, `git switch claude/modest-faraday-w48twm` (or `main` once merged).
+- Only file to send outside git: `.env` (plus `media/` only if photos were uploaded locally through admin). Advice given: don't send real third-party keys over WhatsApp; client generates their own `SECRET_KEY` / `INTERNAL_CRON_TOKEN`; safest is `cp .env.example .env` + send only changed values. Everything else (`.venv`, `node_modules`, `static/css/app.css`, `static/vendor`, `static/fonts`, DB) is rebuilt.
+
+**Open questions for the user**
+1. Merge v4 into `main` via PR? 2. Their verdict on v4 with real photos (Cairo pop accents back? The user chose Cairo pop on 2026-10-03; v4 replaced it at their request). 3. Configurable DB port? 4. Deploy tokens.
 
 ---
 
@@ -17,7 +40,7 @@
 
 ## 0a. Deploy hand-off (2026-10-03, branch `claude/nifty-davinci-f88xxv`)
 
-- `609ce36`: `cleanup.yml` / `backup.yml` now skip with a notice until their GitHub secrets exist (the cleanup cron was failing every 30 min with `curl: (3) No host part` because `SITE_URL` was unset). Backup installs the `pg_dump` major matching the server. **Not on `main` yet**: scheduled workflows only run from the default branch, so failure emails continue until merged.
+- `609ce36`: `cleanup.yml` / `backup.yml` now skip with a notice until their GitHub secrets exist (the cleanup cron was failing every 30 min with `curl: (3) No host part` because `SITE_URL` was unset). Backup installs the `pg_dump` major matching the server. **Merged into `main` (PR #1)**; PR #2 (`b5b3fdc`) fixed Supabase `sb_secret_` keys being sent as `Authorization: Bearer` (now `apikey` header only).
 - `161930d`: `.mcp.json` with the Supabase MCP server (project ref `bmswdsenobkgcdmmalcu`, full features, not read-only). Needs interactive approval + browser OAuth, so unusable in cloud sessions. Recommended: add `&read_only=true`.
 - Supabase project already exists: ref `bmswdsenobkgcdmmalcu`.
 - Deploy hardening (this branch): DATABASE_URL accepted as copied from Supabase (scheme + sslmode normalized, pooler auto-detected); BASE_URL falls back to RENDER_EXTERNAL_URL; `scripts/bootstrap.py` runs after migrations (SEED_DEMO_DATA, ADMIN_BOOTSTRAP_*) because Render free has no shell; Alembic uses unique prepared-statement names through the pooler. Simulated prod start verified locally (79 tests).
@@ -49,7 +72,7 @@
 
 ## 1. Where we are (one paragraph)
 
-The MVP is **built, tested and committed locally**. A bilingual (EN/AR) store for one local brand: products with color × size variants, cart, checkout with cash on delivery or Paymob (Apple Pay), admin panel, Bosta courier, Telegram alerts, customer emails, a JSON API, CI and deployment config. **72 automated tests pass (80% coverage)**, 16 real-browser checks pass, Lighthouse mobile scores are Performance 90–97 / Accessibility 100. **Not deployed yet.** That's the next milestone, and it needs the user's accounts. The user was about to run and test it manually on their machine.
+The MVP is **built, tested and pushed** (v4 UI on branch `claude/modest-faraday-w48twm`, see section 00). A bilingual (EN/AR) store for one local brand: products with color × size variants, cart, checkout with cash on delivery or Paymob (Apple Pay), admin panel, Bosta courier, Telegram alerts, customer emails, a JSON API, CI and deployment config. **81 automated tests pass**, 16 real-browser checks pass, Lighthouse mobile (v4) home 94 perf / 96 a11y, product 100 / 100. **Not deployed yet.** That's the next milestone, and it needs the user's accounts. The user is testing v4 locally and preparing to hand the repo to the client.
 
 ---
 
@@ -60,6 +83,8 @@ The MVP is **built, tested and committed locally**. A bilingual (EN/AR) store fo
 - **Hard rule: every changeable value lives in `.env`** (brand, logo, WhatsApp, keys, fees, limits, version...).
 - Likes: being asked questions up front, then autonomy ("go cook"). Ships fast, MVP mindset.
 - Answers to the original scoping questions are in Claude memory (`client-answers-v1`). Summary in section 9 below.
+- Address the user as **"Sir"** (never by name). Wants direct, concise, critical answers (challenge wrong ideas), key points only, real runnable commands with **no placeholders**. Replies in Egyptian Arabic if they write Arabic.
+- Local machine: `C:\Users\KimoStore\Desktop\E-Commerce`, PowerShell with venv `(brand-store)`; also runs a Temporal docker stack that grabs port 5432.
 
 ---
 
@@ -168,7 +193,8 @@ Rule: controllers → services → repositories/integrations. Routers never touc
 3. **Verify against live accounts:** Paymob (Apple Pay can't be tested in Paymob test mode and likely needs a custom domain); Bosta payload (city names/fields may need adjusting; city = governorate English name).
 4. User's **manual local testing** (instructions were given; README has them). Await their feedback.
 5. Deferred by the user to future versions: Meta Pixel / CAPI, GA4, sitemap / OG / structured data / product feeds, SMS OTP provider, Bosta status webhook, customer accounts, discounts/coupons.
-6. Re-run Lighthouse after the v3 redesign; check contrast of white text on hibiscus and of mango/ink pairs; real campaign photos will matter a lot for the poster hero.
+6. v4 checked with generated stand-in photos only (cloud proxy blocks Unsplash). Re-check with real photos; the full-bleed hero depends on a strong campaign photo. Known trade-off: manifesto words start at 18% opacity until scrolled (Lighthouse contrast flag).
+8. Merge `claude/modest-faraday-w48twm` into `main` (PR) once the user approves v4.
 7. Nice-to-have, not started: mobile menu without JS, admin UI in Arabic, image `srcset` for pasted external image links (only Unsplash and our own uploads get srcset), shrinking the 565 MB Docker image.
 
 ---
@@ -195,6 +221,11 @@ Rule: controllers → services → repositories/integrations. Routers never touc
 - Git Bash heredocs sometimes mangle content/backslashes (long Python heredocs with Jinja and quotes fail with `unexpected EOF`) → write files with the Write tool or a Python script file instead. Use `MSYS_NO_PATHCONV=1` when passing `/paths` as args to Python.
 - The Chrome extension window can't be resized (maximized) → use headless Playwright for viewport screenshots (`uv run --with playwright ...`; chromium already installed).
 - CRLF warnings on commit are harmless (`.gitattributes` normalizes to LF).
+- Port 5432 taken by `temporal-postgresql` (other project, auto-starts with Docker Desktop) → stop the Temporal stack in Docker Desktop before `docker compose -f docker/docker-compose.yml up -d db`.
+- Compose project name is `docker` (derived from `docker/`), so the DB container is `docker-db-1` with its own volume.
+
+**Environment quirks (cloud sessions)**
+- Proxy blocks images.unsplash.com → screenshots need a Playwright route stub; browser check "no JS errors" fails without it. Playwright from `uv run --with playwright` needs `executable_path="/opt/pw-browsers/chromium-1194/chrome-linux/chrome"`. Postgres 16 is preinstalled: `service postgresql start` (role/db `store` exist).
 
 **Open / risks**
 - Paymob and Bosta untested against real accounts (see section 7).
@@ -216,21 +247,26 @@ One brand; placeholders for brand; EN+AR ~75/25 with modern Arabic fonts; 30–4
 docker compose -f docker/docker-compose.yml up -d db   # database (Docker Desktop must be running)
 uv sync; cd src/frontend; npm ci; npm run build; cd ../..   # deps + CSS/fonts/vendored JS
 uv run alembic upgrade head
-uv run python -m scripts.seed           # demo catalog (no-op if not empty; --reset to reload)
-uv run python -m scripts.create_admin owner "Name"
+uv run python -m scripts.seed           # from src/backend; demo catalog (no-op if not empty; --reset to reload)
+uv run python -m scripts.create_admin owner "Owner"    # run from src/backend
 uv run uvicorn app.main:app --app-dir src/backend --reload   # http://localhost:8000  /ar  /admin  /api/docs
 cd src/frontend; npm run watch:css; cd ../..   # while editing templates
-uv run pytest                           # 72 tests
+uv run pytest                           # 81 tests
 uv run ruff check . ; uv run ruff format --check . ; uv run mypy src/backend/app
 uv run --with playwright python -m scripts.browser_check   # needs app running
 docker compose -f docker/docker-compose.yml up        # Docker-only path (db + app + css watcher)
 ```
 
-Local DB state at hand-off: 10 demo products, 0 orders, 1 admin (`owner`).
+Local DB state: the user's new `docker-db-1` volume starts empty (migrate + seed + create admin). Demo catalog = 10 products.
 
 ## 11. Commit log
 
 ```
+bda063f feat: polish v4: Shop-all end tile, footer letter lift, RTL counter, docs   (branch claude/modest-faraday-w48twm)
+e6d216f feat: v4 "Nile Noir" redesign: editorial minimal UI with cinematic motion
+6b158bf chore: add design-md skill (74 DESIGN.md references)
+f5b275b Merge PR #2: Supabase secret keys on the apikey header only               (main)
+059248f Merge PR #1: deploy hardening, scheduled jobs skip until secrets exist
 3190a5b feat: "Cairo pop" storefront redesign with Preline components and Motion animations
 baea3aa docs: move DESIGN and CHECKPOINT into docs/ and fix paths
 3836bf3 refactor: move Docker config into docker/
@@ -247,8 +283,8 @@ d090985 feat: bilingual storefront, checkout, admin and integrations MVP
 
 ## 12. Suggested next steps for the new session
 
-1. Ask the user for feedback on the v3 "Cairo pop" design and their manual test; fix what they report.
-2. Check the first GitHub Actions CI run on `origin/main` and fix anything red; add the repo secrets listed in section 7.1.
-3. Get the deployment accounts (section 7.1) and deploy; verify `/health`, the storefront and admin on the live URL; set up UptimeRobot and the GitHub secrets.
-4. Once client keys arrive: test Paymob in test mode end to end (card first, then Apple Pay on a custom domain), test a Bosta staging shipment, test Telegram and Brevo.
-5. Replace placeholder content and photos; then hand over to the client.
+1. Read section 00. Ask the user: v4 feedback from their local run (real photos), and whether to open a PR to merge `claude/modest-faraday-w48twm` into `main`.
+2. Help with the client hand-off: repo collaborator access, client's local setup (Windows/Docker steps in section 10), `.env` from `.env.example` with client-owned secrets.
+3. Deploy (section 0a plan): needs `RENDER_API_KEY`, `SUPABASE_ACCESS_TOKEN` and network allowlist; then UptimeRobot + the 4 GitHub secrets.
+4. Once client keys arrive: Paymob test mode end to end (card, then Apple Pay on a custom domain), Bosta staging shipment, Telegram, Brevo.
+5. Replace placeholder content and photos; re-run Lighthouse and the browser checks; hand over.
