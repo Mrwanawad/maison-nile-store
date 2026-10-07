@@ -17,9 +17,14 @@
    the photo settles from a slight zoom; on scroll the photo drifts and the type lifts away. #}
 <section class="grain relative -mt-16 flex h-[100svh] min-h-[620px] overflow-hidden bg-ink text-paper md:-mt-[72px] md:min-h-[700px]" aria-labelledby="hero-heading" data-hero>
   <div class="absolute inset-0" data-hero-media>
-    {% set hero = settings.hero_image_url or static('img/placeholder.svg') %}
+    {# No HERO_IMAGE_URL: stay on the dark ink ground with a soft accent glow, so the white type still reads. #}
+    {% set hero = settings.hero_image_url %}
+    {% if hero %}
     <img src="{{ hero }}" alt="{{ t('home.hero_alt') }}" {% if srcset(hero) %}srcset="{{ srcset(hero) }}" sizes="100vw"{% endif %}
          width="1600" height="1000" fetchpriority="high" class="size-full object-cover" data-hero-img>
+    {% else %}
+    <div class="size-full bg-[radial-gradient(60%_70%_at_75%_30%,color-mix(in_oklab,var(--color-accent)_45%,transparent),transparent_70%)]" aria-hidden="true"></div>
+    {% endif %}
   </div>
   <div class="absolute inset-0 bg-[linear-gradient(180deg,rgb(18_17_16/0.45)_0%,rgb(18_17_16/0)_30%,rgb(18_17_16/0.15)_55%,rgb(18_17_16/0.82)_100%)]" aria-hidden="true"></div>
 
