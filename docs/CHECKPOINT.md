@@ -29,7 +29,7 @@
 
 ## 0. Changes made in the latest sessions (2026-10-03)
 
-**Session B: "Cairo pop" frontend redesign (commit `3190a5b`).** The user found the v2 design "basic and AI-looking" and asked for ready-made components, animation and a full polish. They chose: direction **Bold street / Cairo pop**, motion **rich but tasteful**, palette/fonts **free to change**.
+**Session B: "Cairo pop" frontend redesign (commit `3190a5b`). Superseded by the SYN redesign (section 0b); kept for history.** The user found the v2 design "basic and AI-looking" and asked for ready-made components, animation and a full polish. They chose: direction **Bold street / Cairo pop**, motion **rich but tasteful**, palette/fonts **free to change**.
 - **Identity:** Lalezar (Cairo cinema-poster display, Latin + Arabic, one weight) + Readex Pro (body). Tokens in `src/frontend/static/css/input.css`: chalk `#F6F6F1`, ink `#10133A`, cobalt accent `#1E3FE0` / `#1530B8` (default in `config.py`, `.env.example` and local `.env`), mango `#FFC21A`, hibiscus `#E5306B` (new `hibiscus` token). 2px ink borders, hard offset shadows (`--shadow-pop`), sticker badges (`.badge-sale/.badge-new/.badge-soldout`), `.btn-pop` (mango CTA, one per screen), `.panel-pop`, `.marquee`, `.card`/`.card-media`. Alexandria removed.
 - **Components (Preline, vendored per plugin):** overlay (cart drawer, mobile menu, size-guide modal), accordion (product details / delivery), collapse (mobile filters). `app.js` re-inits all three after HTMX swaps.
 - **Motion:** Motion One (`motion` npm, vendored to `static/vendor/motion.js`, ~47 KB gz) driven by new `static/js/fx.js`: hero load sequence (`[data-hero]`, `[data-hero-part]`), scroll reveals (`[data-reveal]`, `[data-reveal-stagger]`), header hide-on-scroll (`[data-header]`), cart badge pop + bag wiggle, drawer item cascade, toast entrance. New blocking `static/js/boot.js` adds `.js` before paint; `.fx-off` shows everything if Motion is missing (2.5 s) or reduced motion is on. CSS marquees. Cross-document View Transitions: card photo and product gallery share `view-transition-name: p-<slug>`.
@@ -48,7 +48,7 @@
 
 ## 1. Where we are (one paragraph)
 
-The MVP is **built, tested and committed locally**. A bilingual (EN/AR) store for one local brand: products with color × size variants, cart, checkout with cash on delivery or Paymob (Apple Pay), admin panel, Bosta courier, Telegram alerts, customer emails, a JSON API, CI and deployment config. **72 automated tests pass (80% coverage)**, 16 real-browser checks pass, Lighthouse mobile scores are Performance 90–97 / Accessibility 100. **Not deployed yet.** That's the next milestone, and it needs the user's accounts. The user was about to run and test it manually on their machine.
+The MVP is **built, tested and pushed to GitHub**. A bilingual (EN/AR) store for one local brand: products with color × size variants, cart, checkout with cash on delivery or Paymob (Apple Pay), admin panel, Bosta courier, Telegram alerts, customer emails, a JSON API, CI and deployment config. **80 automated tests pass**, 16 real-browser checks pass, Lighthouse mobile scores were Performance 90–97 / Accessibility 100 (measured before v3; re-run pending). **Not deployed yet.** That's the next milestone, and it needs the user's accounts. The user was about to run and test it manually on their machine.
 
 ---
 
@@ -64,7 +64,7 @@ The MVP is **built, tested and committed locally**. A bilingual (EN/AR) store fo
 
 ## 3. Stack (fixed by the user)
 
-FastAPI + Uvicorn (1 worker) · Jinja2 server-rendered HTML · HTMX 2 · Tailwind CSS v4 (built at build time) + Preline (**overlay, accordion, collapse** plugins) + Motion One (animations) · SQLAlchemy 2 async + asyncpg · Alembic · PostgreSQL 16 locally / Supabase in prod · Pydantic v2 · httpx · slowapi · Pillow · bcrypt · Sentry SDK (optional) · pytest · ruff · mypy --strict.
+FastAPI + Uvicorn (1 worker) · Jinja2 server-rendered HTML · HTMX 2 · Tailwind CSS v4 (built at build time) + Preline (**overlay, accordion, collapse** plugins) · system font + self-hosted Inter / IBM Plex Sans Arabic · no animation library (IntersectionObserver + Web Animations) · SQLAlchemy 2 async + asyncpg · Alembic · PostgreSQL 16 locally / Supabase in prod · Pydantic v2 · httpx · slowapi · Pillow · bcrypt · Sentry SDK (optional) · pytest · ruff · mypy --strict.
 Hosting plan: Render free web service (Docker) + Supabase free + UptimeRobot + GitHub Actions.
 
 ---
@@ -88,10 +88,10 @@ src/backend/app/
   locales/         en.json, ar.json (admin.* keys English only)
   content/         en|ar/*.md: about, shipping-returns, size-guide, faq, contact, privacy, terms (PLACEHOLDER text)
   (src/frontend/static/)  css/input.css (tokens + @font-face + components), js/boot.js (pre-paint .js flag), js/app.js (toasts, drawer, picker, checkout),
-                   js/fx.js (Motion One animations); build output: css/app.css, vendor/ (htmx, preline-*, motion), fonts/ (lalezar-*, readex-*) (gitignored)
+                   js/fx.js (reveals, badge pulse, header scroll edge; no library); build output: css/app.css, vendor/ (htmx, preline-*), fonts/ (inter-latin, plex-arabic-*) (gitignored)
 src/backend/migrations/  Alembic, single initial migration a2cf68da34bd (+ enables RLS on all tables)
 src/backend/scripts/ seed.py, create_admin.py, browser_check.py (Playwright)
-src/frontend/scripts/vendor.mjs  copies htmx, Preline overlay/accordion/collapse, Motion and fonts into src/frontend/static
+src/frontend/scripts/vendor.mjs  copies htmx, Preline overlay/accordion/collapse and the fallback fonts into src/frontend/static
 tests/             unit/test_utils.py; integration/ test_orders, test_http, test_admin_catalog, test_integrations, test_storefront
 .github/workflows/ ci.yml, backup.yml (nightly encrypted pg_dump), cleanup.yml (every 30 min)
 docker/Dockerfile  stages: assets (node) → base → dev (compose) / runtime (prod, runs alembic then uvicorn)
@@ -116,7 +116,7 @@ Rule: controllers → services → repositories/integrations. Routers never touc
 ## 6. Features — DONE ✅
 
 **Storefront**
-- EN at `/`, AR at `/ar/...` (RTL, logical CSS). Visual identity "Cairo pop" (DESIGN.md last bullet): Lalezar + Readex Pro, cobalt / mango / hibiscus on chalk, Preline overlay+accordion+collapse, Motion One animations (fx.js), View Transitions.
+- EN at `/`, AR at `/ar/...` (RTL, logical CSS). Visual identity v4 "SYN" (DESIGN.md last bullet): system font (SF on Apple devices) with Inter / IBM Plex Sans Arabic fallbacks, semantic tokens with automatic light/dark and increased contrast, deep-teal tint for interactive elements only, glass header/filter bar/buy bar, ambient colour wash on product pages, Preline overlay+accordion+collapse, View Transitions.
 - Home (bilingual poster hero + sticker, category marquee, featured grid, sticker promise cards, story), shop listing with search / category / size / in-stock filters and sort (HTMX, URL updates), category pages, product page (swatches, size buttons, sold-out marked, "Only N left", sale %, gallery per color, size-guide modal, info accordion, WhatsApp prefilled), related products.
 - Cart in signed session cookie (`{variant_id: qty}` only). HTMX slide-out drawer + full cart page, toasts, badge. Quantity capped by stock and `MAX_QTY_PER_LINE`. Cart fixes itself when stock drops or a product is hidden.
 - Checkout: inline bilingual validation, Egyptian phone normalization (Arabic digits, +20), governorate select with live fee, details remembered in localStorage, honeypot, double-submit guard.
@@ -153,10 +153,10 @@ Rule: controllers → services → repositories/integrations. Routers never touc
 - Production refuses to start with default `SECRET_KEY` / `INTERNAL_CRON_TOKEN` or a non-https `BASE_URL`.
 
 **Quality**
-- 72 pytest tests on real Postgres (database `store_test`, created automatically); fake HTTP transport for third parties.
+- 80 pytest tests on real Postgres (database `store_test`, created automatically); fake HTTP transport for third parties.
 - `src/backend/scripts/browser_check.py`: 16 Playwright checks (EN + AR, 390px; opens the mobile filter panel before picking a size).
 - ruff + mypy --strict clean. Pre-commit config present (not installed yet: `uv run pre-commit install`).
-- Lighthouse mobile (before the v3 and v4 redesigns): Performance 90–97, Accessibility 100, Best practices 100. **Not re-measured after v3** (Motion + 2 Preline plugins + Lalezar added; re-run before deploy).
+- Lighthouse mobile (before the v3 and v4 redesigns): Performance 90–97, Accessibility 100, Best practices 100. **Not re-measured since** (v4 removed Motion One and the display font, so it should be lighter than v3; re-run before deploy).
 
 ---
 
@@ -219,9 +219,9 @@ uv run python -m scripts.seed           # demo catalog (no-op if not empty; --re
 uv run python -m scripts.create_admin owner "Name"
 uv run uvicorn app.main:app --app-dir src/backend --reload   # http://localhost:8000  /ar  /admin  /api/docs
 cd src/frontend; npm run watch:css; cd ../..   # while editing templates
-uv run pytest                           # 72 tests
+uv run pytest                           # 80 tests
 uv run ruff check . ; uv run ruff format --check . ; uv run mypy src/backend/app
-uv run --with playwright python -m scripts.browser_check   # needs app running
+uv run --with playwright python -m scripts.browser_check   # needs app running; PW_CHROMIUM=<path> for a preinstalled Chromium
 docker compose -f docker/docker-compose.yml up        # Docker-only path (db + app + css watcher)
 ```
 
@@ -230,6 +230,10 @@ Local DB state at hand-off: 10 demo products, 0 orders, 1 admin (`owner`).
 ## 11. Commit log
 
 ```
+8b90e2d feat: SYN redesign built on Apple HIG principles
+f1e317f chore: add apple-design skill for Claude Code
+f5b275b Merge pull request #2 (Supabase secret keys on the apikey header only)
+059248f Merge pull request #1 (scheduled jobs skip without secrets; first Render deploy without a shell)
 3190a5b feat: "Cairo pop" storefront redesign with Preline components and Motion animations
 baea3aa docs: move DESIGN and CHECKPOINT into docs/ and fix paths
 3836bf3 refactor: move Docker config into docker/
@@ -246,7 +250,7 @@ d090985 feat: bilingual storefront, checkout, admin and integrations MVP
 
 ## 12. Suggested next steps for the new session
 
-1. Ask the user for feedback on the v3 "Cairo pop" design and their manual test; fix what they report.
+1. Ask the user for feedback on the SYN redesign (branch `apple-design-resdesign`, tested on the client laptop); fix what they report, then open a PR to `main` (CI runs only on `main` pushes and PRs, so the branch has no CI run yet).
 2. Check the first GitHub Actions CI run on `origin/main` and fix anything red; add the repo secrets listed in section 7.1.
 3. Get the deployment accounts (section 7.1) and deploy; verify `/health`, the storefront and admin on the live URL; set up UptimeRobot and the GitHub secrets.
 4. Once client keys arrive: test Paymob in test mode end to end (card first, then Apple Pay on a custom domain), test a Bosta staging shipment, test Telegram and Brevo.

@@ -4,6 +4,8 @@ A bilingual (English / Arabic) online store for a local Egyptian brand: products
 
 Stack: FastAPI · Jinja2 + HTMX · Tailwind v4 + Preline · PostgreSQL (Supabase) · Paymob · Bosta · Telegram. Full design notes are in [docs/DESIGN.md](docs/DESIGN.md).
 
+Current look: **SYN** (placeholder brand, "Made together, in Egypt."), built on Apple's Human Interface Guidelines principles: system font, semantic colors with automatic light and dark mode, glass header, product pages tinted by the selected color. The spec is the "Visual identity v4 SYN" entry at the end of [docs/DESIGN.md](docs/DESIGN.md). The `apple-design` Claude Code skill used to build it lives in `.claude/skills/apple-design` (update with `npx skills update apple-design`).
+
 ## Run it locally (Windows, macOS or Linux)
 
 Requirements: Docker Desktop, [uv](https://docs.astral.sh/uv/), Node 20+.
@@ -12,7 +14,7 @@ Requirements: Docker Desktop, [uv](https://docs.astral.sh/uv/), Node 20+.
 cp .env.example .env              # every setting lives here, with comments
 docker compose -f docker/docker-compose.yml up -d db   # Postgres 16 on localhost:5432
 uv sync                           # Python dependencies
-cd src/frontend && npm install && npm run build && cd ../..   # CSS + vendored JS (once, or after template changes)
+cd src/frontend && npm ci && npm run build && cd ../..   # CSS, fonts, vendored JS (once, or after template changes)
 uv run alembic upgrade head       # create tables
 uv run python -m scripts.seed     # demo catalog (10 products)
 uv run python -m scripts.create_admin owner "Shop Owner"   # prompts for a password
@@ -34,6 +36,18 @@ docker compose -f docker/docker-compose.yml exec app python -m scripts.seed
 docker compose -f docker/docker-compose.yml exec app python -m scripts.create_admin owner "Shop Owner"
 ```
 
+## Updating an existing checkout
+
+After pulling new commits (or switching branch, e.g. `git fetch origin && git switch apple-design-resdesign`):
+
+```bash
+uv sync                                                  # Python dependencies may have changed
+cd src/frontend && npm ci && npm run build && cd ../..   # always rebuild: package.json, fonts or templates may have changed
+uv run alembic upgrade head                              # no-op when there are no new migrations
+```
+
+Your `.env` is never touched by git. Compare it with `.env.example` after a pull and copy over any new or renamed keys. For the SYN redesign that means `BRAND_NAME`, `BRAND_NAME_AR`, `BRAND_TAGLINE_EN`, `BRAND_TAGLINE_AR`, `BRAND_ACCENT_COLOR`, `BRAND_ACCENT_HOVER_COLOR`, the new `BRAND_ACCENT_DARK_COLOR`, and `EMAIL_FROM_NAME`. Otherwise the old name and colors stay.
+
 ## Tests and checks
 
 ```bash
@@ -41,6 +55,8 @@ uv run pytest            # needs the docker compose db (uses a separate store_te
 uv run ruff check . && uv run ruff format --check .
 uv run mypy src/backend/app
 ```
+
+Browser end-to-end check (app must be running): `uv run --with playwright python -m scripts.browser_check`. Set `PW_CHROMIUM=/path/to/chrome` to use an already-installed Chromium.
 
 Install the git hooks once with `uv run pre-commit install`.
 
