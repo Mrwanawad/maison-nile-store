@@ -50,14 +50,17 @@ class Settings(BaseSettings):
     secret_key: str = "change-me-to-a-long-random-string"
 
     # Brand
-    brand_name: str = "Maison Nile"
-    brand_name_ar: str = "ميزون نايل"
-    brand_tagline_en: str = "Everyday pieces, made in Egypt."
-    brand_tagline_ar: str = "قطع يومية، صُنعت في مصر."
+    brand_name: str = "SYN"
+    brand_name_ar: str = "سين"
+    brand_tagline_en: str = "Made together, in Egypt."
+    brand_tagline_ar: str = "صُنعت معًا، في مصر."
     brand_logo_url: str = ""
     brand_favicon_url: str = "/static/img/favicon.svg"
-    brand_accent_color: str = "#1E3FE0"
-    brand_accent_hover_color: str = "#1530B8"
+    # Tint = interactive colour only (primary action, links, focus). Light and dark
+    # appearances each need their own value to keep 4.5:1 contrast.
+    brand_accent_color: str = "#006A73"
+    brand_accent_hover_color: str = "#00535A"
+    brand_accent_dark_color: str = "#5CC8CF"
     hero_image_url: str = ""
 
     # Contact
@@ -127,7 +130,7 @@ class Settings(BaseSettings):
     email_provider: Literal["none", "brevo", "resend"] = "none"
     email_api_key: str = ""
     email_from: str = "orders@example.com"
-    email_from_name: str = "Maison Nile"
+    email_from_name: str = "SYN"
 
     # OTP
     otp_provider: Literal["none"] = "none"

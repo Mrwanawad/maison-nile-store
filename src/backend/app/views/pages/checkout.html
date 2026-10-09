@@ -11,16 +11,16 @@
 
 {% block content %}
 <div class="container-page pt-8 md:pt-12">
-  <a href="{{ url('/cart') }}" class="inline-flex items-center gap-1.5 text-sm text-ink-soft hover:text-ink">{{ icon("arrow-left", "size-4", flip=true) }} {{ t("checkout.back_to_cart") }}</a>
-  <h1 class="mt-3 text-6xl md:text-7xl">{{ t("checkout.title") }}</h1>
+  <a href="{{ url('/cart') }}" class="btn btn-plain btn-sm -ms-3 gap-1">{{ icon("chevron-left", "size-4", flip=true) }} {{ t("checkout.back_to_cart") }}</a>
+  <h1 class="text-display mt-2">{{ t("checkout.title") }}</h1>
 
   {% if form_error %}
-  <div class="mt-6 flex gap-3 rounded-sm border-2 border-danger bg-danger/5 font-medium px-4 py-3 text-danger" role="alert">
+  <div class="mt-6 flex gap-3 rounded-xl bg-danger/10 px-4 py-3 text-danger" role="alert">
     {{ icon("alert", "size-5 shrink-0") }}<p>{{ form_error }}</p>
   </div>
   {% endif %}
   {% if errors %}
-  <p class="mt-6 rounded-sm border-2 border-danger bg-danger/5 font-medium px-4 py-3 text-danger" role="alert">{{ t("checkout.fix_errors") }}</p>
+  <p class="mt-6 flex gap-3 rounded-xl bg-danger/10 px-4 py-3 text-danger" role="alert">{{ icon("alert", "size-5 shrink-0") }}{{ t("checkout.fix_errors") }}</p>
   {% endif %}
 
   <form method="post" action="{{ url('/checkout') }}" class="mt-8 grid gap-10 lg:grid-cols-12" novalidate data-checkout-form>
@@ -33,7 +33,7 @@
 
     <div class="space-y-10 lg:col-span-7">
       <fieldset>
-        <legend class="flex items-center gap-3 font-display text-3xl"><span class="price flex size-9 items-center justify-center rounded-full border-2 border-ink bg-mango font-sans text-base font-bold" aria-hidden="true">1</span>{{ t("checkout.contact") }}</legend>
+        <legend class="text-[1.375rem] font-semibold">{{ t("checkout.contact") }}</legend>
         <div class="mt-5 grid gap-5 sm:grid-cols-2">
           <div class="sm:col-span-2">
             <label for="full_name" class="field-label">{{ t("checkout.full_name") }}</label>
@@ -48,7 +48,7 @@
             {% if errors.get("phone") %}{{ field_error("phone") }}{% else %}<p class="field-hint">{{ t("checkout.phone_hint") }}</p>{% endif %}
           </div>
           <div>
-            <label for="email" class="field-label">{{ t("checkout.email") }} <span class="font-normal text-ink-soft">({{ t("common.optional") }})</span></label>
+            <label for="email" class="field-label">{{ t("checkout.email") }} <span class="font-normal text-label-2">({{ t("common.optional") }})</span></label>
             <input id="email" name="email" type="email" autocomplete="email" dir="ltr"
                    value="{{ values.get('email', '') or '' }}" class="field text-start" {{ invalid('email') }} data-remember>
             {% if errors.get("email") %}{{ field_error("email") }}{% else %}<p class="field-hint">{{ t("checkout.email_hint") }}</p>{% endif %}
@@ -57,7 +57,7 @@
       </fieldset>
 
       <fieldset>
-        <legend class="flex items-center gap-3 font-display text-3xl"><span class="price flex size-9 items-center justify-center rounded-full border-2 border-ink bg-mango font-sans text-base font-bold" aria-hidden="true">2</span>{{ t("checkout.delivery") }}</legend>
+        <legend class="text-[1.375rem] font-semibold">{{ t("checkout.delivery") }}</legend>
         <div class="mt-5 grid gap-5">
           <div>
             <label for="governorate" class="field-label">{{ t("checkout.governorate") }}</label>
@@ -77,7 +77,7 @@
             {{ field_error("address") }}
           </div>
           <div>
-            <label for="notes" class="field-label">{{ t("checkout.notes") }} <span class="font-normal text-ink-soft">({{ t("common.optional") }})</span></label>
+            <label for="notes" class="field-label">{{ t("checkout.notes") }} <span class="font-normal text-label-2">({{ t("common.optional") }})</span></label>
             <input id="notes" name="notes" type="text" maxlength="500" placeholder="{{ t('checkout.notes_placeholder') }}"
                    value="{{ values.get('notes', '') or '' }}" class="field">
           </div>
@@ -85,16 +85,16 @@
       </fieldset>
 
       <fieldset>
-        <legend class="flex items-center gap-3 font-display text-3xl"><span class="price flex size-9 items-center justify-center rounded-full border-2 border-ink bg-mango font-sans text-base font-bold" aria-hidden="true">3</span>{{ t("checkout.payment") }}</legend>
+        <legend class="text-[1.375rem] font-semibold">{{ t("checkout.payment") }}</legend>
         {% if payment_options %}
         <div class="mt-5 grid gap-3">
           {% for opt in payment_options %}
-          <label class="flex cursor-pointer gap-4 rounded-sm border-2 border-ink/15 bg-paper p-4 transition-[border-color,background-color] hover:border-ink has-[:checked]:border-ink has-[:checked]:bg-mango/40 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-accent">
-            <input type="radio" name="payment_method" value="{{ opt.value }}" class="mt-1 size-5 accent-[var(--color-ink)]"
+          <label class="flex cursor-pointer gap-4 rounded-2xl bg-surface p-4 ring-1 ring-separator transition-[box-shadow] hover:ring-label/30 has-[:checked]:ring-2 has-[:checked]:ring-tint has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-tint">
+            <input type="radio" name="payment_method" value="{{ opt.value }}" class="mt-0.5 size-5 accent-[var(--color-tint)]"
                    {% if values.get('payment_method') == opt.value %}checked{% endif %} required data-payment>
             <span class="flex-1">
-              <span class="flex items-center gap-2 font-medium">{{ icon("credit-card" if opt.value == "paymob" else "banknote", "size-5 text-ink-soft") }} {{ opt.label }}</span>
-              <span class="mt-1 block text-sm text-ink-soft">{{ opt.hint }}</span>
+              <span class="flex items-center gap-2 font-semibold">{{ icon("credit-card" if opt.value == "paymob" else "banknote", "size-5 text-label-2") }} {{ opt.label }}</span>
+              <span class="mt-1 block text-[0.9375rem] text-label-2">{{ opt.hint }}</span>
             </span>
           </label>
           {% endfor %}
@@ -107,30 +107,30 @@
     </div>
 
     <aside class="lg:col-span-5">
-      <div class="panel-pop p-6 lg:sticky lg:top-28">
-        <h2 class="text-3xl">{{ t("cart.summary") }}</h2>
-        <ul class="mt-5 divide-y divide-line" role="list">
+      <div class="panel p-6 lg:sticky lg:top-20">
+        <h2 class="text-[1.375rem]">{{ t("cart.summary") }}</h2>
+        <ul class="mt-4 divide-y divide-separator" role="list">
           {% for line in cart.lines %}
           <li class="flex gap-3 py-3">
             <div class="relative shrink-0">
-              <img src="{{ line.image_url }}" alt="" width="56" height="70" loading="lazy" class="h-[70px] w-14 rounded-sm border-2 border-ink bg-sand object-cover">
-              <span class="price absolute -end-2 -top-2 flex size-5 items-center justify-center rounded-full border-2 border-ink bg-mango text-[11px] font-bold text-ink">{{ line.quantity }}</span>
+              <img src="{{ line.image_url }}" alt="" width="56" height="70" loading="lazy" class="h-[4.375rem] w-14 rounded-xl bg-well object-cover">
+              <span class="price absolute -end-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-label px-1 text-[0.6875rem] font-semibold text-canvas"><span class="sr-only">{{ t("product.quantity") }}: </span>{{ line.quantity }}</span>
             </div>
             <div class="min-w-0 flex-1">
-              <p class="truncate text-sm font-medium">{{ line.product_name }}</p>
-              {% if line.label %}<p class="text-sm text-ink-soft">{{ line.label }}</p>{% endif %}
+              <p class="truncate text-[0.9375rem] font-medium">{{ line.product_name }}</p>
+              {% if line.label %}<p class="text-[0.875rem] text-label-2">{{ line.label }}</p>{% endif %}
             </div>
-            <p class="price text-sm">{{ price(line.line_total) }}</p>
+            <p class="price text-[0.9375rem]">{{ price(line.line_total) }}</p>
           </li>
           {% endfor %}
         </ul>
         {% include "partials/checkout_totals.html" %}
-        <button type="submit" class="btn btn-pop btn-lg mt-6 w-full" data-submit
+        <button type="submit" class="btn btn-primary btn-lg mt-6 w-full" data-submit
                 data-label-cod="{{ t('checkout.place_order') }}" data-label-paymob="{{ t('checkout.continue_payment') }}"
                 {% if not payment_options %}disabled{% endif %}>
           <span data-submit-label>{{ t('checkout.continue_payment') if values.get('payment_method') == 'paymob' else t('checkout.place_order') }}</span>
         </button>
-        <p class="mt-3 flex items-center justify-center gap-1.5 text-xs text-ink-soft">{{ icon("shield", "size-4") }} {{ t("checkout.secure") }}</p>
+        <p class="mt-3 flex items-center justify-center gap-1.5 text-[0.8125rem] text-label-2">{{ icon("shield", "size-4") }} {{ t("checkout.secure") }}</p>
       </div>
     </aside>
   </form>

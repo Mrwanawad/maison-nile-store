@@ -5,28 +5,32 @@
 {% block title %}{{ name }} · {{ brand_name() }}{% endblock %}
 {% block description %}{{ localized(product, "description")|truncate(155) }}{% endblock %}
 {% block content %}
+{# Signature: the page washes in the colour being viewed. --ambient starts at the
+   first colour and app.js cross-fades it when the shopper picks another. #}
+{% set first_hex = colors[0].hex if colors else 'transparent' %}
+<div class="ambient" style="--ambient: {{ first_hex }}" data-picker>
 <div class="container-page pt-5 md:pt-8">
-  <nav aria-label="{{ t('nav.breadcrumb') }}" class="text-sm font-medium text-ink-soft">
-    <a href="{{ url('/') }}" class="hover:text-ink">{{ t("nav.home") }}</a><span class="mx-1.5">/</span>
-    {% if product.category %}<a href="{{ url('/c/' ~ product.category.slug) }}" class="hover:text-ink">{{ localized(product.category, "name") }}</a><span class="mx-1.5">/</span>{% endif %}
-    <span class="text-ink" aria-current="page">{{ name }}</span>
+  <nav aria-label="{{ t('nav.breadcrumb') }}" class="text-[0.8125rem] text-label-2">
+    <a href="{{ url('/') }}" class="hover:text-label hover:underline">{{ t("nav.home") }}</a><span class="mx-1" aria-hidden="true">›</span>
+    {% if product.category %}<a href="{{ url('/c/' ~ product.category.slug) }}" class="hover:text-label hover:underline">{{ localized(product.category, "name") }}</a><span class="mx-1" aria-hidden="true">›</span>{% endif %}
+    <span class="text-label" aria-current="page">{{ name }}</span>
   </nav>
 
-  <div class="mt-5 grid gap-8 md:grid-cols-12 lg:gap-14" data-picker>
+  <div class="mt-5 grid gap-8 md:grid-cols-12 lg:gap-12">
     <script type="application/json" data-picker-json>{{ picker|tojson }}</script>
 
     {# Gallery: swipe on mobile, stacked on desktop. The first photo morphs from the card. #}
     <div class="md:col-span-7">
-      <div class="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:px-0 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible" data-gallery aria-label="{{ t('product.gallery') }}">
+      <div class="-mx-4 flex snap-x snap-mandatory gap-2 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:px-0 md:grid md:grid-cols-2 md:gap-3 md:overflow-visible" data-gallery aria-label="{{ t('product.gallery') }}">
         {% for img in product.images %}
-        <figure class="relative aspect-[4/5] w-[86%] shrink-0 snap-center overflow-hidden rounded-md border-2 border-ink bg-sand md:w-auto {% if loop.first %}md:col-span-2{% endif %}"
+        <figure class="relative aspect-[4/5] w-[88%] shrink-0 snap-center overflow-hidden rounded-2xl bg-well md:w-auto {% if loop.first %}md:col-span-2{% endif %}"
                 data-image-color="{{ img.color_id or '' }}" {% if loop.first %}style="view-transition-name: p-{{ product.slug }}"{% endif %}>
           <img src="{{ img.url }}" alt="{{ localized(img, 'alt') or name }}" width="{{ img.width }}" height="{{ img.height }}"
-               {% if srcset(img.url) %}srcset="{{ srcset(img.url) }}" sizes="(min-width: 768px) {{ '55vw' if loop.first else '28vw' }}, 86vw"{% endif %}
+               {% if srcset(img.url) %}srcset="{{ srcset(img.url) }}" sizes="(min-width: 768px) {{ '55vw' if loop.first else '28vw' }}, 88vw"{% endif %}
                {% if loop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async" class="size-full object-cover">
         </figure>
         {% else %}
-        <figure class="aspect-[4/5] w-full overflow-hidden rounded-md border-2 border-ink bg-sand md:col-span-2" style="view-transition-name: p-{{ product.slug }}">
+        <figure class="aspect-[4/5] w-full overflow-hidden rounded-2xl bg-well md:col-span-2" style="view-transition-name: p-{{ product.slug }}">
           <img src="{{ static('img/placeholder.svg') }}" alt="" width="400" height="500" class="size-full object-cover">
         </figure>
         {% endfor %}
@@ -35,23 +39,23 @@
 
     {# Details #}
     <div class="md:col-span-5">
-      <div class="md:sticky md:top-24">
-        <div class="flex flex-wrap items-center gap-2">
-          {% if product.category %}<a href="{{ url('/c/' ~ product.category.slug) }}" class="chip border-ink px-3 py-1 text-xs">{{ localized(product.category, "name") }}</a>{% endif %}
+      <div class="md:sticky md:top-20">
+        <div class="flex flex-wrap items-center gap-2 text-[0.9375rem]">
           {% if not card.in_stock %}<span class="badge-soldout">{{ t("product.sold_out") }}</span>
-          {% elif card.is_new and not product.compare_at_piasters %}<span class="badge-new">{{ t("product.new") }}</span>{% endif %}
+          {% elif card.is_new and not product.compare_at_piasters %}<span class="font-semibold">{{ t("product.new") }}</span>{% endif %}
+          {% if product.category %}<a href="{{ url('/c/' ~ product.category.slug) }}" class="text-label-2 hover:text-label hover:underline">{{ localized(product.category, "name") }}</a>{% endif %}
         </div>
-        <h1 class="mt-4 text-5xl md:text-6xl">{{ name }}</h1>
-        <div class="mt-4 flex flex-wrap items-center gap-3">
-          <p class="price text-3xl font-bold {% if product.compare_at_piasters %}text-hibiscus{% endif %}" data-price>{{ price(product.price_piasters) }}</p>
+        <h1 class="text-title mt-2">{{ name }}</h1>
+        <div class="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <p class="price text-[1.375rem] {% if product.compare_at_piasters %}font-semibold text-sale{% endif %}" data-price>{{ price(product.price_piasters) }}</p>
           {% if product.compare_at_piasters %}
-            <s class="price text-lg text-ink-soft">{{ price(product.compare_at_piasters) }}</s>
-            <span class="badge-sale" dir="ltr">−{{ card.percent_off }}%</span>
+            <s class="price text-[1.0625rem] text-label-2">{{ price(product.compare_at_piasters) }}</s>
+            <span class="text-[0.9375rem] font-semibold text-sale">{{ t("product.save", percent=card.percent_off) }}</span>
           {% endif %}
         </div>
-        <p class="mt-2 text-sm text-ink-soft">{{ t("product.shipping_from", fee=price(shipping_from)) }}</p>
+        <p class="mt-1 text-[0.875rem] text-label-2">{{ t("product.shipping_from", fee=price(shipping_from)) }}</p>
 
-        <form class="mt-8" method="post" action="{{ url('/cart/items') }}"
+        <form id="add-form" class="mt-8" method="post" action="{{ url('/cart/items') }}"
               hx-post="{{ url('/cart/items') }}" hx-target="#cart-drawer-body" hx-swap="innerHTML" data-add-form>
           {{ csrf_input(request) }}
           <input type="hidden" name="product_id" value="{{ product.id }}">
@@ -59,14 +63,14 @@
 
           {% if colors and not single_variant %}
           <fieldset class="mb-7">
-            <legend class="mb-3 text-sm"><span class="font-semibold">{{ t("product.color") }}:</span> <span class="text-ink-soft" data-color-name>{% if colors|length == 1 %}{{ localized(colors[0], "name") }}{% endif %}</span></legend>
-            <div class="flex flex-wrap gap-3">
+            <legend class="mb-3 text-[0.9375rem]"><span class="font-semibold">{{ t("product.color") }}</span> <span class="text-label-2" data-color-name>{% if colors|length == 1 %}{{ localized(colors[0], "name") }}{% endif %}</span></legend>
+            <div class="flex flex-wrap gap-2">
               {% for c in colors %}
               <label class="cursor-pointer" title="{{ localized(c, 'name') }}">
-                <input type="radio" name="color_id" value="{{ c.id }}" class="peer sr-only" data-color data-name="{{ localized(c, 'name') }}"
+                <input type="radio" name="color_id" value="{{ c.id }}" class="peer sr-only" data-color data-name="{{ localized(c, 'name') }}" data-hex="{{ c.hex }}"
                        {% if colors|length == 1 %}checked{% endif %} {% if not color_available(c.id) %}data-soldout{% endif %} required>
-                <span class="block size-11 rounded-full border-2 border-ink/15 p-1 transition-[border-color,transform] duration-150 hover:scale-105 peer-checked:scale-110 peer-checked:border-ink peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent peer-data-[soldout]:opacity-40">
-                  <span class="block size-full rounded-full border border-ink/15" style="background: {{ c.hex }}"></span>
+                <span class="block size-11 rounded-full p-[3px] ring-2 ring-transparent transition-[box-shadow] duration-150 hover:ring-separator peer-checked:ring-label peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-tint peer-data-[soldout]:opacity-40">
+                  <span class="swatch size-full" style="background: {{ c.hex }}"></span>
                 </span>
                 <span class="sr-only">{{ localized(c, 'name') }}{% if not color_available(c.id) %} ({{ t("product.sold_out") }}){% endif %}</span>
               </label>
@@ -78,15 +82,15 @@
           {% if sizes and not single_variant %}
           <fieldset class="mb-7">
             <div class="mb-3 flex items-center justify-between">
-              <legend class="text-sm font-semibold">{{ t("product.size") }}</legend>
-              <a href="{{ url('/pages/size-guide') }}" class="inline-flex items-center gap-1.5 text-sm font-semibold text-accent underline decoration-accent/30 decoration-2 underline-offset-4 hover:decoration-accent"
+              <legend class="text-[0.9375rem] font-semibold">{{ t("product.size") }}</legend>
+              <a href="{{ url('/pages/size-guide') }}" class="-me-3 inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[0.9375rem] text-tint hover:underline"
                  hx-get="{{ url('/pages/size-guide') }}" hx-select=".prose-store" hx-target="#size-guide-body" hx-swap="innerHTML" data-size-guide>{{ icon("ruler", "size-4") }} {{ t("product.size_guide") }}</a>
             </div>
-            <div class="flex flex-wrap gap-2">
+            <div class="grid grid-cols-4 gap-2 sm:grid-cols-5">
               {% for s in sizes %}
               <label class="cursor-pointer">
                 <input type="radio" name="size_id" value="{{ s.id }}" class="peer sr-only" data-size {% if not size_available(s.id) %}data-soldout{% endif %} required>
-                <span class="chip min-w-14 py-2.5 peer-checked:border-ink peer-checked:bg-ink peer-checked:text-bone peer-focus-visible:outline-3 peer-focus-visible:outline-accent peer-data-[soldout]:border-dashed peer-data-[soldout]:text-ink-soft/50 peer-data-[soldout]:line-through">{{ localized(s, "label") }}</span>
+                <span class="chip w-full rounded-xl peer-checked:border-label peer-checked:bg-label peer-checked:text-canvas peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-tint peer-data-[soldout]:border-dashed peer-data-[soldout]:text-label-2 peer-data-[soldout]:line-through">{{ localized(s, "label") }}</span>
                 <span class="sr-only" data-size-state>{% if not size_available(s.id) %} ({{ t("product.sold_out") }}){% endif %}</span>
               </label>
               {% endfor %}
@@ -94,21 +98,20 @@
           </fieldset>
           {% endif %}
 
-          <p class="mb-4 min-h-6 text-sm font-semibold" data-stock aria-live="polite"
+          <p class="mb-4 min-h-6 text-[0.9375rem]" data-stock aria-live="polite"
              data-msg-in="{{ t('product.in_stock') }}" data-msg-low="{{ t('product.low_stock', count='{n}') }}" data-msg-out="{{ t('product.sold_out_long') }}"
              data-msg-add="{{ t('product.add_to_cart') }}" data-msg-soldout="{{ t('product.sold_out') }}">
             {% if not card.in_stock %}<span class="text-danger">{{ t("product.sold_out_long") }}</span>
-            {% elif single_variant and single_variant.stock <= settings.low_stock_threshold %}<span class="text-hibiscus">{{ t("product.low_stock", count=single_variant.stock) }}</span>
-            {% elif single_variant %}<span class="text-olive">{{ t("product.in_stock") }}</span>{% endif %}
+            {% elif single_variant and single_variant.stock <= settings.low_stock_threshold %}<span class="text-caution">{{ t("product.low_stock", count=single_variant.stock) }}</span>
+            {% elif single_variant %}<span class="text-success">{{ t("product.in_stock") }}</span>{% endif %}
           </p>
 
-          <div class="flex gap-3">
+          <div class="flex gap-3" data-buy-main>
             <label for="qty" class="sr-only">{{ t("product.quantity") }}</label>
-            <select id="qty" name="quantity" class="field w-20 shrink-0 rounded-full border-ink text-center font-semibold">
+            <select id="qty" name="quantity" class="field price w-[5.5rem] shrink-0 rounded-full text-center">
               {% for n in range(1, 6) %}<option value="{{ n }}">{{ n }}</option>{% endfor %}
             </select>
-            <button type="submit" class="btn btn-pop btn-lg flex-1" data-add-button {% if not card.in_stock %}disabled{% endif %}>
-              {{ icon("bag", "size-5") }}
+            <button type="submit" class="btn btn-primary btn-lg flex-1" data-add-button {% if not card.in_stock %}disabled{% endif %}>
               <span data-add-label>{{ t("product.add_to_cart") if card.in_stock else t("product.sold_out") }}</span>
               {{ icon("loader", "htmx-indicator size-4 animate-spin") }}
             </button>
@@ -116,36 +119,36 @@
         </form>
 
         {% if settings.whatsapp_number %}
-        <a href="{{ whatsapp_link(whatsapp_message) }}" target="_blank" rel="noopener" class="btn btn-secondary mt-3 w-full">
+        <a href="{{ whatsapp_link(whatsapp_message) }}" target="_blank" rel="noopener" class="btn btn-plain mt-2 w-full">
           {{ icon("chat", "size-4") }} {{ t("product.ask_whatsapp") }}
         </a>
         {% endif %}
 
-        {# Info accordion (Preline). Without JS every panel stays open. #}
+        {# Details and delivery as disclosure rows (Preline accordion). Without JS every panel stays open. #}
         <noscript><style>.hs-accordion-content{display:block!important}</style></noscript>
         {% set desc = localized(product, "description") %}
-        <div class="hs-accordion-group mt-8 border-t-2 border-ink" data-hs-accordion-always-open>
+        <div class="hs-accordion-group mt-8 border-t border-separator" data-hs-accordion-always-open>
           {% if desc %}
-          <div class="hs-accordion active border-b-2 border-ink" id="acc-details">
-            <button type="button" class="hs-accordion-toggle flex w-full items-center justify-between gap-4 py-4 text-start font-display text-2xl" aria-expanded="true" aria-controls="acc-details-panel">
+          <div class="hs-accordion active border-b border-separator" id="acc-details">
+            <button type="button" class="hs-accordion-toggle flex min-h-14 w-full items-center justify-between gap-4 text-start text-headline" aria-expanded="true" aria-controls="acc-details-panel">
               {{ t("product.details") }}
-              <span class="flex size-8 shrink-0 items-center justify-center rounded-full border-2 border-ink transition-transform duration-300 hs-accordion-active:rotate-45">{{ icon("plus", "size-4") }}</span>
+              {{ icon("chevron-down", "size-5 shrink-0 text-label-2 transition-transform duration-300 hs-accordion-active:rotate-180") }}
             </button>
             <div id="acc-details-panel" class="hs-accordion-content w-full overflow-hidden transition-[height] duration-300" role="region" aria-labelledby="acc-details">
-              <div class="prose-store pb-5 whitespace-pre-line">{{ desc }}</div>
+              <div class="prose-store pb-5 whitespace-pre-line text-label-2">{{ desc }}</div>
             </div>
           </div>
           {% endif %}
-          <div class="hs-accordion border-b-2 border-ink" id="acc-info">
-            <button type="button" class="hs-accordion-toggle flex w-full items-center justify-between gap-4 py-4 text-start font-display text-2xl" aria-expanded="false" aria-controls="acc-info-panel">
+          <div class="hs-accordion border-b border-separator" id="acc-info">
+            <button type="button" class="hs-accordion-toggle flex min-h-14 w-full items-center justify-between gap-4 text-start text-headline" aria-expanded="false" aria-controls="acc-info-panel">
               {{ t("product.info") }}
-              <span class="flex size-8 shrink-0 items-center justify-center rounded-full border-2 border-ink transition-transform duration-300 hs-accordion-active:rotate-45">{{ icon("plus", "size-4") }}</span>
+              {{ icon("chevron-down", "size-5 shrink-0 text-label-2 transition-transform duration-300 hs-accordion-active:rotate-180") }}
             </button>
             <div id="acc-info-panel" class="hs-accordion-content hidden w-full overflow-hidden transition-[height] duration-300" role="region" aria-labelledby="acc-info">
-              <ul class="space-y-3 pb-5 text-[15px]" role="list">
-                <li class="flex gap-3">{{ icon("truck", "size-5 shrink-0 text-accent") }}<span>{{ t("product.delivery_note", min=settings.delivery_days_min, max=settings.delivery_days_max) }}</span></li>
-                <li class="flex gap-3">{{ icon("banknote", "size-5 shrink-0 text-accent") }}<span>{{ t("product.payment_note") }}</span></li>
-                <li class="flex gap-3">{{ icon("return", "size-5 shrink-0 text-accent") }}<span>{{ t("product.returns_note", days=settings.exchange_days) }} <a href="{{ url('/pages/shipping-returns') }}" class="link">{{ t("common.details") }}</a></span></li>
+              <ul class="space-y-3 pb-5 text-[0.9375rem] text-label-2" role="list">
+                <li class="flex gap-3">{{ icon("truck", "size-5 shrink-0 text-label") }}<span>{{ t("product.delivery_note", min=settings.delivery_days_min, max=settings.delivery_days_max) }}</span></li>
+                <li class="flex gap-3">{{ icon("banknote", "size-5 shrink-0 text-label") }}<span>{{ t("product.payment_note") }}</span></li>
+                <li class="flex gap-3">{{ icon("return", "size-5 shrink-0 text-label") }}<span>{{ t("product.returns_note", days=settings.exchange_days) }} <a href="{{ url('/pages/shipping-returns') }}" class="link">{{ t("common.details") }}</a></span></li>
               </ul>
             </div>
           </div>
@@ -153,27 +156,44 @@
       </div>
     </div>
   </div>
+</div>
+</div>
 
+<div class="container-page">
   {% if related %}
   <section class="mt-24 md:mt-32" aria-labelledby="related-heading">
-    <h2 id="related-heading" class="mb-8 text-5xl md:text-6xl" data-reveal>{{ t("product.related") }}</h2>
-    <div class="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4 lg:gap-x-7" data-reveal data-reveal-stagger>
+    <h2 id="related-heading" class="text-title mb-6 md:mb-8">{{ t("product.related") }}</h2>
+    <div class="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-4 md:grid-cols-4 lg:gap-x-6">
       {% for card in related %}{% include "components/product_card.html" %}{% endfor %}
     </div>
   </section>
   {% endif %}
 </div>
 
-{# Size guide modal: filled from the size-guide page on demand (the link works without JS). #}
+{# Small screens: once the main button scrolls away, a glass buy bar takes over at the
+   bottom, within thumb reach. It submits the same form, so behaviour is identical. #}
+<div class="glass fixed inset-x-0 bottom-0 z-30 translate-y-full border-t border-separator px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] transition-transform duration-300 ease-out data-shown:translate-y-0 md:hidden" data-buybar aria-hidden="true">
+  <div class="flex items-center gap-4">
+    <div class="min-w-0 flex-1">
+      <p class="truncate text-[0.875rem] font-semibold">{{ name }}</p>
+      <p class="price text-[0.875rem] text-label-2" data-buybar-price>{{ price(product.price_piasters) }}</p>
+    </div>
+    <button type="submit" form="add-form" class="btn btn-primary shrink-0 px-6" data-add-button tabindex="-1" {% if not card.in_stock %}disabled{% endif %}>
+      <span data-add-label>{{ t("product.add_to_cart") if card.in_stock else t("product.sold_out") }}</span>
+    </button>
+  </div>
+</div>
+
+{# Size guide: a centred sheet filled from the size-guide page on demand (the link works without JS). #}
 <div id="size-guide" class="hs-overlay pointer-events-none fixed inset-0 z-[85] hidden overflow-y-auto" role="dialog" tabindex="-1" aria-labelledby="size-guide-title">
-  <div class="pointer-events-auto mx-auto flex min-h-full max-w-2xl translate-y-6 items-center p-4 opacity-0 transition-all duration-300 hs-overlay-open:translate-y-0 hs-overlay-open:opacity-100">
-    <div class="panel-pop w-full overflow-hidden">
-      <div class="flex items-center justify-between border-b-2 border-ink bg-mango px-6 py-4">
-        <h2 id="size-guide-title" class="text-3xl">{{ t("product.size_guide") }}</h2>
-        <button type="button" class="rounded-full border-2 border-ink p-2 transition-colors hover:bg-ink hover:text-mango" aria-label="{{ t('common.close') }}" data-hs-overlay="#size-guide">{{ icon("x", "size-5") }}</button>
+  <div class="pointer-events-auto mx-auto flex min-h-full max-w-2xl translate-y-4 items-end p-0 opacity-0 transition-all duration-300 hs-overlay-open:translate-y-0 hs-overlay-open:opacity-100 sm:items-center sm:p-4">
+    <div class="w-full overflow-hidden rounded-t-3xl bg-surface shadow-[var(--shadow-sheet)] sm:rounded-3xl">
+      <div class="flex items-center justify-between px-6 pt-5 pb-2">
+        <h2 id="size-guide-title" class="text-[1.375rem]">{{ t("product.size_guide") }}</h2>
+        <button type="button" class="-me-2 flex size-11 items-center justify-center rounded-full bg-label/[0.06] transition-colors hover:bg-label/[0.1]" aria-label="{{ t('common.close') }}" data-hs-overlay="#size-guide">{{ icon("x", "size-5") }}</button>
       </div>
-      <div id="size-guide-body" class="max-h-[70vh] overflow-y-auto px-6 py-5">
-        <div class="flex justify-center py-10 text-ink-soft">{{ icon("loader", "size-6 animate-spin") }}</div>
+      <div id="size-guide-body" class="max-h-[70vh] overflow-y-auto px-6 pt-2 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+        <div class="flex justify-center py-10 text-label-2">{{ icon("loader", "size-6 animate-spin") }}</div>
       </div>
     </div>
   </div>

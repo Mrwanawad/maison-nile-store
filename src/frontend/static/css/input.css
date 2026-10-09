@@ -10,110 +10,154 @@
 @import "../../node_modules/preline/src/plugins/accordion/variants.css";
 @import "../../node_modules/preline/src/plugins/collapse/variants.css";
 
-/* Self-hosted fonts (copied by scripts/vendor.mjs). Both families cover Latin + Arabic,
-   so EN and AR pages share one type system. Lalezar is a Cairo cinema-poster face. */
-@font-face { font-family: "Lalezar"; font-style: normal; font-weight: 400; font-display: swap;
-  src: url("../fonts/lalezar-latin.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-@font-face { font-family: "Lalezar"; font-style: normal; font-weight: 400; font-display: swap;
-  src: url("../fonts/lalezar-arabic.woff2") format("woff2"); unicode-range: U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC; }
-@font-face { font-family: "Readex Pro"; font-style: normal; font-weight: 160 700; font-display: swap;
-  src: url("../fonts/readex-latin.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
-@font-face { font-family: "Readex Pro"; font-style: normal; font-weight: 160 700; font-display: swap;
-  src: url("../fonts/readex-arabic.woff2") format("woff2"); unicode-range: U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC; }
+/* Type: the system face first (SF Pro / SF Arabic on Apple devices, nothing downloaded),
+   then self-hosted fallbacks for everyone else (copied by scripts/vendor.mjs).
+   unicode-range means an EN page never fetches Arabic glyphs and vice versa. */
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url("../fonts/inter-latin.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: "IBM Plex Sans Arabic"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("../fonts/plex-arabic-400.woff2") format("woff2"); unicode-range: U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC; }
+@font-face { font-family: "IBM Plex Sans Arabic"; font-style: normal; font-weight: 500; font-display: swap;
+  src: url("../fonts/plex-arabic-500.woff2") format("woff2"); unicode-range: U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC; }
+@font-face { font-family: "IBM Plex Sans Arabic"; font-style: normal; font-weight: 600; font-display: swap;
+  src: url("../fonts/plex-arabic-600.woff2") format("woff2"); unicode-range: U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC; }
+@font-face { font-family: "IBM Plex Sans Arabic"; font-style: normal; font-weight: 700; font-display: swap;
+  src: url("../fonts/plex-arabic-700.woff2") format("woff2"); unicode-range: U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC; }
 
 /* ---------------------------------------------------------------------------
-   Design tokens — "Cairo pop": street-sign cobalt, taxi mango, karkadeh pink,
-   printed on chalk. Token names stay stable for templates (admin shares them):
-   bone = page, sand = image well, ink = text, accent = cobalt (overridable
-   from .env), mango = highlight, hibiscus = sale.
+   Design tokens — SYN. Semantic names, one meaning per color, each with a dark
+   variant (prefers-color-scheme) and a stronger one (prefers-contrast: more).
+   Contrast figures are WCAG ratios against canvas (light / dark).
+
+     canvas     page background                 #FBFBF9 / #111111
+     surface    raised: sheets, cards, fields   #FFFFFF / #1C1C1E
+     well       image wells, grouped rows       #F2F1EE / #232325
+     label      primary text   16.2:1 / 16.8:1  #1D1D1F / #F2F2EF
+     label-2    secondary text  6.2:1 /  7.3:1  #5E5E62 / #A1A19B
+     separator  hairlines                       #E3E2DE / #2E2E30
+     tint       interactive only: primary action, links, focus, selection
+                                5.9:1 /  9.6:1  #006A73 / #5CC8CF  (.env overridable)
+     sale       price drops     5.0:1 /  8.1:1  #C2410C / #FF8A4C
+     success    in stock, paid  5.2:1 /  9.9:1  #1E7A46 / #4CD384
+     caution    low stock       5.7:1 / 10.6:1  #8A5A00 / #F5B83D
+     danger     errors, sold out 5.7:1 / 6.8:1  #C8102E / #FF6B6B
+
+   The brand's colour lives in the content layer instead: product photos, and the
+   ambient wash a product page takes from the colour being viewed (.ambient).
    --------------------------------------------------------------------------- */
 @theme {
-  --color-bone: #f6f6f1;
-  --color-paper: #ffffff;
-  --color-sand: #e8e8e0;
-  --color-ink: #10133a;
-  --color-ink-soft: #565a78;
-  --color-line: #d9d9d0;
-  --color-accent: #1e3fe0;
-  --color-accent-ink: #1530b8;
-  --color-mango: #ffc21a;
-  --color-hibiscus: #e5306b;
-  --color-olive: #1f8a5b;
+  --color-canvas: #fbfbf9;
+  --color-surface: #ffffff;
+  --color-well: #f2f1ee;
+  --color-label: #1d1d1f;
+  --color-label-2: #5e5e62;
+  --color-separator: #e3e2de;
+  --color-tint: #006a73;
+  --color-tint-press: #00535a;
+  --color-on-tint: #ffffff;
+  --color-sale: #c2410c;
+  --color-success: #1e7a46;
+  --color-caution: #8a5a00;
   --color-danger: #c8102e;
 
-  --font-display: "Lalezar", "Readex Pro", ui-sans-serif, sans-serif;
-  --font-sans: "Readex Pro", ui-sans-serif, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "IBM Plex Sans Arabic", "Segoe UI", Roboto, sans-serif;
 
-  /* Shape follows role: photos square-ish (xs), fields (sm), panels (md),
-     buttons/chips pills. Pop surfaces get a hard printed offset, never a blur. */
-  --radius-xs: 4px;
-  --radius-sm: 12px;
-  --radius-md: 20px;
+  /* Shape follows role: fields and rows (xl), media and cards (2xl), sheets (3xl),
+     every button and chip a capsule. No hard shadows; depth comes from material. */
+  --radius-xl: 14px;
+  --radius-2xl: 20px;
+  --radius-3xl: 28px;
 
-  --shadow-pop: 4px 4px 0 0 var(--color-ink);
-  --shadow-pop-lg: 7px 7px 0 0 var(--color-ink);
+  --shadow-sheet: 0 24px 64px -16px rgb(0 0 0 / 0.22), 0 2px 8px rgb(0 0 0 / 0.06);
+  --shadow-float: 0 8px 24px -8px rgb(0 0 0 / 0.18);
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
 
-  --animate-marquee: marquee var(--marquee-speed, 32s) linear infinite;
-  --animate-spin-slow: spin 18s linear infinite;
-  --animate-pop: pop 0.45s var(--ease-spring);
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-canvas: #111111;
+    --color-surface: #1c1c1e;
+    --color-well: #232325;
+    --color-label: #f2f2ef;
+    --color-label-2: #a1a19b;
+    --color-separator: #2e2e30;
+    --color-tint: #5cc8cf;
+    --color-tint-press: color-mix(in oklab, var(--color-tint) 82%, white);
+    --color-on-tint: #0b1214;
+    --color-sale: #ff8a4c;
+    --color-success: #4cd384;
+    --color-caution: #f5b83d;
+    --color-danger: #ff6b6b;
+    --shadow-sheet: 0 24px 64px -16px rgb(0 0 0 / 0.7), 0 0 0 1px rgb(255 255 255 / 0.06);
+    --shadow-float: 0 8px 24px -8px rgb(0 0 0 / 0.6);
+    color-scheme: dark;
+  }
+}
+/* Increase Contrast: stronger secondary text and hairlines in both appearances. */
+@media (prefers-contrast: more) {
+  :root { --color-label-2: #3a3a3d; --color-separator: #8e8e93; }
+}
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root { --color-label-2: #d1d1cc; --color-separator: #8e8e93; }
+}
 
-  @keyframes marquee {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
-  }
-  @keyframes pop {
-    0% { transform: scale(1); }
-    40% { transform: scale(1.35); }
-    100% { transform: scale(1); }
-  }
+/* The product page's ambient wash: a registered colour so it can cross-fade. */
+@property --ambient {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
 }
 
 /* Cross-document page transitions (Chrome/Edge/Safari 18+); plain navigation elsewhere. */
 @media (prefers-reduced-motion: no-preference) {
   @view-transition { navigation: auto; }
-  ::view-transition-old(root) { animation: 160ms var(--ease-out) both vt-out; }
-  ::view-transition-new(root) { animation: 260ms var(--ease-out) both vt-in; }
-  ::view-transition-group(*) { animation-duration: 380ms; animation-timing-function: var(--ease-out); }
+  ::view-transition-old(root) { animation: 140ms var(--ease-standard) both vt-out; }
+  ::view-transition-new(root) { animation: 220ms var(--ease-out) both vt-in; }
+  ::view-transition-group(*) { animation-duration: 340ms; animation-timing-function: var(--ease-out); }
 }
 @keyframes vt-out { to { opacity: 0; } }
-@keyframes vt-in { from { opacity: 0; transform: translateY(10px); } }
+@keyframes vt-in { from { opacity: 0; } }
 
 @layer base {
+  :root { color-scheme: light dark; }
   html {
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
-    scroll-padding-top: 6rem;
+    scroll-padding-top: 5rem;
   }
+  /* 17px body, the platform reading default; layouts are rem-based so browser
+     text-size settings scale everything. */
   body {
-    @apply bg-bone text-ink font-sans text-base leading-relaxed;
+    @apply bg-canvas font-sans text-[1.0625rem] leading-[1.5] text-label;
+    font-feature-settings: "cv11", "ss01";
   }
   [dir="rtl"] body {
-    line-height: 1.8;
+    line-height: 1.7;
   }
-  h1, h2, h3, .font-display {
-    font-family: var(--font-display);
-    font-weight: 400;
-    line-height: 0.98;
+  h1, h2, h3, .text-display, .text-title {
+    font-weight: 700;
+    letter-spacing: -0.022em;
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+  /* Arabic: no negative tracking (it breaks joins) and room for dots and descenders. */
+  [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] .text-display, [dir="rtl"] .text-title, [lang="ar"].text-display {
     letter-spacing: 0;
-  }
-  /* Arabic glyphs need room for dots and descenders. */
-  [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] .font-display, :lang(ar).font-display, [lang="ar"] .font-display {
-    line-height: 1.3;
+    line-height: 1.35;
   }
   a {
     text-underline-offset: 3px;
   }
   :focus-visible {
-    outline: 3px solid var(--color-accent);
-    outline-offset: 2px;
+    outline: 2px solid var(--color-tint);
+    outline-offset: 3px;
+    border-radius: 6px;
   }
   ::selection {
-    background: var(--color-mango);
-    color: var(--color-ink);
+    background: color-mix(in oklab, var(--color-tint) 24%, transparent);
   }
   input, select, textarea, button {
     font: inherit;
@@ -133,187 +177,203 @@
 
 @layer components {
   .container-page {
-    @apply mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-10;
+    @apply mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8;
   }
-  /* Small label: sentence case, no tracking. */
-  .label-caps {
-    @apply text-xs font-medium;
+
+  /* Type scale (rem, so it follows browser text size).
+     display 40→72 · title 28→40 · headline 17 semibold · body 17 · callout 15 · caption 13 */
+  .text-display {
+    font-size: clamp(2.5rem, 1.6rem + 4.2vw, 4.5rem);
+  }
+  .text-title {
+    font-size: clamp(1.75rem, 1.4rem + 1.6vw, 2.5rem);
+  }
+  .text-headline {
+    @apply text-[1.0625rem] font-semibold;
+  }
+  .text-callout {
+    @apply text-[0.9375rem];
+  }
+  .text-caption {
+    @apply text-[0.8125rem];
   }
   .price {
     font-variant-numeric: tabular-nums;
   }
+  /* Kept for existing templates: small secondary label. */
+  .label-caps {
+    @apply text-[0.8125rem] font-medium text-label-2;
+  }
 
-  /* Buttons: class="btn btn-primary". Every button presses down on click. */
+  /* Buttons: class="btn btn-primary". Capsules, 44px tall minimum. One primary per view. */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border-2 border-ink px-6 py-3 text-sm font-semibold
-      transition-[background-color,color,transform,box-shadow] duration-150 ease-out
-      active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-[0.9375rem] font-semibold
+      transition-[background-color,color,opacity,transform] duration-150 ease-out select-none
+      active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100;
   }
   .btn-primary {
-    @apply bg-ink text-bone hover:border-accent hover:bg-accent;
+    @apply bg-tint text-on-tint hover:bg-tint-press;
   }
+  /* Neutral filled button: secondary actions. */
   .btn-secondary {
-    @apply bg-transparent text-ink hover:bg-ink hover:text-bone;
+    @apply bg-label/[0.07] text-label hover:bg-label/[0.12];
   }
-  .btn-ghost {
-    @apply border-transparent px-3 text-ink-soft hover:text-ink;
-  }
-  /* The loud one: mango sticker with a printed offset. One per screen. */
-  .btn-pop {
-    @apply bg-mango text-ink;
-    box-shadow: var(--shadow-pop);
-  }
-  .btn-pop:hover:not(:disabled) {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 0 var(--color-ink);
-  }
-  .btn-pop:active:not(:disabled) {
-    transform: translate(4px, 4px);
-    box-shadow: 0 0 0 0 var(--color-ink);
+  /* Text-only action. */
+  .btn-ghost, .btn-plain {
+    @apply px-3 text-tint hover:bg-tint/[0.08];
   }
   .btn-sm {
-    @apply px-4 py-2 text-xs;
+    @apply min-h-10 px-4 text-[0.875rem];
   }
   .btn-lg {
-    @apply px-8 py-4 text-base;
+    @apply min-h-[3.25rem] px-7 text-[1.0625rem];
   }
 
-  /* Forms */
+  /* Forms: 17px text so iOS never zooms on focus. */
   .field-label {
-    @apply mb-1.5 block text-sm font-semibold text-ink;
+    @apply mb-1.5 block text-[0.9375rem] font-medium text-label;
   }
   .field {
-    @apply block w-full rounded-sm border-2 border-ink/15 bg-paper px-3.5 py-2.5 text-[15px] text-ink
-      placeholder:text-ink-soft/60 transition-[border-color,box-shadow] duration-150
-      focus:border-ink focus:outline-none focus:ring-4 focus:ring-mango/60;
+    @apply block min-h-11 w-full rounded-xl border border-separator bg-surface px-3.5 py-2.5 text-[1.0625rem] text-label
+      placeholder:text-label-2/70 transition-[border-color,box-shadow] duration-150
+      focus:border-tint focus:outline-none focus:ring-4 focus:ring-tint/15;
+  }
+  select.field {
+    @apply appearance-none bg-no-repeat pe-10;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-size: 1.1rem;
+    background-position: right 0.85rem center;
+  }
+  [dir="rtl"] select.field {
+    background-position: left 0.85rem center;
   }
   .field[aria-invalid="true"] {
-    @apply border-danger focus:ring-danger/20;
+    @apply border-danger focus:ring-danger/15;
   }
   .field-error {
-    @apply mt-1.5 text-sm font-medium text-danger;
+    @apply mt-1.5 flex items-center gap-1.5 text-[0.9375rem] text-danger;
   }
   .field-hint {
-    @apply mt-1.5 text-sm text-ink-soft;
+    @apply mt-1.5 text-[0.875rem] text-label-2;
   }
 
-  /* Chips (filters, sizes) */
+  /* Chips (filters, sizes): capsules; selected = filled label. */
   .chip {
-    @apply inline-flex min-w-11 items-center justify-center rounded-full border-2 border-ink/15 bg-paper px-4 py-2
-      text-sm font-semibold text-ink transition-[border-color,background-color,color,transform] duration-150 hover:border-ink active:scale-95;
+    @apply inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-separator bg-surface px-4
+      text-[0.9375rem] font-medium text-label transition-[border-color,background-color,color] duration-150 hover:border-label/40;
   }
   .chip-active {
-    @apply border-ink bg-ink text-bone;
+    @apply border-label bg-label text-canvas hover:border-label;
   }
 
   .link {
-    @apply font-semibold text-accent underline decoration-accent/30 decoration-2 underline-offset-4 transition-colors hover:decoration-accent;
+    @apply font-medium text-tint underline decoration-tint/30 underline-offset-4 transition-colors hover:decoration-tint;
   }
 
   .divider {
-    @apply border-t border-line;
+    @apply border-t border-separator;
   }
 
-  /* Stickers: slapped-on badges, slightly crooked. */
-  .sticker {
-    @apply inline-flex items-center rounded-full border-2 border-ink px-2.5 py-0.5 text-xs font-bold text-ink;
-    transform: rotate(-4deg);
-  }
-  .badge-sale, .badge-new, .badge-soldout {
-    @apply inline-flex items-center rounded-full border-2 border-ink px-2.5 py-0.5 text-xs font-bold;
-    transform: rotate(-4deg);
+  /* Badges sit on photos, so they get an opaque surface; meaning is in the words,
+     colour only reinforces it. */
+  .badge, .badge-sale, .badge-new, .badge-soldout {
+    @apply inline-flex items-center rounded-full bg-surface/95 px-2.5 py-1 text-[0.75rem] leading-none font-semibold text-label;
   }
   .badge-sale {
-    @apply bg-hibiscus text-paper;
-  }
-  .badge-new {
-    @apply bg-mango text-ink;
+    @apply text-sale;
   }
   .badge-soldout {
-    @apply bg-ink text-bone;
-    transform: rotate(3deg);
+    @apply bg-label text-canvas;
   }
 
-  /* Pop panel: paper card with a printed offset. */
-  .panel-pop {
-    @apply rounded-md border-2 border-ink bg-paper;
-    box-shadow: var(--shadow-pop-lg);
+  /* Grouped surface (summaries, forms on their own). */
+  .panel {
+    @apply rounded-2xl bg-surface ring-1 ring-separator;
   }
 
-  /* Marquee: content is duplicated once in markup; track slides half its width. */
-  .marquee {
-    @apply flex overflow-hidden;
-    mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  /* Functional layer material: blurs and lifts whatever scrolls beneath.
+     Reduce Transparency and Increase Contrast get an opaque surface. */
+  .glass {
+    background: color-mix(in oklab, var(--color-canvas) 74%, transparent);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
   }
-  .marquee-track {
-    @apply flex w-max shrink-0 animate-marquee items-center;
-  }
-  [dir="rtl"] .marquee-track {
-    animation-direction: reverse;
-  }
-  .marquee:hover .marquee-track, .marquee:focus-within .marquee-track {
-    animation-play-state: paused;
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    .glass {
+      background: var(--color-canvas);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
   }
 
-  /* Product card: lifts and gets its printed shadow on hover. */
+  /* Product card: the photo is the card. A slow, small zoom on hover; nothing else moves. */
   .card-media {
-    @apply relative aspect-[4/5] overflow-hidden rounded-sm border-2 border-transparent bg-sand
-      transition-[transform,box-shadow,border-color] duration-200 ease-out;
+    @apply relative aspect-[4/5] overflow-hidden rounded-2xl bg-well;
   }
-  .card:hover .card-media, .card:focus-within .card-media {
-    @apply border-ink;
-    transform: translate(-3px, -3px);
-    box-shadow: var(--shadow-pop-lg);
+  .card-media img {
+    transition: transform 600ms var(--ease-out), opacity 300ms var(--ease-standard);
+  }
+  @media (hover: hover) {
+    .card:hover .card-media > img:first-child {
+      transform: scale(1.03);
+    }
   }
 
-  /* Bilingual hero lockup */
-  .hero-lockup {
-    @apply font-display text-bone;
-    font-size: clamp(3.2rem, 8.2vw, 8.75rem);
-    line-height: 0.9;
+  /* Signature: the page takes on the colour being looked at. --ambient is set inline
+     from the selected product colour and cross-fades when the shopper picks another. */
+  .ambient {
+    background:
+      linear-gradient(to bottom, color-mix(in oklab, var(--ambient) 22%, var(--color-canvas)), var(--color-canvas) 92%);
+    transition: --ambient 700ms var(--ease-standard);
   }
-  .hero-lockup [lang="ar"] {
-    font-size: 0.86em;
-    line-height: 1.25;
+  @media (prefers-color-scheme: dark) {
+    .ambient {
+      background: linear-gradient(to bottom, color-mix(in oklab, var(--ambient) 16%, var(--color-canvas)), var(--color-canvas) 92%);
+    }
   }
-  /* Headline lines rise out of a mask on load (JS adds data-ready). */
-  .reveal-line {
-    @apply block overflow-hidden pb-[0.08em];
+
+  /* Swatch: a fabric chip with a hairline so white and black both read. */
+  .swatch {
+    @apply block rounded-full;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.14);
   }
-  .reveal-line > span {
-    @apply inline-block;
+  @media (prefers-color-scheme: dark) {
+    .swatch { box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.22); }
   }
 
   /* Rich text from markdown pages / descriptions */
   .prose-store {
-    @apply max-w-prose text-[15px] leading-7 text-ink;
+    @apply max-w-[68ch] text-[1.0625rem] leading-[1.65] text-label;
   }
   .prose-store h2 {
-    @apply mt-10 mb-3 text-3xl;
+    @apply mt-12 mb-3 text-[1.5rem];
   }
   .prose-store h3 {
-    @apply mt-8 mb-2 text-xl;
+    @apply mt-8 mb-2 text-[1.1875rem];
   }
   .prose-store p, .prose-store ul, .prose-store ol {
     @apply mb-4;
   }
   .prose-store ul {
-    @apply list-disc ps-5 marker:text-accent;
+    @apply list-disc ps-5 marker:text-label-2;
   }
   .prose-store ol {
-    @apply list-decimal ps-5 marker:font-semibold marker:text-accent;
+    @apply list-decimal ps-5 marker:text-label-2;
   }
   .prose-store a {
-    @apply font-semibold text-accent underline decoration-accent/30 decoration-2 underline-offset-4 hover:decoration-accent;
+    @apply font-medium text-tint underline decoration-tint/30 underline-offset-4 hover:decoration-tint;
+  }
+  .prose-store em {
+    @apply text-label-2;
   }
   .prose-store table {
-    @apply mb-6 w-full border-collapse text-sm;
+    @apply mb-6 w-full border-collapse text-[0.9375rem];
   }
   .prose-store th, .prose-store td {
-    @apply border-b border-line px-3 py-2 text-start;
+    @apply border-b border-separator px-3 py-2.5 text-start;
   }
   .prose-store th {
-    @apply bg-sand font-semibold;
+    @apply font-semibold text-label-2;
   }
 
   /* HTMX request indicator */
@@ -328,8 +388,13 @@
   }
 }
 
-/* Scroll reveal targets start hidden only when JS + motion are available. */
+/* Scroll reveals start hidden only when JS is on and motion is allowed (fx.js). */
 @media (prefers-reduced-motion: no-preference) {
-  .js:not(.fx-off) [data-reveal] { opacity: 0; }
-  .js:not(.fx-off) [data-hero-part] { opacity: 0; }
+  .js:not(.fx-off) [data-reveal]:not([data-shown]) {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  [data-reveal] {
+    transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out);
+  }
 }

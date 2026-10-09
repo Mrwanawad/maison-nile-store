@@ -24,7 +24,8 @@ def check(name: str, fn) -> None:  # type: ignore[no-untyped-def]
 
 
 with sync_playwright() as p:
-    browser = p.chromium.launch()
+    # PW_CHROMIUM: use a preinstalled Chromium when the Playwright build differs (CI images).
+    browser = p.chromium.launch(executable_path=os.environ.get("PW_CHROMIUM") or None)
     for prefix in ("", "/ar"):
         ctx = browser.new_context(viewport={"width": 390, "height": 844}, has_touch=True)
         page = ctx.new_page()
@@ -42,7 +43,7 @@ with sync_playwright() as p:
 
         def picker() -> None:
             page.goto(B + prefix + "/p/essential-cotton-tee")
-            add = page.locator("[data-add-button]")
+            add = page.locator("[data-buy-main] [data-add-button]")
             page.locator("label:has(input[data-color])").nth(1).click()  # Black
             expect(page.locator("[data-color-name]")).not_to_be_empty()
             # XL has stock 2 -> low-stock message
@@ -55,7 +56,7 @@ with sync_playwright() as p:
 
         def add_and_drawer() -> None:
             page.locator("label:has(input[data-size])").nth(1).click()  # M
-            page.locator("[data-add-button]").click()
+            page.locator("[data-buy-main] [data-add-button]").click()
             expect(page.locator("#cart-drawer")).to_be_visible()
             expect(page.locator("#toasts")).not_to_be_empty()
             expect(page.locator("#cart-badge")).to_contain_text("1")
@@ -79,7 +80,7 @@ with sync_playwright() as p:
 
         def checkout_memory_and_fee() -> None:
             page.goto(B + prefix + "/p/leather-backpack")
-            page.locator("[data-add-button]").click()
+            page.locator("[data-buy-main] [data-add-button]").click()
             expect(page.locator("#cart-drawer")).to_be_visible()
             page.goto(B + prefix + "/checkout")
             page.fill("#full_name", "Mona Ali")

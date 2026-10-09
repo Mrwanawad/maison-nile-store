@@ -1,20 +1,11 @@
-{# Mango ticker strip. The list is rendered twice so the track can loop seamlessly;
-   the copy is hidden from assistive tech. Pauses on hover/focus, static under reduced motion. #}
-{% set items = [
-  t("bar.delivery_short", min=settings.delivery_days_min, max=settings.delivery_days_max),
-  t("bar.cod"),
-  t("bar.exchange", days=settings.exchange_days),
-  t("bar.made"),
-] %}
-<div dir="ltr" class="marquee border-b-2 border-ink bg-mango py-2 text-[13px] font-semibold text-ink" style="--marquee-speed: 40s">
-  {% for copy in [0, 1] %}
-  <ul class="marquee-track" role="list" {% if copy %}aria-hidden="true"{% endif %}>
-    {% for _ in range(2) %}{% for item in items %}
-    <li class="flex items-center gap-6 pe-6 whitespace-nowrap">
-      <span dir="auto">{{ item }}</span>
-      <svg viewBox="0 0 24 24" class="size-3.5 text-hibiscus" fill="currentColor" aria-hidden="true"><path d="M12 0l2.6 8.4L24 12l-9.4 3.6L12 24l-2.6-8.4L0 12l9.4-3.6z"/></svg>
-    </li>
-    {% endfor %}{% endfor %}
-  </ul>
-  {% endfor %}
+{# One quiet line of the facts people ask first. Static: no ticker, nothing to chase.
+   Small screens get the delivery promise only; wider screens add payment and exchange. #}
+<div class="bg-well text-label-2">
+  <p class="container-page flex min-h-9 items-center justify-center gap-x-5 py-1.5 text-center text-[0.8125rem]">
+    <span>{{ t("bar.delivery_short", min=settings.delivery_days_min, max=settings.delivery_days_max) }}</span>
+    <span class="hidden md:inline" aria-hidden="true">·</span>
+    <span class="hidden md:inline">{{ t("bar.cod") }}</span>
+    <span class="hidden lg:inline" aria-hidden="true">·</span>
+    <span class="hidden lg:inline">{{ t("bar.exchange", days=settings.exchange_days) }}</span>
+  </p>
 </div>

@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 {% block title %}{{ t("error.title") }} · {{ brand_name() }}{% endblock %}
 {% block content %}
-<div class="container-page max-w-2xl py-20 md:py-32">
-  <h1 class="text-6xl text-accent md:text-7xl">{{ t("error.title") }}</h1>
-  <p class="mt-4 text-lg">{{ message }}</p>
-  <div class="mt-8 flex flex-wrap gap-4">
-    <a href="{{ url('/shop') }}" class="btn btn-secondary" data-back>{{ t("common.go_back") }}</a>
-    <a href="{{ url('/') }}" class="btn btn-ghost">{{ t("nav.home") }}</a>
+<div class="container-page max-w-xl py-24 text-center md:py-36">
+  <h1 class="text-display">{{ t("error.title") }}</h1>
+  <p class="mt-4 text-[1.1875rem] text-label-2">{{ message }}</p>
+  <div class="mt-8 flex flex-wrap justify-center gap-3">
+    <a href="{{ url('/shop') }}" class="btn btn-primary" data-back>{{ t("common.go_back") }}</a>
+    <a href="{{ url('/') }}" class="btn btn-secondary">{{ t("nav.home") }}</a>
   </div>
-  {% if status_code >= 500 and reference != "-" %}<p class="mt-6 text-sm text-ink-soft">{{ t("error.reference") }} <code dir="ltr">{{ reference }}</code></p>{% endif %}
+  {% if status_code >= 500 and reference != "-" %}<p class="mt-8 text-[0.875rem] text-label-2">{{ t("error.reference") }} <code dir="ltr">{{ reference }}</code></p>{% endif %}
   {% if settings.whatsapp_number %}
-  <p class="mt-10 text-sm text-ink-soft">{{ t("error.contact") }} <a href="{{ whatsapp_link() }}" class="link" target="_blank" rel="noopener">WhatsApp</a></p>
+  <p class="mt-4 text-[0.875rem] text-label-2">{{ t("error.contact") }} <a href="{{ whatsapp_link() }}" class="link" target="_blank" rel="noopener">WhatsApp</a></p>
   {% endif %}
 </div>
 {% endblock %}

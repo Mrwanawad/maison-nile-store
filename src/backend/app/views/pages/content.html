@@ -1,14 +1,10 @@
 {% extends "base.html" %}
 {% block title %}{{ title }} · {{ brand_name() }}{% endblock %}
 {% block content %}
-<article>
-  <header class="border-b-2 border-ink bg-accent text-bone">
-    <div class="container-page py-12 md:py-20">
-      <h1 class="max-w-4xl text-6xl md:text-8xl" data-reveal>{{ title }}</h1>
-    </div>
+<article class="container-page pt-12 md:pt-20">
+  <header class="mx-auto max-w-[68ch]">
+    <h1 class="text-display">{{ title }}</h1>
   </header>
-  <div class="container-page mt-12 md:mt-16">
-    <div class="prose-store mx-auto md:text-base">{{ body }}</div>
-  </div>
+  <div class="prose-store mx-auto mt-8 md:mt-10">{{ body }}</div>
 </article>
 {% endblock %}

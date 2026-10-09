@@ -1,44 +1,43 @@
 {% from "components/icons.html" import icon %}
-<footer class="mt-28 overflow-hidden bg-ink text-bone">
-  <div class="container-page grid gap-12 pt-16 pb-10 md:grid-cols-12">
+{# Quiet, grouped, small. The brand already said its piece in the header. #}
+<footer class="mt-24 border-t border-separator bg-well/60 text-[0.875rem] md:mt-32">
+  <div class="container-page grid gap-10 py-12 md:grid-cols-12 md:py-14">
     <div class="md:col-span-5">
-      <p class="max-w-sm font-display text-4xl leading-tight text-mango">{{ tagline() }}</p>
-      <div class="mt-6 flex items-center gap-2">
-        {% if settings.instagram_url %}<a href="{{ settings.instagram_url }}" class="rounded-full border-2 border-bone/30 p-2.5 transition-colors hover:border-mango hover:bg-mango hover:text-ink" target="_blank" rel="noopener" aria-label="Instagram">{{ icon("instagram") }}</a>{% endif %}
-        {% if settings.facebook_url %}<a href="{{ settings.facebook_url }}" class="rounded-full border-2 border-bone/30 p-2.5 transition-colors hover:border-mango hover:bg-mango hover:text-ink" target="_blank" rel="noopener" aria-label="Facebook">{{ icon("facebook") }}</a>{% endif %}
-        {% if settings.tiktok_url %}<a href="{{ settings.tiktok_url }}" class="rounded-full border-2 border-bone/30 p-2.5 transition-colors hover:border-mango hover:bg-mango hover:text-ink" target="_blank" rel="noopener" aria-label="TikTok">{{ icon("music") }}</a>{% endif %}
+      <p class="text-[1.0625rem] font-semibold text-label">{{ tagline() }}</p>
+      <p class="mt-2 max-w-xs text-label-2">{{ t("footer.blurb") }}</p>
+      {% if settings.instagram_url or settings.facebook_url or settings.tiktok_url %}
+      <div class="mt-5 flex items-center gap-1 -ms-2.5">
+        {% if settings.instagram_url %}<a href="{{ settings.instagram_url }}" class="flex size-11 items-center justify-center rounded-full text-label-2 transition-colors hover:bg-label/[0.06] hover:text-label" target="_blank" rel="noopener" aria-label="Instagram">{{ icon("instagram") }}</a>{% endif %}
+        {% if settings.facebook_url %}<a href="{{ settings.facebook_url }}" class="flex size-11 items-center justify-center rounded-full text-label-2 transition-colors hover:bg-label/[0.06] hover:text-label" target="_blank" rel="noopener" aria-label="Facebook">{{ icon("facebook") }}</a>{% endif %}
+        {% if settings.tiktok_url %}<a href="{{ settings.tiktok_url }}" class="flex size-11 items-center justify-center rounded-full text-label-2 transition-colors hover:bg-label/[0.06] hover:text-label" target="_blank" rel="noopener" aria-label="TikTok">{{ icon("music") }}</a>{% endif %}
       </div>
+      {% endif %}
     </div>
-    <div class="md:col-span-3">
-      <p class="font-display text-2xl text-bone/60">{{ t("footer.shop") }}</p>
-      <ul class="mt-4 space-y-2.5 font-semibold" role="list">
-        <li><a href="{{ url('/shop') }}" class="hover:text-mango">{{ t("nav.shop_all") }}</a></li>
-        {% for c in nav_categories() %}<li><a href="{{ url('/c/' ~ c.slug) }}" class="hover:text-mango">{{ c.name(locale()) }}</a></li>{% endfor %}
+    <nav class="md:col-span-3" aria-labelledby="footer-shop">
+      <h2 id="footer-shop" class="text-[0.8125rem] font-semibold tracking-normal text-label">{{ t("footer.shop") }}</h2>
+      <ul class="mt-3 space-y-1" role="list">
+        <li><a href="{{ url('/shop') }}" class="inline-block py-1 text-label-2 hover:text-label hover:underline">{{ t("nav.shop_all") }}</a></li>
+        {% for c in nav_categories() %}<li><a href="{{ url('/c/' ~ c.slug) }}" class="inline-block py-1 text-label-2 hover:text-label hover:underline">{{ c.name(locale()) }}</a></li>{% endfor %}
       </ul>
-    </div>
-    <div class="md:col-span-4">
-      <p class="font-display text-2xl text-bone/60">{{ t("footer.help") }}</p>
-      <ul class="mt-4 space-y-2.5 font-semibold" role="list">
-        <li><a href="{{ url('/track') }}" class="hover:text-mango">{{ t("nav.track") }}</a></li>
-        <li><a href="{{ url('/pages/shipping-returns') }}" class="hover:text-mango">{{ t("footer.shipping_returns") }}</a></li>
-        <li><a href="{{ url('/pages/size-guide') }}" class="hover:text-mango">{{ t("footer.size_guide") }}</a></li>
-        <li><a href="{{ url('/pages/faq') }}" class="hover:text-mango">{{ t("footer.faq") }}</a></li>
-        <li><a href="{{ url('/pages/contact') }}" class="hover:text-mango">{{ t("footer.contact") }}</a></li>
+    </nav>
+    <nav class="md:col-span-4" aria-labelledby="footer-help">
+      <h2 id="footer-help" class="text-[0.8125rem] font-semibold tracking-normal text-label">{{ t("footer.help") }}</h2>
+      <ul class="mt-3 space-y-1" role="list">
+        <li><a href="{{ url('/track') }}" class="inline-block py-1 text-label-2 hover:text-label hover:underline">{{ t("nav.track") }}</a></li>
+        <li><a href="{{ url('/pages/shipping-returns') }}" class="inline-block py-1 text-label-2 hover:text-label hover:underline">{{ t("footer.shipping_returns") }}</a></li>
+        <li><a href="{{ url('/pages/size-guide') }}" class="inline-block py-1 text-label-2 hover:text-label hover:underline">{{ t("footer.size_guide") }}</a></li>
+        <li><a href="{{ url('/pages/faq') }}" class="inline-block py-1 text-label-2 hover:text-label hover:underline">{{ t("footer.faq") }}</a></li>
+        <li><a href="{{ url('/pages/contact') }}" class="inline-block py-1 text-label-2 hover:text-label hover:underline">{{ t("footer.contact") }}</a></li>
+        <li><a href="{{ url('/pages/about') }}" class="inline-block py-1 text-label-2 hover:text-label hover:underline">{{ t("nav.about") }}</a></li>
       </ul>
-    </div>
+    </nav>
   </div>
-  {# Wordmark sits on the bottom edge like a shop sign. #}
-  <div class="container-page" aria-hidden="true">
-    <p class="font-display leading-[0.8] whitespace-nowrap text-accent" style="font-size: clamp(4rem, 15vw, 14rem)">{{ brand_name() }}</p>
-  </div>
-  <div class="border-t-2 border-bone/15">
-    <div class="container-page flex flex-col gap-3 py-5 text-sm text-bone/70 sm:flex-row sm:items-center sm:justify-between">
-      <p>© {{ brand_name() }}. {{ t("footer.made_in") }}</p>
-      <div class="flex gap-5">
-        <a href="{{ url('/pages/privacy') }}" class="hover:text-bone">{{ t("footer.privacy") }}</a>
-        <a href="{{ url('/pages/terms') }}" class="hover:text-bone">{{ t("footer.terms") }}</a>
-        <a href="{{ switch_locale_url(request) }}" class="hover:text-bone" lang="{{ 'en' if locale() == 'ar' else 'ar' }}">{{ "English" if locale() == "ar" else "العربية" }}</a>
-      </div>
+  <div class="container-page flex flex-col gap-3 border-t border-separator py-5 text-[0.8125rem] text-label-2 sm:flex-row sm:items-center sm:justify-between">
+    <p>© {{ brand_name() }}. {{ t("footer.made_in") }}</p>
+    <div class="-mx-2 flex flex-wrap">
+      <a href="{{ url('/pages/privacy') }}" class="px-2 py-1 hover:text-label hover:underline">{{ t("footer.privacy") }}</a>
+      <a href="{{ url('/pages/terms') }}" class="px-2 py-1 hover:text-label hover:underline">{{ t("footer.terms") }}</a>
+      <a href="{{ switch_locale_url(request) }}" class="inline-flex items-center gap-1.5 px-2 py-1 hover:text-label hover:underline" lang="{{ 'en' if locale() == 'ar' else 'ar' }}">{{ icon("globe", "size-3.5") }}{{ "English" if locale() == "ar" else "العربية" }}</a>
     </div>
   </div>
 </footer>
