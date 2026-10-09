@@ -2,11 +2,11 @@
 {# Needs: line (CartLine), target (CSS selector for hx-target) #}
 <form method="post" action="{{ url('/cart/items/' ~ line.variant.id ~ '/update') }}"
       hx-post="{{ url('/cart/items/' ~ line.variant.id ~ '/update') }}" hx-target="{{ target }}" hx-swap="innerHTML"
-      class="inline-flex items-center rounded-full border-2 border-ink bg-paper" data-stepper>
+      class="inline-flex items-center rounded-full bg-label/[0.06]" data-stepper>
   {{ csrf_input(request) }}
-  <button type="submit" name="quantity" value="{{ line.quantity - 1 }}" class="flex size-9 items-center justify-center text-ink-soft hover:text-ink"
+  <button type="submit" name="quantity" value="{{ line.quantity - 1 }}" class="flex size-11 items-center justify-center rounded-full text-label transition-colors hover:bg-label/[0.06]"
           aria-label="{{ t('cart.decrease') }}">{{ icon("minus", "size-4") }}</button>
-  <span class="price w-8 text-center text-sm font-medium" aria-live="polite">{{ line.quantity }}</span>
-  <button type="submit" name="quantity" value="{{ line.quantity + 1 }}" class="flex size-9 items-center justify-center text-ink-soft hover:text-ink disabled:opacity-30"
+  <span class="price w-6 text-center text-[0.9375rem] font-medium" aria-live="polite">{{ line.quantity }}</span>
+  <button type="submit" name="quantity" value="{{ line.quantity + 1 }}" class="flex size-11 items-center justify-center rounded-full text-label transition-colors hover:bg-label/[0.06] disabled:opacity-30 disabled:hover:bg-transparent"
           aria-label="{{ t('cart.increase') }}" {% if line.quantity >= line.max_quantity %}disabled{% endif %}>{{ icon("plus", "size-4") }}</button>
 </form>

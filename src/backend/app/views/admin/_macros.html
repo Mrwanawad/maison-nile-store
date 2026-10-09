@@ -1,17 +1,19 @@
 {% macro status_badge(value) -%}
+{# Status text always carries the meaning; the tint only groups it at a glance.
+   Translucent fills so each pairing holds contrast in light and dark. #}
 {% set tones = {
-  "pending": "bg-sand text-ink",
-  "confirmed": "bg-[#E6ECDF] text-olive",
-  "shipped": "bg-[#E3E8EF] text-[#2E3A56]",
-  "delivered": "bg-olive text-white",
+  "pending": "bg-label/[0.07] text-label",
+  "confirmed": "bg-tint/12 text-tint",
+  "shipped": "bg-label/[0.07] text-label-2",
+  "delivered": "bg-success/12 text-success",
   "cancelled": "bg-danger/10 text-danger",
-  "unpaid": "bg-sand text-ink-soft",
-  "paid": "bg-[#E6ECDF] text-olive",
+  "unpaid": "bg-label/[0.07] text-label-2",
+  "paid": "bg-success/12 text-success",
   "failed": "bg-danger/10 text-danger",
-  "refunded": "bg-[#EFE6E1] text-accent-ink",
-  "partially_refunded": "bg-[#EFE6E1] text-accent-ink",
+  "refunded": "bg-caution/12 text-caution",
+  "partially_refunded": "bg-caution/12 text-caution",
 } %}
-<span class="inline-block rounded-xs px-2 py-0.5 text-xs font-semibold {{ tones.get(value, 'bg-sand') }}">{{ value.replace("_", " ") }}</span>
+<span class="inline-block rounded-md px-2 py-0.5 text-xs font-semibold {{ tones.get(value, 'bg-well') }}">{{ value.replace("_", " ") }}</span>
 {%- endmacro %}
 
 {% macro egp(piasters) -%}{{ "{:,}".format(piasters // 100) }}{% if piasters % 100 %}.{{ "%02d"|format(piasters % 100) }}{% endif %} EGP{%- endmacro %}

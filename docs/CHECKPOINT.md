@@ -1,9 +1,18 @@
 # CHECKPOINT — Brand Store (Egyptian e-commerce MVP)
 
-> Hand-off file for a fresh session. Read this first, then `docs/DESIGN.md` (section 15 overrides older sections; the last bullet, "Visual identity v3", overrides all earlier visual specs) and `README.md`.
-> Last updated: 2026-10-03. Branch `main`, all work committed (latest feature commit `3190a5b`), working tree clean. Remote: private GitHub repo **https://github.com/Mrwanawad/maison-nile-store** (`origin`, `main` tracks `origin/main`).
+> Hand-off file for a fresh session. Read this first, then `docs/DESIGN.md` (section 15 overrides older sections; the last bullet, "Visual identity v4 SYN", overrides all earlier visual specs) and `README.md`.
+> Last updated: 2026-10-09. Branch `apple-design-resdesign` (SYN redesign, not merged yet); `main` is at `f5b275b` (merged PRs 1 and 2). Remote: private GitHub repo **https://github.com/Mrwanawad/maison-nile-store** (`origin`).
 
 ---
+
+## 0b. SYN redesign (2026-10-09, branch `apple-design-resdesign`)
+
+- **Skill wired:** `npx skills add dickwu/apple-design-skill -a claude-code` installed `apple-design` project-scoped at `.claude/skills/apple-design` (lock in `skills-lock.json`; update with `npx skills update apple-design`). It is a HIG-grounded reviewer: for this web app only its principles + foundations apply. Reviewed before use: Markdown references plus `scripts/pull-hig.mjs` (fetches developer.apple.com only, not run).
+- **Brand persona changed** to **SYN / سين** ("together"); tagline "Made together, in Egypt."; calm, plain voice; error copy without apologies or "we". New defaults in `config.py` + `.env.example` (`BRAND_*`, `EMAIL_FROM_NAME`), new `BRAND_ACCENT_DARK_COLOR`. New locale keys: `home.subhead`, `footer.blurb`, `product.save`; removed `home.sticker`, `bar.made`.
+- **Whole UI rebuilt** (storefront, emails, admin). Spec: DESIGN.md last bullet "Visual identity v4 SYN". Semantic tokens with light + dark + increased contrast; system font first (SF on Apple), Inter + IBM Plex Sans Arabic fallbacks; Lalezar, Readex Pro and Motion One removed from `package.json`; glass functional layer; product-page ambient colour wash as the signature; mobile buy bar; new favicon.
+- `scripts/browser_check.py` now targets `[data-buy-main] [data-add-button]` (the buy bar duplicates the button) and accepts `PW_CHROMIUM` for a preinstalled Chromium.
+- **Checks:** 80 pytest pass, ruff + mypy clean, browser check 14/16 (the 2 failures are Unsplash photos blocked by the cloud sandbox proxy, not JS errors), screenshots reviewed: EN/AR, light/dark, 1440px/390px, home, shop, product, drawer, checkout, order, admin.
+- **Not done:** Lighthouse not re-run; real photography will decide how strong the hero and the ambient wash look (pale colours wash very lightly by design).
 
 ## 0a. Deploy hand-off (2026-10-03, branch `claude/nifty-davinci-f88xxv`)
 
@@ -147,7 +156,7 @@ Rule: controllers → services → repositories/integrations. Routers never touc
 - 72 pytest tests on real Postgres (database `store_test`, created automatically); fake HTTP transport for third parties.
 - `src/backend/scripts/browser_check.py`: 16 Playwright checks (EN + AR, 390px; opens the mobile filter panel before picking a size).
 - ruff + mypy --strict clean. Pre-commit config present (not installed yet: `uv run pre-commit install`).
-- Lighthouse mobile (before the v3 redesign): Performance 90–97, Accessibility 100, Best practices 100. **Not re-measured after v3** (Motion + 2 Preline plugins + Lalezar added; re-run before deploy).
+- Lighthouse mobile (before the v3 and v4 redesigns): Performance 90–97, Accessibility 100, Best practices 100. **Not re-measured after v3** (Motion + 2 Preline plugins + Lalezar added; re-run before deploy).
 
 ---
 
@@ -188,7 +197,7 @@ Rule: controllers → services → repositories/integrations. Routers never touc
 
 **Open / risks**
 - Paymob and Bosta untested against real accounts (see section 7).
-- Placeholder content: brand "Maison Nile", policies, size chart, Unsplash photos (the biker jacket photo shows a small "ZARA" label).
+- Placeholder content: brand "SYN" (was "Maison Nile"), policies, size chart, Unsplash photos (the biker jacket photo shows a small "ZARA" label).
 - `orders.paymob_client_secret` is stored but never read (harmless; could be dropped in a future migration).
 - Dev admin `owner` exists in the local DB with a dev-only password; the user was told to reset it with `create_admin`.
 

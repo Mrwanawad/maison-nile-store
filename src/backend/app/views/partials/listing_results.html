@@ -1,25 +1,25 @@
 {% set base_path = url('/c/' ~ category.slug) if category else url('/shop') %}
-<section id="results" class="mt-8" aria-live="polite">
+<section id="results" class="mt-6" aria-live="polite">
   <h2 class="sr-only">{{ t("nav.shop_all") }}</h2>
-  <p class="mb-6 text-sm font-medium text-ink-soft">{{ t("search.count", count=listing.total) }}</p>
+  <p class="mb-5 text-[0.875rem] text-label-2">{{ t("search.count", count=listing.total) }}</p>
   {% if listing.cards %}
-  <div class="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-7 lg:gap-y-14" data-reveal data-reveal-stagger>
+  <div class="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-6 lg:gap-y-12">
     {% for card in listing.cards %}{% set eager = loop.index <= 2 %}{% include "components/product_card.html" %}{% endfor %}
   </div>
   {% if listing.pages > 1 %}
-  <nav class="mt-14 flex items-center justify-center gap-2" aria-label="{{ t('nav.pagination') }}">
+  <nav class="mt-14 flex items-center justify-center gap-1.5" aria-label="{{ t('nav.pagination') }}">
     {% for p in range(1, listing.pages + 1) %}
       {% set qs = request.query_params.multi_items()|rejectattr(0, "equalto", "page")|list %}
       <a href="{{ base_path }}?{% for k, v in qs %}{{ k }}={{ v|urlencode }}&{% endfor %}page={{ p }}"
-         class="chip {% if p == listing.page %}chip-active{% endif %}" {% if p == listing.page %}aria-current="page"{% endif %}>{{ p }}</a>
+         class="chip price {% if p == listing.page %}chip-active{% endif %}" {% if p == listing.page %}aria-current="page"{% endif %}>{{ p }}</a>
     {% endfor %}
   </nav>
   {% endif %}
   {% else %}
-  <div class="panel-pop mx-auto max-w-lg -rotate-1 bg-mango px-6 py-14 text-center">
-    <p class="font-display text-4xl">{{ t("search.empty_title") }}</p>
-    <p class="mt-2 font-medium">{{ t("search.empty_body") }}</p>
-    <a href="{{ url('/shop') }}" class="btn btn-primary mt-6">{{ t("search.clear") }}</a>
+  <div class="mx-auto max-w-md py-20 text-center">
+    <p class="text-[1.375rem] font-semibold">{{ t("search.empty_title") }}</p>
+    <p class="mt-2 text-label-2">{{ t("search.empty_body") }}</p>
+    <a href="{{ url('/shop') }}" class="btn btn-secondary mt-6">{{ t("search.clear") }}</a>
   </div>
   {% endif %}
 </section>

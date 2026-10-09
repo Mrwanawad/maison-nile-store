@@ -68,7 +68,7 @@ async def test_cart_heals_when_stock_drops_or_product_is_hidden(client, catalog:
         )
         await s.commit()
     page = (await client.get("/cart")).text
-    assert "lowered a quantity" in page and "no longer available" in page
+    assert "quantity was lowered" in page and "no longer available" in page
     assert _badge((await client.get("/cart/drawer", headers={"HX-Request": "true"})).text) == 2
 
 

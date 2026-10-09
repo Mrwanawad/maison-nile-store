@@ -3,7 +3,7 @@
 {% block title %}COD blocklist{% endblock %}
 {% block content %}
 <h1 class="text-3xl">Cash-on-delivery blocklist</h1>
-<p class="mt-2 max-w-2xl text-ink-soft">Numbers here can still order, but only with online payment. Use it for customers who refused deliveries. Other automatic limits (max COD total, max open orders per phone) are set in <code>.env</code>.</p>
+<p class="mt-2 max-w-2xl text-label-2">Numbers here can still order, but only with online payment. Use it for customers who refused deliveries. Other automatic limits (max COD total, max open orders per phone) are set in <code>.env</code>.</p>
 
 <form method="post" action="/admin/blocklist" class="mt-6 flex flex-wrap items-end gap-3">
   {{ csrf_input(request) }}
@@ -12,23 +12,23 @@
   <button class="btn btn-primary">Block for COD</button>
 </form>
 
-<div class="mt-8 overflow-x-auto rounded-md border border-line bg-paper">
+<div class="mt-8 overflow-x-auto rounded-2xl border border-separator bg-surface">
   <table class="w-full text-sm">
-    <thead class="border-b border-line bg-bone text-xs uppercase tracking-wide text-ink-soft">
+    <thead class="border-b border-separator bg-canvas text-xs uppercase tracking-wide text-label-2">
       <tr><th class="px-4 py-3 text-start font-semibold">Phone</th><th class="px-4 py-3 text-start font-semibold">Reason</th><th class="px-4 py-3 text-start font-semibold">Added</th><th class="px-4 py-3"></th></tr>
     </thead>
-    <tbody class="divide-y divide-line">
+    <tbody class="divide-y divide-separator">
       {% for r in rows %}
       <tr>
         <td class="px-4 py-3" dir="ltr">{{ r.phone }}</td>
         <td class="px-4 py-3">{{ r.reason or "—" }}</td>
-        <td class="px-4 py-3 text-ink-soft">{{ r.created_by }} · {{ when(r.created_at) }}</td>
+        <td class="px-4 py-3 text-label-2">{{ r.created_by }} · {{ when(r.created_at) }}</td>
         <td class="px-4 py-3 text-end">
           <form method="post" action="/admin/blocklist/{{ r.phone }}/delete">{{ csrf_input(request) }}<button class="link text-sm">Unblock</button></form>
         </td>
       </tr>
       {% else %}
-      <tr><td colspan="4" class="px-4 py-8 text-center text-ink-soft">No blocked numbers.</td></tr>
+      <tr><td colspan="4" class="px-4 py-8 text-center text-label-2">No blocked numbers.</td></tr>
       {% endfor %}
     </tbody>
   </table>

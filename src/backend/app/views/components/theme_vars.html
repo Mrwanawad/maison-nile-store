@@ -1,0 +1,4 @@
+{# Brand tint from .env, per appearance. Everything else is fixed in input.css. #}
+<meta name="theme-color" content="#FBFBF9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)">
+<style>:root{--color-tint:{{ settings.brand_accent_color }};--color-tint-press:{{ settings.brand_accent_hover_color }}}@media (prefers-color-scheme:dark){:root{--color-tint:{{ settings.brand_accent_dark_color }};--color-tint-press:color-mix(in oklab,{{ settings.brand_accent_dark_color }} 82%,white)}}</style>

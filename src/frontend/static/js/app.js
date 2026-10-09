@@ -10,17 +10,18 @@
     const box = toastBox();
     if (!box || !message) return;
     const el = document.createElement("div");
-    const tone =
-      kind === "error"
-        ? "bg-danger text-paper"
-        : kind === "info"
-          ? "bg-paper text-ink"
-          : "bg-mango text-ink";
+    // Toasts float on the functional layer: glass, monochrome text, an icon for the kind.
+    const mark = kind === "error" ? "!" : kind === "info" ? "i" : "\u2713";
+    const tone = kind === "error" ? "bg-danger text-canvas" : "bg-tint text-on-tint";
     el.className =
-      "pointer-events-auto max-w-sm rounded-full border-2 border-ink px-5 py-3 text-sm font-semibold shadow-[4px_4px_0_0_var(--color-ink)] transition-opacity duration-200 " +
-      tone;
+      "glass pointer-events-auto flex max-w-sm items-center gap-3 rounded-full py-2.5 ps-2.5 pe-5 text-[0.9375rem] font-medium text-label shadow-[var(--shadow-float)] ring-1 ring-separator transition-[opacity,transform] duration-300 ease-out";
+    const icon = document.createElement("span");
+    icon.className = "flex size-6 shrink-0 items-center justify-center rounded-full text-[0.8125rem] font-bold " + tone;
+    icon.setAttribute("aria-hidden", "true");
+    icon.textContent = mark;
+    el.appendChild(icon);
     el.setAttribute("role", kind === "error" ? "alert" : "status");
-    el.textContent = message;
+    el.appendChild(document.createTextNode(message));
     box.appendChild(el);
     setTimeout(() => {
       el.style.opacity = "0";
@@ -82,13 +83,23 @@
     const colors = [...form.querySelectorAll("[data-color]")];
     const sizes = [...form.querySelectorAll("[data-size]")];
     const stockEl = form.querySelector("[data-stock]");
-    const button = form.querySelector("[data-add-button]");
-    const label = form.querySelector("[data-add-label]");
+    // The add button lives in the form and, on small screens, in the buy bar too.
+    const buttons = [...document.querySelectorAll("[data-add-button]")];
+    const labels = [...document.querySelectorAll("[data-add-label]")];
     const priceEl = root.querySelector("[data-price]");
+    const barPrice = document.querySelector("[data-buybar-price]");
     const colorName = form.querySelector("[data-color-name]");
     const gallery = root.querySelector("[data-gallery]");
     const fmt = (p) => priceEl && priceEl.textContent.replace(/[\d,.]+/, (p / 100).toLocaleString("en-US", { maximumFractionDigits: 2 }));
     const basePrice = priceEl ? priceEl.textContent : "";
+    const setButtons = (disabled, text) => {
+      buttons.forEach((b) => (b.disabled = disabled));
+      labels.forEach((l) => (l.textContent = text));
+    };
+    const setPrice = (text) => {
+      if (priceEl) priceEl.textContent = text;
+      if (barPrice) barPrice.textContent = text;
+    };
 
     const selected = (list) => (list.find((i) => i.checked) || {}).value || null;
 
@@ -100,7 +111,7 @@
 
     function setMessage(kind, n) {
       if (!stockEl) return;
-      const map = { in: ["text-olive", stockEl.dataset.msgIn], low: ["text-hibiscus", (stockEl.dataset.msgLow || "").replace("{n}", n)], out: ["text-danger", stockEl.dataset.msgOut] };
+      const map = { in: ["text-success", stockEl.dataset.msgIn], low: ["text-caution", (stockEl.dataset.msgLow || "").replace("{n}", n)], out: ["text-danger", stockEl.dataset.msgOut] };
       if (!kind) { stockEl.innerHTML = ""; return; }
       const [cls, text] = map[kind];
       stockEl.innerHTML = "";
@@ -113,9 +124,11 @@
     function update() {
       const color = selected(colors);
       const size = selected(sizes);
-      if (colorName && color) {
+      if (color) {
         const c = colors.find((i) => i.checked);
-        colorName.textContent = c ? c.dataset.name : "";
+        if (colorName) colorName.textContent = c ? c.dataset.name : "";
+        // Signature: the page washes into the chosen colour (CSS cross-fades --ambient).
+        if (c && c.dataset.hex) root.style.setProperty("--ambient", c.dataset.hex);
       }
       // Mark sizes sold out for the chosen color
       sizes.forEach((input) => {
@@ -140,25 +153,34 @@
       const ready = (!colors.length || color) && (!sizes.length || size);
       if (!ready) {
         setMessage(null);
-        if (priceEl) priceEl.textContent = basePrice;
-        button.disabled = false;
-        label.textContent = stockEl.dataset.msgAdd;
+        setPrice(basePrice);
+        setButtons(false, stockEl.dataset.msgAdd);
         return;
       }
       const v = findVariant(color, size);
       if (!v || v.stock <= 0) {
         setMessage("out");
-        button.disabled = true;
-        label.textContent = stockEl.dataset.msgSoldout;
+        setButtons(true, stockEl.dataset.msgSoldout);
       } else {
         setMessage(v.stock <= data.lowStock ? "low" : "in", v.stock);
-        button.disabled = false;
-        label.textContent = stockEl.dataset.msgAdd;
+        setButtons(false, stockEl.dataset.msgAdd);
       }
-      if (priceEl && v) priceEl.textContent = fmt(v.price);
+      if (v) setPrice(fmt(v.price));
     }
 
     form.addEventListener("change", update);
+    // Buy bar (small screens): appears once the main button has scrolled out of view.
+    const bar = document.querySelector("[data-buybar]");
+    const main = root.querySelector("[data-buy-main]");
+    if (bar && main && "IntersectionObserver" in window) {
+      new IntersectionObserver(([entry]) => {
+        const show = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+        bar.toggleAttribute("data-shown", show);
+        bar.setAttribute("aria-hidden", show ? "false" : "true");
+        bar.querySelectorAll("button").forEach((b) => (show ? b.removeAttribute("tabindex") : b.setAttribute("tabindex", "-1")));
+      }).observe(main);
+    }
+
     form.addEventListener("submit", (e) => {
       // Native "required" handles the no-selection case; just make it visible.
       if (!form.checkValidity()) {

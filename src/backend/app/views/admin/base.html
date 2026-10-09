@@ -4,30 +4,32 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
   <meta name="robots" content="noindex, nofollow">
   <meta name="htmx-config" content='{"includeIndicatorStyles": false, "allowEval": false, "allowScriptTags": false}'>
   <title>{% block title %}Admin{% endblock %} · {{ settings.brand_name }}</title>
   <link rel="icon" href="{{ settings.brand_favicon_url }}">
   <link rel="stylesheet" href="{{ static('css/app.css') }}">
-  <style>:root{--color-accent:{{ settings.brand_accent_color }};--color-accent-ink:{{ settings.brand_accent_hover_color }}}</style>
+  {% include "components/theme_vars.html" %}
 </head>
-<body class="min-h-dvh bg-bone text-[15px]" hx-headers='{{ hx_headers(request) }}'>
+<body class="min-h-dvh bg-canvas text-[15px]" hx-headers='{{ hx_headers(request) }}'>
   {% if admin is defined %}
-  <header class="border-b border-line bg-paper">
+  {# Same functional-layer glass as the store, denser: admin is a desktop tool. #}
+  <header class="glass sticky top-0 z-30 border-b border-separator">
     <div class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 sm:px-6">
-      <a href="/admin" class="font-display text-lg">{{ settings.brand_name }} <span class="font-sans text-sm text-ink-soft">admin</span></a>
+      <a href="/admin" class="flex min-h-9 items-center gap-2 text-[1.0625rem] font-bold tracking-[0.12em]">{{ settings.brand_name }} <span class="text-[0.8125rem] font-medium tracking-normal text-label-2">Admin</span></a>
       {% set path = request.url.path %}
       <nav class="flex flex-wrap gap-1 text-sm" aria-label="Admin">
         {% for href, label in [("/admin", "Dashboard"), ("/admin/orders", "Orders"), ("/admin/products", "Products"), ("/admin/categories", "Categories & sizes"), ("/admin/blocklist", "COD blocklist")] %}
         {% set active = (path == href) if href == "/admin" else path.startswith(href) %}
-        <a href="{{ href }}" class="rounded-sm px-3 py-1.5 {% if active %}bg-ink text-bone{% else %}text-ink-soft hover:bg-sand hover:text-ink{% endif %}" {% if active %}aria-current="page"{% endif %}>{{ label }}</a>
+        <a href="{{ href }}" class="inline-flex min-h-8 items-center rounded-full px-3 {% if active %}bg-label/[0.08] font-semibold text-label{% else %}text-label-2 hover:bg-label/[0.05] hover:text-label{% endif %}" {% if active %}aria-current="page"{% endif %}>{{ label }}</a>
         {% endfor %}
       </nav>
       <div class="ms-auto flex items-center gap-3 text-sm">
-        <a href="/" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-ink-soft hover:text-ink">View store {{ icon("external", "size-3.5") }}</a>
-        <span class="text-ink-soft">·</span>
+        <a href="/" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-label-2 hover:text-label">View store {{ icon("external", "size-3.5") }}</a>
+        <span class="text-label-2">·</span>
         <span>{{ admin.display_name }}</span>
-        <form method="post" action="/admin/logout">{{ csrf_input(request) }}<button class="inline-flex items-center gap-1 text-ink-soft hover:text-ink">{{ icon("log-out", "size-4") }} Log out</button></form>
+        <form method="post" action="/admin/logout">{{ csrf_input(request) }}<button class="inline-flex items-center gap-1 text-label-2 hover:text-label">{{ icon("log-out", "size-4") }} Log out</button></form>
       </div>
     </div>
   </header>

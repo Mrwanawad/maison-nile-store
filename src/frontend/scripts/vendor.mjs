@@ -1,4 +1,4 @@
-// Copies the browser JS we ship (HTMX, Preline plugins, Motion) from node_modules into
+// Copies the browser JS we ship (HTMX, Preline plugins) from node_modules into
 // static/vendor, so the Python runtime never needs Node.
 import { copyFileSync, mkdirSync } from "node:fs";
 
@@ -10,16 +10,17 @@ const files = [
   ["node_modules/preline/dist/overlay.js", "preline-overlay.js"],
   ["node_modules/preline/dist/accordion.js", "preline-accordion.js"],
   ["node_modules/preline/dist/collapse.js", "preline-collapse.js"],
-  ["node_modules/motion/dist/motion.js", "motion.js"],
 ];
 
-// Self-hosted fonts (no third-party requests). Lalezar = poster display, Readex Pro = body;
-// both cover Latin + Arabic so EN and AR share one type system.
+// Self-hosted fallback fonts (no third-party requests). Apple devices render the system
+// face (SF Pro / SF Arabic) and never download these. Elsewhere Inter covers Latin and
+// IBM Plex Sans Arabic covers Arabic; unicode-range keeps each page to the script it uses.
 const fonts = [
-  ["@fontsource/lalezar/files/lalezar-latin-400-normal.woff2", "lalezar-latin.woff2"],
-  ["@fontsource/lalezar/files/lalezar-arabic-400-normal.woff2", "lalezar-arabic.woff2"],
-  ["@fontsource-variable/readex-pro/files/readex-pro-latin-wght-normal.woff2", "readex-latin.woff2"],
-  ["@fontsource-variable/readex-pro/files/readex-pro-arabic-wght-normal.woff2", "readex-arabic.woff2"],
+  ["@fontsource-variable/inter/files/inter-latin-wght-normal.woff2", "inter-latin.woff2"],
+  ...[400, 500, 600, 700].map((w) => [
+    `@fontsource/ibm-plex-sans-arabic/files/ibm-plex-sans-arabic-arabic-${w}-normal.woff2`,
+    `plex-arabic-${w}.woff2`,
+  ]),
 ];
 
 for (const [from, to] of files) {

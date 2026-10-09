@@ -2,9 +2,9 @@
 {% block title %}Sign in{% endblock %}
 {% block content %}
 <div class="mx-auto mt-16 max-w-sm">
-  <p class="font-display text-3xl">{{ settings.brand_name }}</p>
-  <p class="mt-1 text-ink-soft">Shop admin</p>
-  {% if error %}<p class="mt-6 rounded-sm border border-danger/30 bg-danger/5 px-4 py-3 text-danger" role="alert">{{ error }}</p>{% endif %}
+  <p class="font-semibold tracking-tight text-3xl">{{ settings.brand_name }}</p>
+  <p class="mt-1 text-label-2">Shop admin</p>
+  {% if error %}<p class="mt-6 rounded-lg border border-danger/30 bg-danger/5 px-4 py-3 text-danger" role="alert">{{ error }}</p>{% endif %}
   <form method="post" action="/admin/login" class="mt-8 space-y-5">
     {{ csrf_input(request) }}
     <div>

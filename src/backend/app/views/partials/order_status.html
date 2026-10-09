@@ -1,46 +1,49 @@
 {% from "components/icons.html" import icon %}
-<div id="order-status" class="mt-6"
+<div id="order-status" class="mt-2"
      {% if awaiting_payment and order.payment_status.value == "unpaid" %}hx-get="{{ url('/order/' ~ order.id ~ '/status') }}?t={{ token }}" hx-trigger="every 4s" hx-swap="outerHTML"{% endif %}>
   {% if order.status.value == "cancelled" %}
-    <p class="text-lg text-danger">{{ t("order.cancelled") }}</p>
+    <h1 class="text-title">{{ t("order.title", number=order.order_number) }}</h1>
+    <p class="mt-3 flex items-center gap-2 text-[1.0625rem] text-danger">{{ icon("x", "size-5") }}{{ t("order.cancelled") }}</p>
   {% elif awaiting_payment and order.payment_status.value == "failed" %}
-    <div class="rounded-sm border-2 border-danger bg-danger/5 font-medium p-5">
-      <p class="font-medium text-danger">{{ t("order.payment_failed") }}</p>
-      <p class="mt-1 text-sm text-ink-soft">{{ t("order.payment_failed_body") }}</p>
+    <div class="mt-4 rounded-2xl bg-danger/10 p-5">
+      <p class="flex items-center gap-2 font-semibold text-danger">{{ icon("alert", "size-5") }}{{ t("order.payment_failed") }}</p>
+      <p class="mt-1 text-[0.9375rem] text-label-2">{{ t("order.payment_failed_body") }}</p>
       <form method="post" action="{{ url('/order/' ~ order.id ~ '/pay') }}" class="mt-4">
         {{ csrf_input(request) }}<input type="hidden" name="t" value="{{ token }}">
         <button class="btn btn-primary">{{ t("order.retry_payment") }}</button>
       </form>
     </div>
   {% elif awaiting_payment %}
-    <div class="panel-pop flex gap-3 p-5">
-      {{ icon("loader", "size-5 shrink-0 animate-spin text-ink-soft") }}
+    <div class="panel mt-4 flex gap-3 p-5">
+      {{ icon("loader", "size-5 shrink-0 animate-spin text-label-2") }}
       <div>
-        <p class="font-medium">{{ t("order.confirming_payment") }}</p>
-        <p class="mt-1 text-sm text-ink-soft">{{ t("order.confirming_payment_body") }}</p>
+        <p class="font-semibold">{{ t("order.confirming_payment") }}</p>
+        <p class="mt-1 text-[0.9375rem] text-label-2">{{ t("order.confirming_payment_body") }}</p>
         <form method="post" action="{{ url('/order/' ~ order.id ~ '/pay') }}" class="mt-3">
           {{ csrf_input(request) }}<input type="hidden" name="t" value="{{ token }}">
-          <button class="link text-sm">{{ t("order.open_payment") }}</button>
+          <button class="link text-[0.9375rem]">{{ t("order.open_payment") }}</button>
         </form>
       </div>
     </div>
   {% else %}
-    <h1 class="text-5xl md:text-6xl">{{ t("order.thanks", name=order.ship_full_name.split(' ')[0]) }}</h1>
-    <p class="mt-3 max-w-xl text-lg text-ink-soft">
+    <span class="mt-2 flex size-12 items-center justify-center rounded-full bg-success/12 text-success">{{ icon("check", "size-6") }}</span>
+    <h1 class="text-display mt-4">{{ t("order.thanks", name=order.ship_full_name.split(' ')[0]) }}</h1>
+    <p class="mt-3 max-w-xl text-[1.1875rem] text-label-2">
       {% if order.payment_method.value == "cod" and order.status.value == "pending" %}{{ t("order.cod_next") }}
       {% elif order.status.value == "shipped" %}{{ t("order.shipped") }}
       {% elif order.status.value == "delivered" %}{{ t("order.delivered") }}
       {% else %}{{ t("order.confirmed_next") }}{% endif %}
     </p>
     {% if tracking_url %}
-    <a href="{{ tracking_url }}" target="_blank" rel="noopener" class="link mt-3 inline-flex items-center gap-1.5 text-sm">{{ icon("truck", "size-4") }} {{ t("order.track_shipment") }}</a>
+    <a href="{{ tracking_url }}" target="_blank" rel="noopener" class="btn btn-plain -ms-3 mt-2">{{ icon("truck", "size-4") }} {{ t("order.track_shipment") }}</a>
     {% endif %}
-    <ol class="mt-8 grid grid-cols-4 gap-2 text-xs sm:text-sm" aria-label="{{ t('order.progress') }}">
+    {# Progress: filled segments up to the current step; the current step is also named in bold. #}
+    <ol class="mt-8 grid grid-cols-4 gap-2 text-[0.8125rem] sm:text-[0.9375rem]" aria-label="{{ t('order.progress') }}">
       {% set steps = ["pending", "confirmed", "shipped", "delivered"] %}
       {% set current = steps.index(order.status.value) if order.status.value in steps else 0 %}
       {% for step in steps %}
-      <li class="{% if loop.index0 <= current %}text-ink{% else %}text-ink-soft{% endif %}" {% if loop.index0 == current %}aria-current="step"{% endif %}>
-        <span class="mb-2 block h-2.5 rounded-full border-2 border-ink {% if loop.index0 <= current %}bg-accent{% else %}bg-paper{% endif %}"></span>
+      <li class="{% if loop.index0 == current %}font-semibold text-label{% elif loop.index0 < current %}text-label{% else %}text-label-2{% endif %}" {% if loop.index0 == current %}aria-current="step"{% endif %}>
+        <span class="mb-2 block h-1 rounded-full {% if loop.index0 <= current %}bg-tint{% else %}bg-separator{% endif %}" aria-hidden="true"></span>
         {{ t("order.step." ~ step) }}
       </li>
       {% endfor %}

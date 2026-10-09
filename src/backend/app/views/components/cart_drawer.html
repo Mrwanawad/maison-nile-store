@@ -1,16 +1,17 @@
 {% from "components/icons.html" import icon %}
+{# Bag sheet from the trailing edge. Title, a close button, then the body HTMX fills. #}
 <div id="cart-drawer"
-     class="hs-overlay hs-overlay-open:translate-x-0 hidden translate-x-full rtl:-translate-x-full fixed top-0 end-0 z-[80] h-full w-full max-w-[440px] transform border-s-2 border-ink bg-bone transition-all duration-300 ease-out"
+     class="hs-overlay hs-overlay-open:translate-x-0 hidden translate-x-full rtl:-translate-x-full fixed top-0 end-0 z-[80] h-full w-full max-w-[26rem] transform bg-canvas pt-[env(safe-area-inset-top)] shadow-[var(--shadow-sheet)] transition-transform duration-300 ease-out"
      role="dialog" tabindex="-1" aria-labelledby="cart-drawer-title">
   <div class="flex h-full flex-col">
-    <div class="flex items-center justify-between border-b-2 border-ink bg-mango px-5 py-4">
-      <h2 id="cart-drawer-title" class="text-3xl">{{ t("cart.title") }}</h2>
-      <button type="button" class="-me-2 rounded-full border-2 border-ink p-2 transition-colors hover:bg-ink hover:text-mango" aria-label="{{ t('common.close') }}" data-hs-overlay="#cart-drawer">
+    <div class="flex h-14 items-center justify-between px-5">
+      <h2 id="cart-drawer-title" class="text-[1.375rem]">{{ t("cart.title") }}</h2>
+      <button type="button" class="-me-2 flex size-11 items-center justify-center rounded-full bg-label/[0.06] transition-colors hover:bg-label/[0.1]" aria-label="{{ t('common.close') }}" data-hs-overlay="#cart-drawer">
         {{ icon("x", "size-5") }}
       </button>
     </div>
     <div id="cart-drawer-body" class="flex min-h-0 flex-1 flex-col">
-      <div class="flex flex-1 items-center justify-center text-ink-soft">{{ icon("loader", "size-6 animate-spin") }}</div>
+      <div class="flex flex-1 items-center justify-center text-label-2">{{ icon("loader", "size-6 animate-spin") }}</div>
     </div>
   </div>
 </div>
